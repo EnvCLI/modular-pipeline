@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Running Action.CIDebug"
+
+# debug mode
+DEBUG=${DEBUG:-false}
+if [ "$DEBUG" == "true" ]; then
+    echo "-> Debugging mode enabled ..."
+    set -x
+fi
+
+# normalize ci variables
+echo "-> Execute: NormalizeCI"
+eval $(normalizeci)
+
+# usable env variables
+echo "-> Execute: Print available environment variables"
+printenv | grep NCI

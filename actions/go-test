@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Running Action.GoTest"
+
+# debug mode
+DEBUG=${DEBUG:-false}
+if [ "$DEBUG" == "true" ]; then
+    echo "-> Debugging mode enabled ..."
+    set -x
+fi
+
+# normalize ci variables
+echo "-> Execute: NormalizeCI"
+eval $(normalizeci)
+
+# run tests
+echo "-> Execute: Tests"
+go test ./...
+# go test -v ./... DEBUG

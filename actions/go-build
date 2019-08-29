@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Running Action.GoBuild"
+
+# debug mode
+DEBUG=${DEBUG:-false}
+if [ "$DEBUG" == "true" ]; then
+    echo "-> Debugging mode enabled ..."
+    set -x
+fi
+
+# normalize ci variables
+echo "-> Execute: NormalizeCI"
+eval $(normalizeci)
+
+# configuration
+echo "-> Execute: Configuration"
+ARTIFACT_BUILD_ARCHS=${ARTIFACT_BUILD_ARCHS:-linux_386,linux_amd64,linux_armv7,linux_armv8,windows_386,windows_amd64,darwin_386,darwin_amd64}
+UPX_ENABLED=${UPX_ENABLED:-false}
+
+# artifact generation
+generate() {
+  ARTIFACT=$1_$2
+  ARTIFACT_OS=$1
+  ARTIFACT_ARCH=$2
+  GOARM=
+  
+  # arm architectures -> https://github.com/golang/go/wiki/GoArm#supported-architectures
+  if echo "$2" | grep -q 'armv7'; then
+    ARTIFACT_ARCH=arm
+    GOARM=7
+  fi
+  if echo "$2" | grep -q 'armv8'; then
+    ARTIFACT_ARCH=arm64
+  fi
+
+  # if $2=arm, then set GOARM=7
+  echo "--> Generating artifact $ARTIFACT ..."
+  env GOOS="$ARTIFACT_OS" GOARCH="$ARTIFACT_ARCH" GOARM="$GOARM" CGO_ENABLED=0 go build -o dist/"$ARTIFACT" -ldflags="-w -X main.Version=0.1.0" ./src/*
+
+  if echo "$UPX_ENABLED" | grep -q 'true'; then
+    echo "--> Compressing artifact $ARTIFACT with UPX ..."
+    upx --brute "$ARTIFACT"
+  fi
+}
+
+# build artifacts
+echo "-> Execute: Artifact Generation"
+# linux_386
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_386'; then
+  generate linux 386
+fi
+# linux_amd64
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_amd64'; then
+  generate linux amd64
+fi
+# linux_armv7
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_armv7'; then
+  generate linux armv7
+fi
+# linux_armv8
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_armv8'; then
+  generate linux armv8
+fi
+# windows_386
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'windows_386'; then
+  generate windows 386
+fi
+# windows_amd64
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'windows_amd64'; then
+  generate windows amd64
+fi
+# darwin_386
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_386'; then
+  generate darwin 386
+fi
+# darwin_amd64
+if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_amd64'; then
+  generate darwin amd64
+fi
