@@ -1,0 +1,26 @@
+images:
+# - Golang
+- name: go
+  description: Go (golang) is a general purpose, higher-level, imperative programming language.
+  provides:
+  - go
+  image: docker.io/golang:1.12-alpine
+  directory: /go/src/src
+  shell: sh
+# - Node
+- name: npm
+  description: Node.js is a JavaScript-based platform for server-side and networking applications.
+  provides:
+  - npm
+  - yarn
+  image: docker.io/node:10-alpine
+  cache:
+  - name: node-10
+    directory: /root/.npm
+# - Shell
+- name: shellcheck
+  description: ShellCheck -- Shell script analysis tool 
+  provides:
+  - shellcheck
+  image: docker.io/koalaman/shellcheck:v0.7.0
+  entrypoint: /bin/bash

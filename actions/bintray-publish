@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Running Action.BintrayPublish"
+
+# Used to publish the artifacts to bintray (/dist)
+#
+# Environment:
+# * DEBUG: Can be set to true to enable debugging
+# * ARTIFACT_DIR: All files from this directory will be published on bintray (default: dist)
+# * BINTRAY_ORGANZATION: The organisation the package should be published in, can be identical to the username.
+# * BINTRAY_REPOSITORY: The repository within the org/user.
+# * BINTRAY_PACKAGE: The package that gets published in a repository within a org.
+# * BINTRAY_USERNAME: Username used to authenticate with bintray.
+# * BINTRAY_TOKEN: Access token for the provided username.
+
+# debug mode
+DEBUG=${DEBUG:-false}
+if [ "$DEBUG" == "true" ]; then
+    echo "-> Debugging mode enabled ..."
+    set -x
+fi
+
+# configuration
+ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+
+# normalize ci variables
+echo "-> Execute: NormalizeCI"
+eval $(normalizeci)
+
+# publish artifacts
+for file in $ARTIFACT_DIR/*
+do
+  echo "--> Publishing $file ..."
+  curl -T "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN -H "X-Bintray-Package:$BINTRAY_PACKAGE" -H "X-Bintray-Version:$NCI_COMMIT_REF_NAME" https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY
+done
