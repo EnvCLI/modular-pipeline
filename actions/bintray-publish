@@ -31,5 +31,5 @@ eval $(normalizeci)
 for file in $ARTIFACT_DIR/*
 do
   echo "--> Publishing $file ..."
-  curl -T "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN -H "X-Bintray-Package:$BINTRAY_PACKAGE" -H "X-Bintray-Version:$NCI_COMMIT_REF_NAME" https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY
+  curl -T "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY/$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$(basename -- "$file")
 done
