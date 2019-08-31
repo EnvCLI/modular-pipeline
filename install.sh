@@ -13,7 +13,7 @@ sudo curl -L -s -o /etc/envcli/.envcli.yml https://raw.githubusercontent.com/Env
 sudo envcli config set global-configuration-path /etc/envcli
 
 echo "-> Getting NormalizeCI ..."
-sudo curl -L -s -o /usr/local/bin/normalizeci https://www.philippheuer.me/linux_amd64
+sudo curl -L -s -o /usr/local/bin/normalizeci https://dl.bintray.com/envcli/golang/normalize-ci/master/linux_amd64
 sudo chmod +x /usr/local/bin/normalizeci
 
 echo "-> Getting CI Scripts ..."
