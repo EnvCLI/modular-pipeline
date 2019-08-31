@@ -30,6 +30,8 @@ eval $(normalizeci)
 # publish artifacts
 for file in $ARTIFACT_DIR/*
 do
-  echo "--> Publishing $file ..."
-  curl -T "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY/$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$(basename -- "$file")
+  TARGET_PATH=$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$(basename -- "$file")
+  echo "--> Publishing $file to $TARGET_PATH ..."
+
+  curl -T "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY/$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$TARGET_PATH
 done
