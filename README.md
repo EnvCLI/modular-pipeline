@@ -5,7 +5,7 @@
 ### host
 
 ```bash
-curl https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/install.sh | sh
+curl https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/install.sh | sudo sh
 ```
 
 ### docker
@@ -18,3 +18,8 @@ curl https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/install.sh
 - [CIDebug](actions/ci-debug)
 - [GoTest](actions/go-test)
 - [GoBuild](actions/go-build)
+
+### stages
+
+- build
+- test

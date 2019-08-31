@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+function onPreScript {
+  echo "Running Action $ACTION_CATEGORY.$ACTION_NAME"
+
+  # debug mode
+  DEBUG=${DEBUG:-false}
+  if [ "$DEBUG" == "true" ]; then
+      echo "-> Debugging mode enabled ..."
+      set -x
+  fi
+
+  # normalize ci variables
+  echo "-> Execute: NormalizeCI"
+  eval $(normalizeci)
+}

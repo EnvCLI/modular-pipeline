@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
-echo "Running Action.GoBuild"
+ACTION_CATEGORY="Go"
+ACTION_NAME="Build"
 
-# debug mode
-DEBUG=${DEBUG:-false}
-if [ "$DEBUG" == "true" ]; then
-    echo "-> Debugging mode enabled ..."
-    set -x
-fi
-
-# normalize ci variables
-echo "-> Execute: NormalizeCI"
-eval $(normalizeci)
+# common
+source common-pipeline-scripts
+onPreScript
 
 # configuration
 echo "-> Execute: Configuration"
+ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
 ARTIFACT_BUILD_ARCHS=${ARTIFACT_BUILD_ARCHS:-linux_386,linux_amd64,linux_armv7,linux_armv8,windows_386,windows_amd64,darwin_386,darwin_amd64}
-UPX_ENABLED=${UPX_ENABLED:-false}
 
 # artifact generation
 generate() {
@@ -36,12 +30,8 @@ generate() {
 
   # if $2=arm, then set GOARM=7
   echo "--> Generating artifact $ARTIFACT ..."
-  env GOOS="$ARTIFACT_OS" GOARCH="$ARTIFACT_ARCH" GOARM="$GOARM" CGO_ENABLED=0 go build -o dist/"$ARTIFACT" -ldflags="-w -X main.Version=$NCI_COMMIT_REF_RELEASE -X main.CommitHash=$NCI_COMMIT_SHA" ./src/*
-
-  if echo "$UPX_ENABLED" | grep -q 'true'; then
-    echo "--> Compressing artifact $ARTIFACT with UPX ..."
-    upx --brute "$ARTIFACT"
-  fi
+  # shellcheck disable=SC2086
+  env GOOS="$ARTIFACT_OS" GOARCH="$ARTIFACT_ARCH" GOARM="$GOARM" CGO_ENABLED=0 go build -o dist/$ARTIFACT -ldflags="-w -X main.Version=$NCI_COMMIT_REF_RELEASE -X main.CommitHash=$NCI_COMMIT_SHA" ./src/*
 }
 
 # build artifacts
@@ -78,3 +68,7 @@ fi
 if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_amd64'; then
   generate darwin amd64
 fi
+
+echo "-> Generated artifacts: "
+# shellcheck disable=SC2086
+ls $ARTIFACT_DIR/*

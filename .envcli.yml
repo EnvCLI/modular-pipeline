@@ -4,9 +4,10 @@ images:
   description: Go (golang) is a general purpose, higher-level, imperative programming language.
   provides:
   - go
-  image: docker.io/golang:1.12-alpine
-  directory: /go/src/src
-  shell: sh
+  image: docker.io/golang:1.12-buster
+  cache:
+  - name: golang-12
+    directory: /go/pkg
 # - Node
 - name: npm
   description: Node.js is a JavaScript-based platform for server-side and networking applications.
@@ -24,3 +25,9 @@ images:
   - shellcheck
   image: docker.io/koalaman/shellcheck:v0.7.0
   entrypoint: /bin/bash
+# - UPX
+- name: upx
+  description: UPX is a free, portable, extendable, high-performance executable packer for several executable formats.
+  provides:
+  - upx
+  image: docker.io/envcli/upx:latest
