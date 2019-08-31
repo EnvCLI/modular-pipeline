@@ -36,7 +36,7 @@ generate() {
 
   # if $2=arm, then set GOARM=7
   echo "--> Generating artifact $ARTIFACT ..."
-  env GOOS="$ARTIFACT_OS" GOARCH="$ARTIFACT_ARCH" GOARM="$GOARM" CGO_ENABLED=0 go build -o dist/"$ARTIFACT" -ldflags="-w -X main.Version=0.1.0" ./src/*
+  env GOOS="$ARTIFACT_OS" GOARCH="$ARTIFACT_ARCH" GOARM="$GOARM" CGO_ENABLED=0 go build -o dist/"$ARTIFACT" -ldflags="-w -X main.Version=$NCI_COMMIT_REF_RELEASE -X main.CommitHash=$NCI_COMMIT_SHA" ./src/*
 
   if echo "$UPX_ENABLED" | grep -q 'true'; then
     echo "--> Compressing artifact $ARTIFACT with UPX ..."
