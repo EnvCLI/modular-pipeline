@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="Java"
+ACTION_NAME="Test"
+
+# common
+source common-pipeline-scripts
+onPreScript
+
+# configuration
+echo "-> Execute: Configuration"
+
+# run tests
+echo "-> Execute: Tests"
+if ls | grep -q 'build.gradle'; then
+  # gradle
+  echo "-> Detected Gradle Project"
+
+elif ls | grep -q 'pom.xml'; then
+  # maven
+  echo "-> Detected Maven Project"
+
+else
+  echo "-> Unknown Build System!"
+  exit 1
+fi
