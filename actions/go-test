@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-echo "Running Action.GoTest"
+ACTION_CATEGORY="Go"
+ACTION_NAME="Test"
 
-# debug mode
-DEBUG=${DEBUG:-false}
-if [ "$DEBUG" == "true" ]; then
-    echo "-> Debugging mode enabled ..."
-    set -x
-fi
-
-# normalize ci variables
-echo "-> Execute: NormalizeCI"
-eval $(normalizeci)
+# common
+source common-pipeline-scripts
+onPreScript
 
 # run tests
 echo "-> Execute: Tests"

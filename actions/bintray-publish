@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-echo "Running Action.BintrayPublish"
+ACTION_CATEGORY="Bintray"
+ACTION_NAME="Publish"
+
+# common
+source common-pipeline-scripts
+onPreScript
 
 # Used to publish the artifacts to bintray (/dist)
 #
@@ -13,19 +18,8 @@ echo "Running Action.BintrayPublish"
 # * BINTRAY_USERNAME: Username used to authenticate with bintray.
 # * BINTRAY_TOKEN: Access token for the provided username.
 
-# debug mode
-DEBUG=${DEBUG:-false}
-if [ "$DEBUG" == "true" ]; then
-    echo "-> Debugging mode enabled ..."
-    set -x
-fi
-
 # configuration
 ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
-
-# normalize ci variables
-echo "-> Execute: NormalizeCI"
-eval $(normalizeci)
 
 # publish artifacts
 for file in $ARTIFACT_DIR/*
