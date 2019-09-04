@@ -14,6 +14,9 @@ images:
   provides:
   - java
   image: docker.io/adoptopenjdk:11-jdk-hotspot
+  cache:
+  - name: gradle
+    directory: /root/.gradle
 # - Node
 - name: npm
   description: Node.js is a JavaScript-based platform for server-side and networking applications.

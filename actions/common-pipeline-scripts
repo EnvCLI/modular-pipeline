@@ -17,4 +17,5 @@ function onPreScript {
   # proxy
   export PROXY_HOST=${PROXY_HOST:-}
   export PROXY_PORT=${PROXY_PORT:-}
+  export JAVA_PROXY_OPTS="-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT"
 }

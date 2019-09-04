@@ -7,6 +7,12 @@ ACTION_NAME="Build"
 source "${BASH_SOURCE%/*}/common-pipeline-scripts"
 onPreScript
 
+# prerequisites
+which java > /dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+
 # configuration
 echo "-> Execute: Configuration"
 ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
@@ -20,10 +26,10 @@ if test -f "build.gradle"; then
   # gradle wrapper
   if test -f "gradlew"; then
     # - make the gradle wrapper executable.
-    chmod +x gradlew
-
+    chmod +x gradle/wrapper/gradle-wrapper.jar
+    
     # run build (This essentially downloads a copy of Gradle to build the project with.)
-    ./gradlew -Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT assemble
+    java $JAVA_PROXY_OPTS -Dorg.gradle.appname=gradlew -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain assemble
   else
     echo "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html"
     exit 1
