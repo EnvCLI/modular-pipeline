@@ -4,7 +4,7 @@ ACTION_CATEGORY="CI"
 ACTION_NAME="Debug"
 
 # common
-source common-pipeline-scripts
+source "${BASH_SOURCE%/*}/common-pipeline-scripts"
 onPreScript
 
 # usable env variables

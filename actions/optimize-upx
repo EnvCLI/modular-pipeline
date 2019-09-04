@@ -11,7 +11,7 @@ ACTION_NAME="UPX"
 # * UPX_ARGS: Default is `--brute`, use `--best --ultra-brute` for best compression.
 
 # common
-source common-pipeline-scripts
+source "${BASH_SOURCE%/*}/common-pipeline-scripts"
 onPreScript
 
 # configuration

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ACTION_CATEGORY="Java"
-ACTION_NAME="Test"
+ACTION_NAME="Build"
 
 # common
 source "${BASH_SOURCE%/*}/common-pipeline-scripts"
@@ -23,7 +23,7 @@ if test -f "build.gradle"; then
     chmod +x gradlew
 
     # run build (This essentially downloads a copy of Gradle to build the project with.)
-    ./gradlew -Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT clean assemble
+    ./gradlew -Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT assemble
   else
     echo "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html"
     exit 1
@@ -37,7 +37,7 @@ elif test -f "pom.xml"; then
     chmod +x mvnw
 
     # run build
-    ./mvnw -Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT clean package
+    ./mvnw -Dhttp.proxyHost="$PROXY_HOST" -Dhttp.proxyPort="$PROXY_PORT" -Dhttps.proxyHost="$PROXY_HOST" -Dhttps.proxyPort="$PROXY_PORT" clean package
   else
     echo "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper"
     exit 1
@@ -46,3 +46,6 @@ else
   echo "-> Unknown Build System!"
   exit 1
 fi
+
+# copy artifacts to ARTIFACT_DIR
+cp -R build/libs/* $ARTIFACT_DIR

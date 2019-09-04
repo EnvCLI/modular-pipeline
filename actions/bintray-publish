@@ -4,7 +4,7 @@ ACTION_CATEGORY="Bintray"
 ACTION_NAME="Publish"
 
 # common
-source common-pipeline-scripts
+source "${BASH_SOURCE%/*}/common-pipeline-scripts"
 onPreScript
 
 # Used to publish the artifacts to bintray (/dist)

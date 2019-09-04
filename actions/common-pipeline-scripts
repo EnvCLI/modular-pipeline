@@ -13,4 +13,8 @@ function onPreScript {
   # normalize ci variables
   echo "-> Execute: NormalizeCI"
   eval $(normalizeci)
+
+  # proxy
+  export PROXY_HOST=${PROXY_HOST:-}
+  export PROXY_PORT=${PROXY_PORT:-}
 }

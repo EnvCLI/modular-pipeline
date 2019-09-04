@@ -8,6 +8,12 @@ images:
   cache:
   - name: golang-12
     directory: /go/pkg
+# - Java
+- name: java
+  description: OpenJDK 11
+  provides:
+  - java
+  image: docker.io/adoptopenjdk:11-jdk-hotspot
 # - Node
 - name: npm
   description: Node.js is a JavaScript-based platform for server-side and networking applications.

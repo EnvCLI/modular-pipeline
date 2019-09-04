@@ -4,7 +4,7 @@ ACTION_CATEGORY="Go"
 ACTION_NAME="Build"
 
 # common
-source common-pipeline-scripts
+source "${BASH_SOURCE%/*}/common-pipeline-scripts"
 onPreScript
 
 # configuration
