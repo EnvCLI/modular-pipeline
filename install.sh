@@ -1,33 +1,51 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 set -e
-
 echo "Installing modular pipeline components"
 
+# configuration
+LOCAL_PATH=${BASH_SOURCE%/*}
+INSTALL_FROM=${INSTALL_FROM:-remote}
+CONFIG_DIR=${CONFIG_DIR:-/etc/envcli}
+TARGET_DIR=${TARGET_DIR:-/usr/local/bin}
+
+# preq: envcli
 echo "-> Getting EnvCLI ..."
-curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.0/envcli_linux_amd64
-chmod +x /usr/local/bin/envcli
-
+if ! test -f $TARGET_DIR/envcli; then
+    curl -L -s -o $TARGET_DIR/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.0/envcli_linux_amd64
+    chmod +x $TARGET_DIR/envcli
+fi
 echo "-> EnvCLI Configuration"
-mkdir -p /etc/envcli
-envcli config set global-configuration-path /etc/envcli
-curl -L -s -o /etc/envcli/.envcli.yml https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/.envcli.yml
-chmod 644 /etc/envcli/.envcli.yml
-cp /etc/envcli/.envcli.yml /usr/local/bin/.envcli.yml # temporary workaround, since config set didn't seem to have any effect
+mkdir -p $CONFIG_DIR
+envcli config set global-configuration-path $CONFIG_DIR
+chmod 644 $TARGET_DIR/.envclirc
+if echo "$INSTALL_FROM" | grep -q 'remote'; then
+    curl -L -s -o $CONFIG_DIR/.envcli.yml https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/.envcli.yml
+elif echo "$INSTALL_FROM" | grep -q 'local'; then
+    cp $LOCAL_PATH/.envcli.yml $CONFIG_DIR/.envcli.yml
+fi
+chmod 644 $CONFIG_DIR/.envcli.yml
 
+# req: normalizeci
 echo "-> Getting NormalizeCI ..."
-curl -L -s -o /usr/local/bin/normalizeci https://dl.bintray.com/envcli/golang/normalize-ci/v0.0.1/linux_amd64
-chmod +x /usr/local/bin/normalizeci
+if ! test -f $TARGET_DIR/normalizeci; then
+    curl -L -s -o $TARGET_DIR/normalizeci https://dl.bintray.com/envcli/golang/normalize-ci/v0.0.1/linux_amd64
+    chmod +x $TARGET_DIR/normalizeci
+fi
 
+# pipeline
 echo "-> Getting CI Scripts ..."
-curl -L -s -o /usr/local/bin/common-pipeline-scripts https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/common-pipeline-scripts
-curl -L -s -o /usr/local/bin/ci-debug https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/ci-debug
-curl -L -s -o /usr/local/bin/go-test https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/go-test
-curl -L -s -o /usr/local/bin/go-build https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/go-build
-curl -L -s -o /usr/local/bin/bintray-publish https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/bintray-publish
-curl -L -s -o /usr/local/bin/optimize-upx https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/optimize-upx
+ACTION_LIST=("common-pipeline-scripts" "ci-debug" "go-test" "go-build" "java-build" "package-dockerfile" "bintray-publish" "optimize-upx")
+for i in "${ACTION_LIST[@]}"; do
+    echo "--> Action: $i"
+    if echo "$INSTALL_FROM" | grep -q 'remote'; then
+        curl -L -s -o $TARGET_DIR/$i https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/$i
+        chmod +x $TARGET_DIR/$i
+    elif echo "$INSTALL_FROM" | grep -q 'local'; then
+        cp $LOCAL_PATH/actions/$i $TARGET_DIR/$i
+        chmod +x $TARGET_DIR/$i
+    fi
+done
 
+# aliases
 echo "-> Installing EnvCLI Aliases"
 envcli install-aliases
-
-echo "-> Executable permissions"
-chmod +x /usr/local/bin/*

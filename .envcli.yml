@@ -17,6 +17,8 @@ images:
   cache:
   - name: gradle
     directory: /root/.gradle
+  - name: maven
+    directory: /root/.m2
 # - Node
 - name: npm
   description: Node.js is a JavaScript-based platform for server-side and networking applications.

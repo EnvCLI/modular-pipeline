@@ -5,7 +5,6 @@ ACTION_NAME="Build"
 
 # common
 source "${BASH_SOURCE%/*}/common-pipeline-scripts"
-onPreScript
 
 # configuration
 echo "-> Execute: Configuration"
