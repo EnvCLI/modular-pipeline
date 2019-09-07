@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="ci"
+ACTION_NAME="debug"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+    # usable env variables
+    echo "-> Execute: Print available environment variables"
+    printenv | grep NCI
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Prints all available normalized variables, which are save to use in your scripts"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="go"
+ACTION_NAME="build"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/action-go-common"
+
+# main
+function main()
+{
+  # configuration
+  echo "-> Execute: Configuration"
+  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+  ARTIFACT_BUILD_ARCHS=${ARTIFACT_BUILD_ARCHS:-linux_386,linux_amd64,linux_armv7,linux_armv8,windows_386,windows_amd64,darwin_386,darwin_amd64}
+
+  # code generation
+  echo "-> Execute: Code Generation"
+  go generate ./...
+
+  # build artifacts
+  echo "-> Execute: Artifact Generation"
+  # linux_386
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_386'; then
+    act-go-common-build linux 386
+  fi
+  # linux_amd64
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_amd64'; then
+    act-go-common-build linux amd64
+  fi
+  # linux_armv7
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_armv7'; then
+    act-go-common-build linux armv7
+  fi
+  # linux_armv8
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_armv8'; then
+    act-go-common-build linux armv8
+  fi
+  # windows_386
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'windows_386'; then
+    act-go-common-build windows 386
+  fi
+  # windows_amd64
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'windows_amd64'; then
+    act-go-common-build windows amd64
+  fi
+  # darwin_386
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_386'; then
+    act-go-common-build darwin 386
+  fi
+  # darwin_amd64
+  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_amd64'; then
+    act-go-common-build darwin amd64
+  fi
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Used to generate go artifacts"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
+    echo "* ARTIFACT_BUILD_ARCHS: The type of binaries that should be build, supported are [linux_386,linux_amd64,linux_armv7,linux_armv8,windows_386,windows_amd64,darwin_386,darwin_amd64]"
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

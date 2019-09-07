@@ -2,9 +2,10 @@
 set -euo pipefail
 ACTION_CATEGORY="CI"
 ACTION_NAME="Debug"
+echo "Running Action $ACTION_CATEGORY.$ACTION_NAME"
 
 # common
-source "${BASH_SOURCE%/*}/common-pipeline-scripts"
+source "${BASH_SOURCE%/*}/action-common"
 
 # usable env variables
 echo "-> Execute: Print available environment variables"

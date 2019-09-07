@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ACTION_CATEGORY="Java"
-ACTION_NAME="Build"
 
-# common
-source "${BASH_SOURCE%/*}/common-pipeline-scripts"
+# function: detect build system
+function act-java-common-detect
+{
+  if test -f "build.gradle"; then
+    export BUILD_SYSTEM=gradle
+  elif test -f "pom.xml"; then
+    export BUILD_SYSTEM=maven
+  else
+    export BUILD_SYSTEM=unknown
+    echo "--> error: unknown build system!"
+    echo "Supported are: gradle, maven"
+    exit 1
+  fi
+}
 
-# configuration
-echo "-> execute: configuration"
-ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
-
-# make sure the directory exists
-mkdir -p $ARTIFACT_DIR
-
-# run
-echo "-> execute: build"
-
-if test -f "build.gradle"; then
-  # gradle
-  echo "--> build system: gradle"
+# function: gradle
+function act-java-common-gradle
+{
   GRADLE_CALL=("-Dorg.gradle.appname=gradlew" "-classpath" "gradle/wrapper/gradle-wrapper.jar" "org.gradle.wrapper.GradleWrapperMain")
 
   # gradle wrapper
@@ -29,15 +29,16 @@ if test -f "build.gradle"; then
     fi
 
     # run build (This essentially downloads a copy of Gradle to build the project with.)
-    java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} assemble
-
-    # copy artifacts to ARTIFACT_DIR
-    cp -R build/libs/*.jar $ARTIFACT_DIR
+    java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} $@
   else
     echo "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html"
     exit 1
   fi
-elif test -f "pom.xml"; then
+}
+
+# function: maven
+function act-java-common-maven
+{
   # maven config
   M2_HOME=${M2_HOME:-/root/.m2}
   MAVEN_CONFIG=${MAVEN_CONFIG:-}
@@ -65,17 +66,9 @@ elif test -f "pom.xml"; then
     fi
 
     # run build
-    echo "java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} clean package"
-    java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG clean package
-
-    # copy artifacts to ARTIFACT_DIR
-    cp -R target/*.jar $ARTIFACT_DIR
+    java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
   else
     echo "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper"
     exit 1
   fi
-else
-  echo "--> error: unknown build system!"
-  echo "Supported are: gradle, maven"
-  exit 1
-fi
+}

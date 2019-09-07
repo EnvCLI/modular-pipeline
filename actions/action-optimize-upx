@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="Optimize"
+ACTION_NAME="UPX"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/action-java-common"
+
+# main
+function main()
+{
+  # configuration
+  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+  UPX_ARGS=${UPX_ARGS:---brute}
+
+  # execute
+  echo "-> Execute: Optimization"
+  for file in $ARTIFACT_DIR/*
+  do
+    echo "--> Compressing $file ..."
+    upx $UPX_ARGS "$file"
+  done
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Used to compress executable files using upx (the Ultimate Packer for eXecutables)"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* ARTIFACT_DIR: All files from this directory will be published on bintray (default: dist)"
+    echo "* UPX_ARGS: Default is `--brute`, use `--best --ultra-brute` for best compression."
+    ;;
+  *)
+    act-common-hook "pre-prepare"
+    act-common-prepare
+    act-common-hook "post-prepare"
+    act-common-hook "pre-build"
+    main "$@"
+    act-common-hook "post-build"
+;;
+esac

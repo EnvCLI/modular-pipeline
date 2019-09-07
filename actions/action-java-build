@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="java"
+ACTION_NAME="build"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/action-java-common"
+
+# main
+function main()
+{
+  # configuration
+  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+
+  # make sure the directory exists
+  mkdir -p $ARTIFACT_DIR
+
+  # detect build system
+  act-java-common-detect
+  echo "-> execute: build"
+  if echo "$BUILD_SYSTEM" | grep -q 'gradle'; then
+    # gradle
+    act-java-common-gradle assemble
+
+    # copy artifacts to ARTIFACT_DIR
+    cp -R build/libs/*.jar $ARTIFACT_DIR
+  elif echo "$BUILD_SYSTEM" | grep -q 'maven'; then
+    # maven
+    act-java-common-maven package
+
+    # copy artifacts to ARTIFACT_DIR
+    cp -R target/*.jar $ARTIFACT_DIR
+  else
+    echo "--> error: unknown build system!"
+    echo "Supported are: gradle, maven"
+    exit 1
+  fi
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Build script for java projects"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

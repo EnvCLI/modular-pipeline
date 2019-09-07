@@ -34,7 +34,7 @@ fi
 
 # pipeline
 echo "-> Getting CI Scripts ..."
-ACTION_LIST=("common-pipeline-scripts" "ci-debug" "go-test" "go-build" "java-build" "package-dockerfile" "bintray-publish" "optimize-upx")
+ACTION_LIST=("action-common" "ci-debug" "action-go-test" "action-go-build" "action-java-build" "action-optimize-upx")
 for i in "${ACTION_LIST[@]}"; do
     echo "--> Action: $i"
     if echo "$INSTALL_FROM" | grep -q 'remote'; then

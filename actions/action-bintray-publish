@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="bintray"
+ACTION_NAME="publish"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+    # configuration
+  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+
+  # publish artifacts
+  for file in $ARTIFACT_DIR/*
+  do
+    TARGET_PATH=$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$(basename -- "$file")
+    echo "--> Publishing $file to $TARGET_PATH ..."
+
+    curl -T "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY/$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$TARGET_PATH
+  done
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Used to publish artifacts to bintray"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* ARTIFACT_DIR: All files from this directory will be published on bintray (default: dist)"
+    echo "* BINTRAY_ORGANZATION: The organisation the package should be published in, can be identical to the username."
+    echo "* BINTRAY_REPOSITORY: The repository within the org/user."
+    echo "* BINTRAY_PACKAGE: The package that gets published in a repository within a org."
+    echo "* BINTRAY_USERNAME: Username used to authenticate with bintray."
+    echo "* BINTRAY_TOKEN: Access token for the provided username."
+    
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac
