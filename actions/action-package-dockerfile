@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="package"
+ACTION_NAME="dockerfile"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # configuration
+  DOCKERFILE_PATH=${DOCKERFILE_PATH:-.}
+  DOCKERFILE_NAME=${DOCKERFILE_NAME:-Dockerfile}
+  CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
+
+  # build
+  docker build --no-cache --pull --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg proxy_host=$PROXY_HOST --build-arg proxy_port=$PROXY_PORT -f $DOCKERFILE_NAME -t test:$CONTAINER_TAG $DOCKERFILE_PATH
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Used to package a app with a dockerfile"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging."
+    echo "* DOCKERFILE_PATH: Path of the dockerfile, by default the current working directory."
+    echo "* DOCKERFILE_NAME: Name of the dockerfile. (default: Dockerfile)"
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

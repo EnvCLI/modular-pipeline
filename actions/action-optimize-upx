@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ACTION_CATEGORY="Optimize"
-ACTION_NAME="UPX"
+ACTION_CATEGORY="optimize"
+ACTION_NAME="upx"
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
 source "$LOCAL_PATH/action-common"
-source "$LOCAL_PATH/action-java-common"
 
 # main
 function main()
@@ -35,11 +34,10 @@ case "${1:-}" in
     echo "* UPX_ARGS: Default is `--brute`, use `--best --ultra-brute` for best compression."
     ;;
   *)
-    act-common-hook "pre-prepare"
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
     act-common-prepare
-    act-common-hook "post-prepare"
-    act-common-hook "pre-build"
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"
-    act-common-hook "post-build"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
 ;;
 esac

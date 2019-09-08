@@ -5,8 +5,16 @@ echo "Installing modular pipeline components"
 # configuration
 LOCAL_PATH=${BASH_SOURCE%/*}
 INSTALL_FROM=${INSTALL_FROM:-remote}
+INSTALL_MODE=${INSTALL_MODE:-system} # system or project (prject creates a .ci/bin dir and imports it into PATH)
 CONFIG_DIR=${CONFIG_DIR:-/etc/envcli}
 TARGET_DIR=${TARGET_DIR:-/usr/local/bin}
+
+# support for user-mode setup
+if echo "$INSTALL_MODE" | grep -q 'project'; then
+    TARGET_DIR=$(pwd)/.ci/bin
+    mkdir -p $(pwd)/.ci/bin
+    export PATH=$PATH:$(pwd)/.ci/bin
+fi
 
 # preq: envcli
 echo "-> Getting EnvCLI ..."
@@ -34,7 +42,7 @@ fi
 
 # pipeline
 echo "-> Getting CI Scripts ..."
-ACTION_LIST=("action-common" "ci-debug" "action-go-test" "action-go-build" "action-java-build" "action-optimize-upx")
+ACTION_LIST=("action-common" "ci-debug" "action-go-test" "action-go-build" "action-java-build" "action-optimize-upx" "action-package-dockerfile")
 for i in "${ACTION_LIST[@]}"; do
     echo "--> Action: $i"
     if echo "$INSTALL_FROM" | grep -q 'remote'; then
