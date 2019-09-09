@@ -30,11 +30,12 @@ function act-common-prepare()
         exit 1
     fi
 
-    # find container runtime 
+    # find container runtime (if docker info fails)
     if ! docker info &>/dev/null; then
         echo "-> Searching for container runtime ..."
 
         # overwrite DOCKER_HOST to reach the daemon, whereever it's running
+        set +u
         if [ -z "$DOCKER_HOST" ] && [ "$KUBERNETES_PORT" ]; then
             echo "-> Detected kubernetes usage, using DOCKER_HOST = tcp://localhost:2375"
             export DOCKER_HOST='tcp://localhost:2375'
@@ -42,6 +43,7 @@ function act-common-prepare()
             echo "-> Detected docker tls cert usage, using DOCKER_HOST = tcp://docker:2376"
             export DOCKER_HOST='tcp://docker:2376'
         fi
+        set -u
     fi
 
     # normalize ci variables

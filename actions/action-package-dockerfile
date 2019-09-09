@@ -27,11 +27,19 @@ function main()
     else
       echo "--> provided a default dockerfile, downloading ..."
       curl -L -s -o "$DOCKERFILE_PATH/$DOCKERFILE_NAME" "$DOCKERFILE_URL_DEFAULT"
+      USED_DEFAULT_DOCKER=true
     fi
   fi
 
   # build
   docker build --no-cache --pull --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg proxy_host=$PROXY_HOST --build-arg proxy_port=$PROXY_PORT -f $DOCKERFILE_NAME -t $CONTAINER_REPO:$CONTAINER_TAG $DOCKERFILE_PATH
+  echo "--> image build success ..."
+
+  # remove default dockerfile if used
+  if echo "${USED_DEFAULT_DOCKER:-false}" | grep -q 'true'; then
+    echo "--> removed temporary dockerfile"
+    rm "$DOCKERFILE_PATH/$DOCKERFILE_NAME" >> /dev/null
+  fi
 }
 
 # entrypoint
