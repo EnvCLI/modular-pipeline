@@ -13,10 +13,25 @@ function main()
   # configuration
   DOCKERFILE_PATH=${DOCKERFILE_PATH:-.}
   DOCKERFILE_NAME=${DOCKERFILE_NAME:-Dockerfile}
+  DOCKERFILE_URL_DEFAULT=${DOCKERFILE_URL_DEFAULT:-}
+  CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
   CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
 
+  # support for DOCKERFILE_URL_DEFAULT
+  if ! test -f "$DOCKERFILE_PATH/$DOCKERFILE_NAME"; then
+    echo "--> no local dockerfile provided!"
+
+    if [ -z "$DOCKERFILE_URL_DEFAULT" ]; then
+      echo "error: no dockerfile or default dockerfile provided!"
+      exit 1
+    else
+      echo "--> provided a default dockerfile, downloading ..."
+      curl -L -s -o "$DOCKERFILE_PATH/$DOCKERFILE_NAME" "$DOCKERFILE_URL_DEFAULT"
+    fi
+  fi
+
   # build
-  docker build --no-cache --pull --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg proxy_host=$PROXY_HOST --build-arg proxy_port=$PROXY_PORT -f $DOCKERFILE_NAME -t test:$CONTAINER_TAG $DOCKERFILE_PATH
+  docker build --no-cache --pull --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg proxy_host=$PROXY_HOST --build-arg proxy_port=$PROXY_PORT -f $DOCKERFILE_NAME -t $CONTAINER_REPO:$CONTAINER_TAG $DOCKERFILE_PATH
 }
 
 # entrypoint
@@ -28,6 +43,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging."
     echo "* DOCKERFILE_PATH: Path of the dockerfile, by default the current working directory."
     echo "* DOCKERFILE_NAME: Name of the dockerfile. (default: Dockerfile)"
+    echo "* DOCKERFILE_URL_DEFAULT: A url to a default dockerfile to use, if the local dockerfile wasn't found/provided."
     ;;
   *)
     echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
