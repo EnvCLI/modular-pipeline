@@ -19,7 +19,15 @@ function main()
     act-java-common-gradle test
   elif echo "$BUILD_SYSTEM" | grep -q 'maven'; then
     # maven
+    set +e
     act-java-common-maven test
+
+    # - print test reports on build failure
+    if [ ! $? == "0" ]; then
+      find -path '*/target/surefire-reports/*.txt' -exec cat {} \;
+      exit 1
+    fi
+    set -e
   else
     echo "--> error: unknown build system!"
     echo "Supported are: gradle, maven"

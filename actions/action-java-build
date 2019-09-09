@@ -22,13 +22,17 @@ function main()
   echo "-> execute: build"
   if echo "$BUILD_SYSTEM" | grep -q 'gradle'; then
     # gradle
-    act-java-common-gradle assemble
+    act-java-common-gradle clean assemble
 
     # copy artifacts to ARTIFACT_DIR
     cp -R build/libs/*.jar $ARTIFACT_DIR
   elif echo "$BUILD_SYSTEM" | grep -q 'maven'; then
     # maven
-    act-java-common-maven package
+    # - version
+    act-java-common-maven versions:set -DnewVersion=$NCI_COMMIT_REF_RELEASE
+
+    # - build
+    act-java-common-maven clean package
 
     # copy artifacts to ARTIFACT_DIR
     cp -R target/*.jar $ARTIFACT_DIR
