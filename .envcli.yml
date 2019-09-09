@@ -6,7 +6,7 @@ images:
   - go
   image: docker.io/golang:1.13-buster
   cache:
-  - name: golang-12
+  - name: golang
     directory: /go/pkg
 # - Java
 - name: java
