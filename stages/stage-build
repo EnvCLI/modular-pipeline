@@ -21,6 +21,12 @@ function main()
     exit 1
   fi
 
+  # optimization support
+  if [[ ${UPX_ENABLE:-false} == "true" ]]; then
+    # optimize binary using upx
+    action-optimize-upx
+  fi
+
   # by deployment type
 }
 
