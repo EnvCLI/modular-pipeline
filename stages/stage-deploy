@@ -41,8 +41,7 @@ function main()
   elif [[ ${DEPLOYMENT_TYPE} == "helm" ]]; then
     echo "-> deployment will use helm charts ..."
   else
-    echo "error: deployment type ${DEPLOYMENT_TYPE} is not supported!"
-    exit 1
+    echo "warning: deployment type ${DEPLOYMENT_TYPE} is not supported!"
   fi
 }
 

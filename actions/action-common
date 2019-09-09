@@ -50,6 +50,10 @@ function act-common-prepare()
     echo "-> execute: normalizeci"
     eval $(normalizeci)
 
+    # ensure required variables are set
+    export PROJECT_TYPE=${PROJECT_TYPE:-none}
+    export DEPLOYMENT_TYPE=${DEPLOYMENT_TYPE:-none}
+
     # proxy
     export HTTP_PROXY=${HTTP_PROXY:-}
     export HTTPS_PROXY=${HTTPS_PROXY:-}
