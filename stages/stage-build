@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STAGE_NAME="build"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # by project type
+  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
+    # golang
+    action-go-build
+  elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
+    # java
+    action-java-build
+  else
+    echo "error: project type ${PROJECT_TYPE} is not supported!"
+    exit 1
+  fi
+
+  # by deployment type
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Stage - Build"
+    echo "Will build the artifacts."
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running stage [$STAGE_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$STAGE_NAME"
+    main "$@"
+    act-common-hook "post-$STAGE_NAME"
+;;
+esac

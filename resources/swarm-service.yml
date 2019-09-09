@@ -1,0 +1,44 @@
+##
+# Docker Deployment Configuration
+##
+version: '3.3'
+services:
+  service:
+    # Image
+    image: $CONTAINER_REPO:$CONTAINER_TAG
+    # Environment
+    env_file: deploy.env
+    # Networks
+    networks:
+      - traefik_net
+    # Deployment
+    deploy:
+      mode: replicated
+      replicas: $DEPLOYMENT_REPLICAS
+      update_config:
+        parallelism: 1
+        delay: 10s
+      labels:
+        # Feature: Traefik Reverse Proxy
+        traefik.enable: "true"
+        traefik.port: "8080"
+        traefik.protocol: "http"
+        traefik.frontend.entryPoints: "http"
+        traefik.frontend.rule: "Host:$CI_ENVIRONMENT_URL_HOST"
+        traefik.docker.network: "traefik_net"
+      resources:
+        limits:
+          cpus: '$RESOURCES_HARD_CPU'
+          memory: $RESOURCES_HARD_MEMORY
+        reservations:
+          cpus: '$RESOURCES_SOFT_CPU'
+          memory: $RESOURCES_SOFT_MEMORY
+      restart_policy:
+        condition: any
+        delay: 60s
+
+# Networks
+networks:
+  traefik_net:
+    external:
+      name: traefik_net

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STAGE_NAME="deploy"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  local DEPLOYMENT_ENVIRONMENT=${1:-}
+  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
+    echo "error: no target environment specified when calling deploy stage!"
+    exit 1
+  fi
+  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT] ..."
+
+  # by deployment type
+  if [[ ${DEPLOYMENT_TYPE} == "swarm" ]]; then
+    echo "-> deployment will use swarm stacks ..."
+
+    # configuration
+    export SWARMSTACK_FILE=${SWARMSTACK_FILE:-swarm.yml}
+
+    # pull swarm stack by template
+    if [ ! -f $SWARMSTACK_FILE ]; then
+      # retrieve swarm stack template file by project type of the project didn't provide one
+      if [[ ${PROJECT_TYPE} =~ ^.*-service$ ]]; then
+        echo "-> download swarm template for build stack $PROJECT_TYPE and setting SWARMSTACK_FILE."
+        curl -L -s -o "dist/swarm-deployment.yml" "$MPI_RESOURCES_MIRROR/swarm-service.yml"
+        export SWARMSTACK_FILE=dist/swarm-deployment.yml
+      else
+        echo "error: project type $PROJECT_TYPE is not supported yet! Please request support or provide your own swarm.yml."
+        exit 1
+      fi
+    fi
+
+    # run deployment
+    action-swarm-deploy $DEPLOYMENT_ENVIRONMENT
+  elif [[ ${DEPLOYMENT_TYPE} == "helm" ]]; then
+    echo "-> deployment will use helm charts ..."
+  else
+    echo "error: deployment type ${DEPLOYMENT_TYPE} is not supported!"
+    exit 1
+  fi
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Stage - Deploy"
+    echo "Will execute infrastructure deployments for the specified environments"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running stage [$STAGE_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$STAGE_NAME"
+    main "$@"
+    act-common-hook "post-$STAGE_NAME"
+;;
+esac

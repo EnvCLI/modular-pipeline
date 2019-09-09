@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STAGE_NAME="package"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # don't package library projects for any language
+  if [[ ${PROJECT_TYPE} =~ ^.*-library$ ]]; then
+    echo "-> not packaging library projects!"
+    exit 0
+  fi
+
+  # by project type
+  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
+    # golang
+    export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/java-service.dockerfile"
+    action-package-dockerfile
+  elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
+    # java
+    export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/java-service.dockerfile"
+    action-package-dockerfile
+  else
+    echo "error: project type ${PROJECT_TYPE} is not supported!"
+    exit 1
+  fi
+
+  # by deployment type
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Stage - Test"
+    echo "Will execute test cases"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running stage [$STAGE_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$STAGE_NAME"
+    main "$@"
+    act-common-hook "post-$STAGE_NAME"
+;;
+esac

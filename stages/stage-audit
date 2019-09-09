@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STAGE_NAME="audit"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  echo "-> No auditing tools supported yet."
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Stage - Audit"
+    echo "Run auiting tools to find license / security / etc. issues."
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running stage [$STAGE_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$STAGE_NAME"
+    main "$@"
+    act-common-hook "post-$STAGE_NAME"
+;;
+esac

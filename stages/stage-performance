@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STAGE_NAME="performance"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  echo "-> no checks supported yet ..."
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Stage - Performance"
+    echo "Run Performance tasks to check application performance."
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running stage [$STAGE_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$STAGE_NAME"
+    main "$@"
+    act-common-hook "post-$STAGE_NAME"
+;;
+esac

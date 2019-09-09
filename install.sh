@@ -52,7 +52,7 @@ chmod 644 "$CONFIG_DIR/.envcli.yml"
 # req: normalizeci
 echo "-> getting normalize-ci ..."
 if ! test -f "$TARGET_DIR/normalizeci"; then
-    curl -L -s -o "$TARGET_DIR/normalizeci" "https://dl.bintray.com/envcli/golang/normalize-ci/v0.0.1/${OS}_${ARCH}"
+    curl -L -s -o "$TARGET_DIR/normalizeci" "https://dl.bintray.com/envcli/golang/normalize-ci/v0.0.2/${OS}_${ARCH}"
     chmod +x "$TARGET_DIR/normalizeci"
 fi
 
@@ -66,6 +66,17 @@ for i in "${ACTION_LIST[@]}"; do
         curl -L -s -o "$TARGET_DIR/$i" "https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/$i"
     elif echo "$INSTALL_FROM" | grep -q 'local'; then
         cp "$LOCAL_PATH/actions/$i" "$TARGET_DIR/$i"
+    fi
+    chmod +x "$TARGET_DIR/$i"
+done
+# - stages
+STAGE_LIST=("stage-prepare" "stage-build" "stage-test" "stage-package" "stage-audit" "stage-deploy" "stage-performance" "stage-cleanup")
+for i in "${STAGE_LIST[@]}"; do
+    echo "--> stage: $i"
+    if echo "$INSTALL_FROM" | grep -q 'remote'; then
+        curl -L -s -o "$TARGET_DIR/$i" "https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/stages/$i"
+    elif echo "$INSTALL_FROM" | grep -q 'local'; then
+        cp "$LOCAL_PATH/stages/$i" "$TARGET_DIR/$i"
     fi
     chmod +x "$TARGET_DIR/$i"
 done

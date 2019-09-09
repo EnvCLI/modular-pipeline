@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="swarm"
+ACTION_NAME="deploy"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/action-common-deploy"
+
+# main
+function main()
+{
+  # configuration
+  local DEPLOYMENT_ENVIRONMENT=${1:-}
+  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
+    echo "error: no target environment specified when calling deploy stage!"
+    exit 1
+  fi
+  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT] ..."
+  CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
+  CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
+
+  # container registry login
+  # act-common-container-registry-login
+
+  # generate deployment configuration
+  act-common-deploy-generate-configuration $DEPLOYMENT_ENVIRONMENT
+
+  # configuration
+  export SWARMSTACK_FILE=${SWARMSTACK_FILE:-swarm.yml}
+
+  # deploy stack (placeholders are replaced by the .env file provided to the stack file)
+  echo "-> run deployment [SWARM_ID:p${NCI_PROJECT_ID}-${DEPLOYMENT_ENVIRONMENT}] ..."
+  docker stack deploy --compose-file $SWARMSTACK_FILE --with-registry-auth p${NCI_PROJECT_ID}-${DEPLOYMENT_ENVIRONMENT}
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Deploy to a docker swarm cluster / node"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* DEPLOY_ENVIRONMENT_NAME: name of the environment (as slug, ie. production, development, ...)"
+    echo "* SWARMSTACK_FILE: provide a custom file with a docker swarm stack definition. (defaults to swarm.yml)"
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac
