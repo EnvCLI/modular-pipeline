@@ -67,3 +67,16 @@ function act-common-hook()
         $NCI_PROJECT_DIR/.ci/$1.sh
     fi
 }
+
+# container registry login
+function act-common-container-registry-login()
+{
+  echo "-> trying to login to container registry $NCI_CONTAINERREGISTRY_HOST ..."
+
+  if [[ -n "$NCI_CONTAINERREGISTRY_USERNAME" ]]; then
+    docker login -u "$NCI_CONTAINERREGISTRY_USERNAME" -p "$NCI_CONTAINERREGISTRY_PASSWORD" "$NCI_CONTAINERREGISTRY_HOST"
+  else
+    echo "Failed to login to container registry! No credentials provided!"
+    exit 1
+  fi
+}
