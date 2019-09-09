@@ -6,7 +6,7 @@ ACTION_NAME="build"
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
 source "$LOCAL_PATH/action-common"
-source "$LOCAL_PATH/action-go-common"
+source "$LOCAL_PATH/action-common-go"
 
 # main
 function main()
@@ -18,7 +18,7 @@ function main()
 
   # code generation
   echo "-> Execute: Code Generation"
-  go generate ./...
+  envcli run go generate ./...
 
   # build artifacts
   echo "-> Execute: Artifact Generation"

@@ -6,7 +6,7 @@ ACTION_NAME="build"
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
 source "$LOCAL_PATH/action-common"
-source "$LOCAL_PATH/action-java-common"
+source "$LOCAL_PATH/action-common-java"
 
 # main
 function main()

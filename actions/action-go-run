@@ -11,7 +11,7 @@ source "$LOCAL_PATH/action-common"
 function main()
 {
     echo "-> execute: run"
-    go run ./src "$@"
+    envcli run go run ./src "$@"
 }
 
 # entrypoint

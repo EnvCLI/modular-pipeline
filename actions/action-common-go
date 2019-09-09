@@ -19,6 +19,6 @@ act-go-common-build() {
 
   echo "--> Generating artifact $ARTIFACT ..."
   # shellcheck disable=SC2086
-  env GOOS="$ARTIFACT_OS" GOARCH="$ARTIFACT_ARCH" GOARM="$GOARM" CGO_ENABLED=0 go build -o $ARTIFACT_DIR/$ARTIFACT -ldflags="-w -X main.Version=$NCI_COMMIT_REF_RELEASE -X main.CommitHash=$NCI_COMMIT_SHA" ./src/*
+  env GOOS="$ARTIFACT_OS" GOARCH="$ARTIFACT_ARCH" GOARM="$GOARM" CGO_ENABLED=0 envcli run go build -o $ARTIFACT_DIR/$ARTIFACT -ldflags="-w -X main.Version=$NCI_COMMIT_REF_RELEASE -X main.CommitHash=$NCI_COMMIT_SHA" ./src/*
   echo "--> Successfully generated artifact $ARTIFACT_DIR/$ARTIFACT [$(ls -lh $ARTIFACT_DIR/$ARTIFACT | cut -d " " -f5)]"
 }

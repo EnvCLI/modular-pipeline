@@ -39,9 +39,6 @@ function act-common-prepare()
     export JAVA_PROXY_OPTS="-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT"
 }
 
-# pathing (temporary) TODO: remove
-export NCI_PROJECT_DIR="$(pwd)"
-
 # func: run hook / $1 = hook name
 function act-common-hook()
 {

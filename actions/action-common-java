@@ -29,7 +29,7 @@ function act-java-common-gradle
     fi
 
     # run build (This essentially downloads a copy of Gradle to build the project with.)
-    java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} $@
+    envcli run java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} $@
   else
     echo "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html"
     exit 1
@@ -66,7 +66,7 @@ function act-java-common-maven
     fi
 
     # run build
-    java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
+    envcli run java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
   else
     echo "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper"
     exit 1
