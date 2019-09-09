@@ -24,36 +24,39 @@ function main()
   echo "-> Execute: Artifact Generation"
   # linux_386
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_386'; then
-    act-go-common-build linux 386
+    act-go-common-build linux 386 &
   fi
   # linux_amd64
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_amd64'; then
-    act-go-common-build linux amd64
+    act-go-common-build linux amd64 &
   fi
   # linux_armv7
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_armv7'; then
-    act-go-common-build linux armv7
+    act-go-common-build linux armv7 &
   fi
   # linux_armv8
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'linux_armv8'; then
-    act-go-common-build linux armv8
+    act-go-common-build linux armv8 &
   fi
   # windows_386
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'windows_386'; then
-    act-go-common-build windows 386
+    act-go-common-build windows 386 &
   fi
   # windows_amd64
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'windows_amd64'; then
-    act-go-common-build windows amd64
+    act-go-common-build windows amd64 &
   fi
   # darwin_386
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_386'; then
-    act-go-common-build darwin 386
+    act-go-common-build darwin 386 &
   fi
   # darwin_amd64
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_amd64'; then
-    act-go-common-build darwin amd64
+    act-go-common-build darwin amd64 &
   fi
+
+  # wait for all builds to finish
+  wait
 }
 
 # entrypoint
