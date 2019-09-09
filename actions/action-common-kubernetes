@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# make sure the namespace / project exists - try to create it otherwise
+function act-common-kubernetes-ensure-namespace {
+  local TARGET_NAMESPACE=${1:-}
+  if [ -z "$TARGET_NAMESPACE" ]; then
+    echo "error: no target namespace specified as first argument when calling func act-common-kubernetes-ensure-namespace"
+    exit 1
+  fi
+
+  echo "-> making sure namespace $TARGET_NAMESPACE exists ..."
+  set +e
+  envcli run kubectl get namespace "$TARGET_NAMESPACE"
+  getnamespace=$?
+  set -e
+  if [ "$getnamespace" -ne "0" ]; then
+    ## create namespace
+    echo "-> creating namespace $TARGET_NAMESPACE"
+    envcli run kubectl create namespace "$TARGET_NAMESPACE"
+  else
+    echo "-> namespace exists. skipping creation ..."
+  fi
+}

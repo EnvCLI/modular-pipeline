@@ -59,7 +59,7 @@ fi
 # pipeline
 echo "-> getting pipeline scripts ..."
 # - actions
-ACTION_LIST=("action-common" "action-ci-debug" "action-common-go" "action-go-test" "action-go-build" "action-common-java" "action-java-test" "action-java-build" "action-optimize-upx" "action-package-dockerfile" "action-common-deploy" "action-swarm-deploy")
+ACTION_LIST=("action-common" "action-common-deploy" "action-common-go" "action-common-java" "action-common-kubernetes" "action-ci-debug" "action-go-test" "action-go-build" "action-java-test" "action-java-build" "action-optimize-upx" "action-package-dockerfile" "action-swarm-deploy")
 for i in "${ACTION_LIST[@]}"; do
     echo "--> action: $i"
     if echo "$INSTALL_FROM" | grep -q 'remote'; then
