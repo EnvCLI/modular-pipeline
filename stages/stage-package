@@ -16,20 +16,20 @@ function main()
   fi
 
   # by project type
-  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
-    # golang
-    export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/java-service.dockerfile"
-    action-package-dockerfile
-  elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
+  if [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
     # java
     export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/java-service.dockerfile"
     action-package-dockerfile
   else
-    echo "error: project type ${PROJECT_TYPE} is not supported!"
-    exit 1
+    echo "warning: project type ${PROJECT_TYPE} is not supported!"
   fi
 
   # by deployment type
+  if [[ ${DEPLOYMENT_TYPE} == "bintray" ]]; then
+    # for cli and libraries, TODO: add filter later
+    echo "-> will publish a bintray package with the artifacts ..."
+    action-bintray-publish
+  fi
 }
 
 # entrypoint
