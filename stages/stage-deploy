@@ -9,6 +9,13 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
+  # deployment target: none
+  if [[ ${DEPLOYMENT_TYPE} == "none" ]]; then
+    echo "-> not running deployment, no DEPLOYMENT_TYPE set!"
+    exit 0
+  fi
+
+  # deployment target
   local DEPLOYMENT_ENVIRONMENT=${1:-}
   if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
     echo "error: no target environment specified when calling deploy stage!"

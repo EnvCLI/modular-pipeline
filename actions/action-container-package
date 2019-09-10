@@ -35,6 +35,10 @@ function main()
   docker build --no-cache --pull --build-arg http_proxy=$HTTP_PROXY --build-arg https_proxy=$HTTPS_PROXY --build-arg proxy_host=$PROXY_HOST --build-arg proxy_port=$PROXY_PORT -f $DOCKERFILE_NAME -t $CONTAINER_REPO:$CONTAINER_TAG $DOCKERFILE_PATH
   echo "--> image build success ..."
 
+  # save image
+  mkdir -p dist/container-image
+  docker save $CONTAINER_REPO:$CONTAINER_TAG > dist/container-image/main.tar
+
   # remove default dockerfile if used
   if echo "${USED_DEFAULT_DOCKER:-false}" | grep -q 'true'; then
     echo "--> removed temporary dockerfile"

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STAGE_NAME="publish"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # by project type
+
+  # by deployment type
+  if [[ ${DEPLOYMENT_TYPE} == "bintray" ]]; then
+    # for cli and libraries, TODO: add filter later
+    echo "-> will publish a bintray package with the artifacts ..."
+    action-bintray-publish
+  fi
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Stage - Publish"
+    echo "Will publish artifacts"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running stage [$STAGE_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$STAGE_NAME"
+    main "$@"
+    act-common-hook "post-$STAGE_NAME"
+;;
+esac

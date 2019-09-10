@@ -10,7 +10,7 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
-    # configuration
+  # configuration
   ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
 
   # publish artifacts
@@ -19,7 +19,7 @@ function main()
     TARGET_PATH=$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$(basename -- "$file")
     echo "--> Publishing $file to $TARGET_PATH ..."
 
-    curl -T "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY/$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$TARGET_PATH
+    curl --upload-file "$file" -u$BINTRAY_USERNAME:$BINTRAY_TOKEN https://api.bintray.com/content/$BINTRAY_ORGANZATION/$BINTRAY_REPOSITORY/$BINTRAY_PACKAGE/$NCI_COMMIT_REF_NAME/$TARGET_PATH
   done
 }
 
@@ -36,7 +36,7 @@ case "${1:-}" in
     echo "* BINTRAY_PACKAGE: The package that gets published in a repository within a org."
     echo "* BINTRAY_USERNAME: Username used to authenticate with bintray."
     echo "* BINTRAY_TOKEN: Access token for the provided username."
-    
+
     ;;
   *)
     echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"

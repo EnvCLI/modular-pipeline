@@ -19,16 +19,9 @@ function main()
   if [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
     # java
     export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/java-service.dockerfile"
-    action-package-dockerfile
+    action-container-package
   else
     echo "warning: project type ${PROJECT_TYPE} is not supported!"
-  fi
-
-  # by deployment type
-  if [[ ${DEPLOYMENT_TYPE} == "bintray" ]]; then
-    # for cli and libraries, TODO: add filter later
-    echo "-> will publish a bintray package with the artifacts ..."
-    action-bintray-publish
   fi
 }
 

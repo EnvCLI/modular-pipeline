@@ -12,12 +12,15 @@ function main()
   # by project type
   if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
     # golang
-    echo "-> pulling required container images"
+    echo "-> pulling required container images ..."
     envcli pull-image go upx
   elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
     # java
-    echo "-> pulling required container images"
+    echo "-> pulling required container images ..."
     envcli pull-image java
+  elif [[ ${PROJECT_TYPE} =~ ^dockerfile-.*$ ]]; then
+    # dockerfile artifact-delivery based projects
+    echo "-> doing nothing."
   else
     echo "error: project type ${PROJECT_TYPE} is not supported!"
     exit 1

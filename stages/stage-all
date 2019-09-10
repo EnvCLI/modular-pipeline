@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+STAGE_NAME="audit"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  local DEPLOYMENT_ENVIRONMENT=${DEPLOYMENT_ENVIRONMENT:-none}
+
+  stage-prepare
+  stage-build
+  stage-test
+  stage-package
+  stage-audit
+  stage-publish
+  stage-deploy $DEPLOYMENT_ENVIRONMENT
+  stage-performance
+  stage-cleanup
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Stage - All"
+    echo "Runs all stages, useful for local testing."
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    echo "Running stage [$STAGE_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$STAGE_NAME"
+    main "$@"
+    act-common-hook "post-$STAGE_NAME"
+;;
+esac

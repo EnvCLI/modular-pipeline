@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="container"
+ACTION_NAME="push"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # configuration
+  CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
+  CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
+
+  # push image
+  act-common-container-registry-push "${CONTAINER_REPO}:${CONTAINER_TAG}"
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Publish a container image on a registry."
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging."
+    echo "* DOCKERFILE_PATH: Path of the dockerfile, by default the current working directory."
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac
