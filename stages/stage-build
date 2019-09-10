@@ -18,7 +18,7 @@ function main()
     action-java-build
   elif [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
     # container
-    action-container-package
+    action-container-build
   else
     echo "warn: project type ${PROJECT_TYPE} is not supported!"
     exit 0

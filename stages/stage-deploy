@@ -21,6 +21,7 @@ function main()
     echo "error: no target environment specified when calling deploy stage!"
     exit 1
   fi
+  local DEPLOYMENT_ID=${2:-p${NCI_PROJECT_ID}-${DEPLOYMENT_ENVIRONMENT}}
   echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT] ..."
 
   # by deployment type
@@ -44,9 +45,12 @@ function main()
     fi
 
     # run deployment
-    action-swarm-deploy $DEPLOYMENT_ENVIRONMENT
+    action-swarm-deploy $DEPLOYMENT_ENVIRONMENT $DEPLOYMENT_ID
   elif [[ ${DEPLOYMENT_TYPE} == "helm" ]]; then
     echo "-> deployment will use helm charts ..."
+
+    # run deployment
+    action-helm-deploy $DEPLOYMENT_ENVIRONMENT $DEPLOYMENT_ID
   else
     echo "warning: deployment type ${DEPLOYMENT_TYPE} is not supported!"
   fi

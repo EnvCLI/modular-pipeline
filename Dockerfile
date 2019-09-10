@@ -32,7 +32,7 @@ RUN echo "System Packages ..." &&\
     envcli config set global-configuration-path /etc/envcli &&\
     chmod 644 /etc/envcli/.envcli.yml &&\
     echo "-> Getting NormalizeCI ..." &&\
-    curl -L -s -o /usr/local/bin/normalizeci https://dl.bintray.com/envcli/golang/normalize-ci/v0.0.2/linux_amd64 &&\
+    curl -L -s -o /usr/local/bin/normalizeci https://dl.bintray.com/envcli/golang/normalize-ci/v0.1.0/linux_amd64 &&\
     chmod +x /usr/local/bin/normalizeci &&\
     echo "-> Installing EnvCLI Aliases" &&\
     envcli install-aliases &&\

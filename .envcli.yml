@@ -1,4 +1,5 @@
 images:
+# Compiler / Runtime
 # - Golang
 - name: go
   description: Go (golang) is a general purpose, higher-level, imperative programming language.
@@ -29,16 +30,42 @@ images:
   cache:
   - name: node-10
     directory: /root/.npm
+# Lint
 # - Shell
 - name: shellcheck
-  description: ShellCheck -- Shell script analysis tool 
+  description: ShellCheck -- Shell script analysis tool
   provides:
   - shellcheck
   image: docker.io/koalaman/shellcheck:v0.7.0
   entrypoint: /bin/bash
+# Optimize
 # - UPX
 - name: upx
   description: UPX is a free, portable, extendable, high-performance executable packer for several executable formats.
   provides:
   - upx
   image: docker.io/envcli/upx:latest
+# Infrastructure
+# - Kubernetes
+- name: KubeCTL
+  description: Use the Kubernetes command-line tool, kubectl, to deploy and manage applications on Kubernetes.
+  provides:
+  - kubectl
+  image: docker.io/envcli/kubectl:1.12.3
+  shell: sh
+  cache:
+  - name: kubectl
+    directory: /root/.kube
+# - Helm
+- name: Helm Client
+  description: Helm is a tool for managing Kubernetes charts. Charts are packages of pre-configured Kubernetes resources.
+  provides:
+  - helm
+  image: docker.io/envcli/helm:2.14.0
+  shell: sh
+  directory: /data
+  cache:
+  - name: kubectl
+    directory: /root/.kube
+  - name: helm
+    directory: /root/.helm

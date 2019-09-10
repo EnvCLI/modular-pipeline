@@ -6,12 +6,6 @@ function act-common-deploy-generate-configuration
 {
   local DEPLOYMENT_ENVIRONMENT=${1:-}
 
-  # provide the host only of the environment url
-  #CI_ENVIRONMENT_URL_HOST=$CI_ENVIRONMENT_URL
-  #CI_ENVIRONMENT_URL_HOST=${CI_ENVIRONMENT_URL_HOST#"http://"} 
-  #CI_ENVIRONMENT_URL_HOST=${CI_ENVIRONMENT_URL_HOST#"https://"} 
-  #export CI_ENVIRONMENT_URL_HOST
-
   # source in .env configuration properties with defaults
   # - common .env file
   if [ -f ".env" ]; then

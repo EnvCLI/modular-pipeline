@@ -59,7 +59,24 @@ fi
 # pipeline
 echo "-> getting pipeline scripts ..."
 # - actions
-ACTION_LIST=("action-common" "action-common-deploy" "action-common-go" "action-common-java" "action-common-kubernetes" "action-ci-debug" "action-go-test" "action-go-build" "action-java-test" "action-java-build" "action-optimize-upx" "action-container-build" "action-container-push" "action-container-package" "action-swarm-deploy")
+ACTION_LIST=(
+  "action-common"
+  "action-common-deploy"
+  "action-common-go"
+  "action-common-java"
+  "action-common-kubernetes"
+  "action-ci-debug"
+  "action-go-test"
+  "action-go-build"
+  "action-java-test"
+  "action-java-build"
+  "action-optimize-upx"
+  "action-container-build"
+  "action-container-push"
+  "action-bintray-publish"
+  "action-swarm-deploy"
+  "action-helm-deploy"
+)
 for i in "${ACTION_LIST[@]}"; do
   echo "--> action: $i"
   if echo "$INSTALL_FROM" | grep -q 'remote'; then
@@ -70,7 +87,18 @@ for i in "${ACTION_LIST[@]}"; do
   chmod +x "$TARGET_DIR/$i"
 done
 # - stages
-STAGE_LIST=("stage-prepare" "stage-build" "stage-test" "stage-package" "stage-audit" "stage-publish" "stage-deploy" "stage-performance" "stage-cleanup" "stage-all")
+STAGE_LIST=(
+  "stage-prepare"
+  "stage-build"
+  "stage-test"
+  "stage-package"
+  "stage-audit"
+  "stage-publish"
+  "stage-deploy"
+  "stage-performance"
+  "stage-cleanup"
+  "stage-all"
+)
 for i in "${STAGE_LIST[@]}"; do
   echo "--> stage: $i"
   if echo "$INSTALL_FROM" | grep -q 'remote'; then

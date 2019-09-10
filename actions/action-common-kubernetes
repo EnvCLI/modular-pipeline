@@ -22,3 +22,67 @@ function act-common-kubernetes-ensure-namespace {
     echo "-> namespace exists. skipping creation ..."
   fi
 }
+
+# download_chart
+function act-common-kubernetes-download-chart
+{
+  local CHART_ID=${1:-}
+
+  # prepare helm cli
+  echo " - Initializing Helm ..."
+  envcli run helm init --client-only --skip-refresh
+
+  # print variable content
+  local CHART_REPOSITORY=$(echo $CHART_ID | cut -d '/' -f 1)
+
+  # Check if the repository is known / needs to be added for the deployment to work
+  echo " - Chart Repository: ${CHART_REPOSITORY}"
+  if [ "$CHART_REPOSITORY" != "stable" ]; then
+    ## if the repo isn't stable/ then we're using a custom repository that we need to initialize
+    echo " - Using custom chart repository: ${CHART_REPOSITORY}"
+
+    if [ "$CHART_REPOSITORY" == "incubator" ]; then
+      envcli run helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com &> /dev/null
+    elif [ "$CHART_REPOSITORY" == "rancher-stable" ]; then
+      envcli run helm repo add rancher-stable https://releases.rancher.com/server-charts/stable &> /dev/null
+    elif [ "$CHART_REPOSITORY" == "appscode" ]; then
+      envcli run helm repo add appscode https://charts.appscode.com/stable &> /dev/null
+    elif [ "$CHART_REPOSITORY" == "gitlab" ]; then
+      envcli run helm repo add gitlab https://charts.gitlab.io &> /dev/null
+    elif [ "$CHART_REPOSITORY" == "jetstack" ]; then
+      envcli run helm repo add jetstack https://charts.jetstack.io &> /dev/null
+    elif [ "$CHART_REPOSITORY" == "philippheuer" ]; then
+      envcli run helm repo add philippheuer https://philippheuer.gitlab.io/kubernetes-charts &> /dev/null
+    fi
+  fi
+  envcli run helm repo update
+}
+
+# initialize tiller
+function act-common-kubernetes-initialize-tiller
+{
+  # check if tiller was already initialized
+  set +e
+  kubectl get serviceaccount --namespace ${DEPLOY_NAMESPACE} tiller
+  getTillerServiceaccount=$?
+  set -e
+  if [ "$getTillerServiceaccount" -ne "0" ]; then
+    echo "--> Initializing Tiller"
+    ## Service Account
+    envcli run kubectl create serviceaccount --namespace ${DEPLOY_NAMESPACE} tiller
+
+    ## Service Account Permissions (namespace admin or cluster admin, depending on $DEPLOYMENT_CLUSTER_ADMIN)
+    if [ "$DEPLOYMENT_CLUSTER_ADMIN" == "true" ]; then
+      echo "--> Granting tiller cluster admin role."
+      envcli run kubectl create clusterrolebinding ${DEPLOY_NAMESPACE}-tiller-rule --clusterrole=cluster-admin --serviceaccount=${DEPLOY_NAMESPACE}:tiller
+    else
+      echo "--> Granting tiller namespace admin role."
+      envcli run kubectl create rolebinding ${DEPLOY_NAMESPACE}-tiller-binding --namespace=${DEPLOY_NAMESPACE} --clusterrole=admin --serviceaccount=${DEPLOY_NAMESPACE}:tiller
+    fi
+
+    ## Install Tiller
+    envcli run helm init --service-account tiller --override 'spec.template.spec.containers[0].command'='{/tiller,--storage=secret}' --history-max 3 --upgrade --wait
+  else
+    echo "Tiller is initialized. skipping setup ..."
+  fi
+}

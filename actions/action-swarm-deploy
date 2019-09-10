@@ -17,12 +17,14 @@ function main()
     echo "error: no target environment specified when calling deploy stage!"
     exit 1
   fi
-  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT] ..."
-  CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
-  CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
-
-  # container registry login
-  # act-common-container-registry-login
+  local DEPLOYMENT_ID=${2:-$DEPLOYMENT_ID}
+  if [ -z "$DEPLOYMENT_ID" ]; then
+    echo "error: no deployment id specified!"
+    exit 1
+  fi
+  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..."
+  export CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
+  export CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
 
   # generate deployment configuration
   act-common-deploy-generate-configuration $DEPLOYMENT_ENVIRONMENT
@@ -30,9 +32,21 @@ function main()
   # configuration
   export SWARMSTACK_FILE=${SWARMSTACK_FILE:-swarm.yml}
 
+  # container registry login (swarm passes the current registry auth to pull the image)
+  act-common-container-registry-login
+
   # deploy stack (placeholders are replaced by the .env file provided to the stack file)
   echo "-> run deployment [SWARM_ID:p${NCI_PROJECT_ID}-${DEPLOYMENT_ENVIRONMENT}] ..."
-  docker stack deploy --compose-file $SWARMSTACK_FILE --with-registry-auth p${NCI_PROJECT_ID}-${DEPLOYMENT_ENVIRONMENT}
+  set +e
+  docker stack deploy --compose-file $SWARMSTACK_FILE --with-registry-auth $DEPLOYMENT_ID
+  deploymentResult=$?
+  set -e
+  if [ "$deploymentResult" -ne "0" ]; then
+    echo "-> deployment failed ..."
+    exit 1
+  else
+    echo "-> deployment succeeded."
+  fi
 }
 
 # entrypoint
@@ -42,7 +56,8 @@ case "${1:-}" in
     echo ""
     echo "Environment:"
     echo "* DEBUG: Can be set to true to enable debugging"
-    echo "* DEPLOY_ENVIRONMENT_NAME: name of the environment (as slug, ie. production, development, ...)"
+    echo "* DEPLOYMENT_ENVIRONMENT: name of the environment (as slug, ie. production, development, ...)"
+    echo "* DEPLOYMENT_ID: unique deployment id"
     echo "* SWARMSTACK_FILE: provide a custom file with a docker swarm stack definition. (defaults to swarm.yml)"
     ;;
   *)

@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="helm"
+ACTION_NAME="deploy"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/action-common-deploy"
+source "$LOCAL_PATH/action-common-kubernetes"
+
+# main
+function main()
+{
+  # configuration
+  export KUBERNETES_VERSION="${KUBERNETES_VERSION:-1.11}"
+  export HELM_VERSION="${HELM_VERSION:-2.14.2}"
+  export DOCKER_DRIVER="${DOCKER_DRIVER:-overlay2}"
+
+  # parameters
+  # - environment
+  local DEPLOYMENT_ENVIRONMENT=${1:-$DEPLOYMENT_ENVIRONMENT}
+  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
+    echo "error: no target environment specified when calling deploy stage!"
+    exit 1
+  fi
+  local DEPLOYMENT_ID=${2:-$DEPLOYMENT_ID}
+  if [ -z "$DEPLOYMENT_ID" ]; then
+    echo "error: no deployment id specified!"
+    exit 1
+  fi
+  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..."
+  # - namespaces
+  local DEPLOYMENT_NAMESPACE=${2:-$DEPLOYMENT_NAMESPACE}
+  if [ -z "$DEPLOYMENT_NAMESPACE" ]; then
+    echo "error: no deployment namespace specified!"
+    exit 1
+  fi
+  export TILLER_NAMESPACE=${DEPLOYMENT_NAMESPACE}
+  # - access
+  export DEPLOYMENT_CLUSTER_ADMIN=${DEPLOYMENT_CLUSTER_ADMIN:-"false"}
+  if [[ -z "${KUBECONFIG_CONTENT:-}" ]]; then
+    echo "You need to provide a kubeconfig in the env variable KUBECONFIG_CONTENT to connect to your kubernetes cluster!"
+    return 1
+  fi
+  # - chart
+  local DEPLOYMENT_CHART=${DEPLOYMENT_CHART:-stable/wordpress} # todo: remove default
+  local DEPLOYMENT_CHART_VERSION=${DEPLOYMENT_CHART_VERSION:-}
+
+  # download the chart / add the required repositories
+  act-common-kubernetes-download-chart $DEPLOYMENT_CHART
+
+  # make sure the target namespace exists
+  act-common-kubernetes-ensure-namespace $DEPLOYMENT_NAMESPACE
+
+  # init tiller
+  act-common-kubernetes-initialize-tiller $DEPLOYMENT_NAMESPACE
+
+  # generate deployment configuration
+  act-common-deploy-generate-configuration $DEPLOYMENT_ENVIRONMENT
+  # values.yaml -f .helm/default.yaml
+
+  # run deployment
+  if [ -z "${DEPLOYMENT_CHART_VERSION}" ]; then
+    ## without version
+    echo " - Deploying chart ${DEPLOYMENT_CHART} into ${DEPLOYMENT_NAMESPACE}"
+    envcli run helm upgrade --install --force --namespace ${DEPLOYMENT_NAMESPACE} $DEPLOY_SLUG ${DEPLOYMENT_CHART}
+  else
+    ## with version
+    echo " - Deploying chart ${DEPLOYMENT_CHART} - ${DEPLOYMENT_CHART_VERSION} into ${DEPLOYMENT_NAMESPACE}"
+    envcli run helm upgrade --install --force --namespace ${DEPLOYMENT_NAMESPACE} --version ${DEPLOYMENT_CHART_VERSION} $DEPLOY_SLUG ${DEPLOYMENT_CHART}
+  fi
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Deploy a helm chart to a kubernetes cluster"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* DEPLOYMENT_ENVIRONMENT: name of the environment (as slug, ie. production, development, ...)"
+    echo "* DEPLOYMENT_ID: unique deployment id"
+    echo "* DEPLOYMENT_NAMESPACE: target kubernetes namespace"
+    echo "* DEPLOYMENT_CLUSTER_ADMIN: deployment needs cluster admin access, defaults to false."
+    echo "* DEPLOYMENT_CHART: helm chart."
+    echo "* DEPLOYMENT_CHART_VERSION: helm chart version, using latest by default."
+    ;;
+  *)
+    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac
