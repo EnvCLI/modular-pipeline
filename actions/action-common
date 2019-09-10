@@ -13,53 +13,73 @@ MPI_RESOURCES_MIRROR=https://raw.githubusercontent.com/EnvCLI/modular-pipeline/m
 # func: prepare
 function act-common-prepare()
 {
-    # prerequisites
-    # - envcli
-    if ! command -v envcli > /dev/null; then
-        echo "-> envcli not available. Please run the modular pipeline installation script!"
-        exit 1
+  # source in .ci/env
+  if [ -f ".ci/env" ]; then
+    if [ "${VERBOSE:-false}" == "true" ]; then
+      echo "-> loading environment from .ci/env"
     fi
-    # - normalizeci
-    if ! command -v normalizeci > /dev/null; then
-        echo "-> normalizeci not available. Please run the modular pipeline installation script!"
-        exit 1
+    export $(grep -v '^#' .ci/env | xargs)
+  fi
+
+  # prerequisites
+  # - envcli
+  if ! command -v envcli > /dev/null; then
+    echo "-> envcli not available. Please run the modular pipeline installation script!"
+    exit 1
+  fi
+  # - normalizeci
+  if ! command -v normalizeci > /dev/null; then
+    echo "-> normalizeci not available. Please run the modular pipeline installation script!"
+    exit 1
+  fi
+  # - docker
+  if ! command -v docker > /dev/null; then
+    echo "-> docker not available. Please install docker!"
+    exit 1
+  fi
+
+  # find container runtime (if docker info fails)
+  if ! docker info &>/dev/null; then
+    echo "-> trying to find a working container runtime ..."
+
+    # set DOCKER_HOST
+    set +u
+    local CHOST=docker
+    local CPORT=2375
+
+    if [ -z "$DOCKER_HOST" ] && [ "$KUBERNETES_PORT" ]; then
+      echo "-> detected kubernetes usage, using localhost"
+      CHOST=localhost
     fi
-    # - docker
-    if ! command -v docker > /dev/null; then
-        echo "-> docker not available. Please install docker!"
-        exit 1
+    if [ "$DOCKER_TLS_CERTDIR" ]; then
+      echo "-> detected docker tls cert usage, using port 2376"
+      CPORT=2376
     fi
 
-    # find container runtime (if docker info fails)
-    if ! docker info &>/dev/null; then
-        echo "-> Searching for container runtime ..."
-
-        # overwrite DOCKER_HOST to reach the daemon, whereever it's running
-        set +u
-        if [ -z "$DOCKER_HOST" ] && [ "$KUBERNETES_PORT" ]; then
-            echo "-> Detected kubernetes usage, using DOCKER_HOST = tcp://localhost:2375"
-            export DOCKER_HOST='tcp://localhost:2375'
-        elif [ "$DOCKER_TLS_CERTDIR" ]; then
-            echo "-> Detected docker tls cert usage, using DOCKER_HOST = tcp://docker:2376"
-            export DOCKER_HOST='tcp://docker:2376'
-        fi
-        set -u
+    export DOCKER_HOST="tcp://${CHOST}:${CPORT}"
+    set -u
+  else
+    if [ "${VERBOSE:-false}" == "true" ]; then
+      echo "-> container runtime is ready for use"
     fi
+  fi
 
-    # normalize ci variables
+  # normalize ci variables
+  if [ "${VERBOSE:-false}" == "true" ]; then
     echo "-> execute: normalizeci"
-    eval $(normalizeci)
+  fi
+  eval $(normalizeci)
 
-    # ensure required variables are set
-    export PROJECT_TYPE=${PROJECT_TYPE:-none}
-    export DEPLOYMENT_TYPE=${DEPLOYMENT_TYPE:-none}
+  # ensure required variables are set
+  export PROJECT_TYPE=${PROJECT_TYPE:-none}
+  export DEPLOYMENT_TYPE=${DEPLOYMENT_TYPE:-none}
 
-    # proxy
-    export HTTP_PROXY=${HTTP_PROXY:-}
-    export HTTPS_PROXY=${HTTPS_PROXY:-}
-    export PROXY_HOST=${PROXY_HOST:-}
-    export PROXY_PORT=${PROXY_PORT:-}
-    export JAVA_PROXY_OPTS="-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT"
+  # proxy
+  export HTTP_PROXY=${HTTP_PROXY:-}
+  export HTTPS_PROXY=${HTTPS_PROXY:-}
+  export PROXY_HOST=${PROXY_HOST:-}
+  export PROXY_PORT=${PROXY_PORT:-}
+  export JAVA_PROXY_OPTS="-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT"
 }
 
 # func: run hook / $1 = hook name
