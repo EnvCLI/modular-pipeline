@@ -52,7 +52,7 @@ chmod 644 "$CONFIG_DIR/.envcli.yml"
 # req: normalizeci
 echo "-> getting normalize-ci ..."
 if ! test -f "$TARGET_DIR/normalizeci"; then
-    curl -L -s -o "$TARGET_DIR/normalizeci" "https://dl.bintray.com/envcli/golang/normalize-ci/v0.0.2/${OS}_${ARCH}"
+    curl -L -s -o "$TARGET_DIR/normalizeci" "https://dl.bintray.com/envcli/golang/normalize-ci/v0.1.0/${OS}_${ARCH}"
     chmod +x "$TARGET_DIR/normalizeci"
 fi
 
