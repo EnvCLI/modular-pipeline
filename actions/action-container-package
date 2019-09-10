@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ACTION_CATEGORY="package"
-ACTION_NAME="dockerfile"
+ACTION_CATEGORY="container"
+ACTION_NAME="package"
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
@@ -38,6 +38,7 @@ function main()
   # save image
   mkdir -p dist/container-image
   docker save $CONTAINER_REPO:$CONTAINER_TAG > dist/container-image/main.tar
+  echo "--> stored image into dist/container-image/main.tar"
 
   # remove default dockerfile if used
   if echo "${USED_DEFAULT_DOCKER:-false}" | grep -q 'true'; then

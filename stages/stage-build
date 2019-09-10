@@ -16,9 +16,12 @@ function main()
   elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
     # java
     action-java-build
+  elif [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
+    # container
+    action-container-package
   else
-    echo "error: project type ${PROJECT_TYPE} is not supported!"
-    exit 1
+    echo "warn: project type ${PROJECT_TYPE} is not supported!"
+    exit 0
   fi
 
   # optimization support
@@ -26,8 +29,6 @@ function main()
     # optimize binary using upx
     action-optimize-upx
   fi
-
-  # by deployment type
 }
 
 # entrypoint

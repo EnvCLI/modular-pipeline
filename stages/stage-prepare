@@ -18,9 +18,8 @@ function main()
     # java
     echo "-> pulling required container images ..."
     envcli pull-image java
-  elif [[ ${PROJECT_TYPE} =~ ^dockerfile-.*$ ]]; then
-    # dockerfile artifact-delivery based projects
-    echo "-> doing nothing."
+  elif [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
+    echo "-> no preparation needed to build a container image."
   else
     echo "error: project type ${PROJECT_TYPE} is not supported!"
     exit 1

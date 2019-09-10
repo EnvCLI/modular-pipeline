@@ -16,6 +16,9 @@ function main()
   elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
     # java
     action-java-test
+  elif [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
+    # container
+    echo "-> no tests for containers yet ..."
   else
     echo "error: project type ${PROJECT_TYPE} is not supported!"
     exit 1

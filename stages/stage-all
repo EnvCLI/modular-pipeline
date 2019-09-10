@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-STAGE_NAME="audit"
+STAGE_NAME="all"
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
