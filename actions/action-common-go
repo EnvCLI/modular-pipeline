@@ -7,7 +7,7 @@ act-go-common-build() {
   ARTIFACT_OS=$1
   ARTIFACT_ARCH=$2
   GOARM=
-  
+
   # arm architectures -> https://github.com/golang/go/wiki/GoArm#supported-architectures
   if echo "$2" | grep -q 'armv7'; then
     ARTIFACT_ARCH=arm
@@ -17,7 +17,7 @@ act-go-common-build() {
     ARTIFACT_ARCH=arm64
   fi
 
-  echo "--> Generating artifact $ARTIFACT ..."
+  echo "--> Generating artifact $ARTIFACT [$NCI_COMMIT_REF_RELEASE] ..."
   # shellcheck disable=SC2086
   envcli run --env GOOS=$ARTIFACT_OS --env GOARCH=$ARTIFACT_ARCH --env GOARM=$GOARM --env CGO_ENABLED=0 go build -o $ARTIFACT_DIR/$ARTIFACT -ldflags="-w -X main.Version=$NCI_COMMIT_REF_RELEASE -X main.CommitHash=$NCI_COMMIT_SHA" ./src
   echo "--> Successfully generated artifact $ARTIFACT_DIR/$ARTIFACT [$(ls -lh $ARTIFACT_DIR/$ARTIFACT | cut -d " " -f5)]"
