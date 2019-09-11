@@ -14,6 +14,9 @@ function main()
   CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
   CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
 
+  # login to registry
+  act-common-container-registry-login
+
   # push image
   act-common-container-registry-push "${CONTAINER_REPO}:${CONTAINER_TAG}"
 }
