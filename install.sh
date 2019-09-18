@@ -33,7 +33,7 @@ fi
 
 # preq: envcli
 echo "-> getting envcli ..."
-if ! test -f "$TARGET_DIR/envcli"; then
+if ! [ -x "$(command -v envcli)" ]; then
   echo "--> installing envcli into $TARGET_DIR"
   curl -L -s -o "$TARGET_DIR/envcli" "https://dl.bintray.com/envcli/golang/envcli/v0.6.0/envcli_${OS}_${ARCH}"
   chmod +x "$TARGET_DIR/envcli"
@@ -51,7 +51,7 @@ chmod 644 "$CONFIG_DIR/.envcli.yml"
 
 # req: normalizeci
 echo "-> getting normalize-ci ..."
-if ! test -f "$TARGET_DIR/normalizeci"; then
+if ! [ -x "$(command -v normalizeci)" ]; then
   curl -L -s -o "$TARGET_DIR/normalizeci" "https://dl.bintray.com/envcli/golang/normalize-ci/v0.1.0/${OS}_${ARCH}"
   chmod +x "$TARGET_DIR/normalizeci"
 fi
@@ -62,9 +62,10 @@ echo "-> getting pipeline scripts ..."
 ACTION_LIST=(
   "action-common"
   "action-common-deploy"
+  "action-common-container"
+  "action-common-kubernetes"
   "action-common-go"
   "action-common-java"
-  "action-common-kubernetes"
   "action-ci-debug"
   "action-go-test"
   "action-go-build"

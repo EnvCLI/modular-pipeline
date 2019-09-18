@@ -13,7 +13,8 @@ function main()
 {
   # detect build system
   act-java-common-detect
-  echo "-> execute: test"
+
+  # run tests
   if echo "$BUILD_SYSTEM" | grep -q 'gradle'; then
     # gradle
     act-java-common-gradle test
@@ -28,10 +29,6 @@ function main()
       exit 1
     fi
     set -e
-  else
-    echo "--> error: unknown build system!"
-    echo "Supported are: gradle, maven"
-    exit 1
   fi
 }
 
@@ -44,7 +41,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging"
     ;;
   *)
-    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"

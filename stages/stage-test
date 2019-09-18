@@ -9,22 +9,26 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
-  # by project type
-  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
-    # golang
-    action-go-test
-  elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
-    # java
-    action-java-test
-  elif [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
-    # container
-    echo "-> no tests for containers yet ..."
-  else
-    echo "error: project type ${PROJECT_TYPE} is not supported!"
-    exit 1
+  # container
+  if [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
+    act-log-message "no tests for containers yet ..." "WARN"
+    exit 0
   fi
 
-  # by deployment type
+  # golang
+  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
+    action-go-test
+    exit 0
+  fi
+
+  # java
+  if [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
+    action-java-test
+    exit 0
+  fi
+
+  # no match
+  act-log-message "project type ${PROJECT_TYPE} does not support tests yet!" "WARN"
 }
 
 # entrypoint
@@ -37,7 +41,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging"
     ;;
   *)
-    echo "Running stage [$STAGE_NAME]"
+    act-log-message "Running stage [$STAGE_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$STAGE_NAME"
     main "$@"

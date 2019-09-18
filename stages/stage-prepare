@@ -9,23 +9,28 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
-  # by project type
-  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
-    # golang
-    echo "-> pulling required container images ..."
-    envcli pull-image go upx
-  elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
-    # java
-    echo "-> pulling required container images ..."
-    envcli pull-image java
-  elif [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
-    echo "-> no preparation needed to build a container image."
-  else
-    echo "error: project type ${PROJECT_TYPE} is not supported!"
-    exit 1
+  # container
+  if [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
+    act-log-message "does not need any preparation." "INFO"
+    exit 0
   fi
 
-  # by deployment type
+  # container
+  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
+    act-log-message "pulling images ..." "INFO"
+    envcli pull-image go upx
+    exit 0
+  fi
+
+  # java
+  if [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
+    act-log-message "pulling images ..." "INFO"
+    envcli pull-image java
+    exit 0
+  fi
+
+  # no match
+  act-log-message "project type ${PROJECT_TYPE} does not support prepare yet!" "WARN"
 }
 
 # entrypoint
@@ -38,7 +43,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging"
     ;;
   *)
-    echo "Running stage [$STAGE_NAME]"
+    act-log-message "Running stage [$STAGE_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$STAGE_NAME"
     main "$@"

@@ -9,7 +9,7 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
-  echo "-> no checks supported yet ..."
+  act-log-message "no checks supported yet ..." "INFO"
 }
 
 # entrypoint
@@ -22,7 +22,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging"
     ;;
   *)
-    echo "Running stage [$STAGE_NAME]"
+    act-log-message "Running stage [$STAGE_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$STAGE_NAME"
     main "$@"

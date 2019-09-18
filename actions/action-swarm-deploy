@@ -7,24 +7,50 @@ ACTION_NAME="deploy"
 LOCAL_PATH=${BASH_SOURCE%/*}
 source "$LOCAL_PATH/action-common"
 source "$LOCAL_PATH/action-common-deploy"
+source "$LOCAL_PATH/action-common-container"
 
 # main
 function main()
 {
-  # configuration
-  local DEPLOYMENT_ENVIRONMENT=${1:-}
-  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
-    echo "error: no target environment specified when calling deploy stage!"
+  # namespace
+  local DEPLOYMENT_NAMESPACE=${1:-$DEPLOYMENT_NAMESPACE}
+  if [ -z "$DEPLOYMENT_NAMESPACE" ]; then
+    act-log-message "Required attribute DEPLOYMENT_NAMESPACE missing, set via env or pass it as 1st parameter to action-swarm-deploy!" "ERROR"
     exit 1
   fi
+
+  # deployment id
   local DEPLOYMENT_ID=${2:-$DEPLOYMENT_ID}
   if [ -z "$DEPLOYMENT_ID" ]; then
-    echo "error: no deployment id specified!"
+    act-log-message "Required attribute DEPLOYMENT_ID missing, set via env or pass it as 2nd parameter to action-swarm-deploy!" "ERROR"
     exit 1
   fi
-  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..."
+
+  # environment
+  local DEPLOYMENT_ENVIRONMENT=${3:-$DEPLOYMENT_ENVIRONMENT}
+  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
+    act-log-message "Required attribute DEPLOYMENT_ENVIRONMENT missing, set via env or pass it as 3rd parameter to action-swarm-deploy!" "ERROR"
+    exit 1
+  fi
+
+  act-log-message "deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..." "INFO"
+  export SWARMSTACKFILE=${SWARMSTACKFILE:-swarm.yml}
   export CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
   export CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
+
+  # support for SWARMSTACKFILE_DEFAULT
+  if ! test -f "$SWARMSTACKFILE"; then
+    act-log-message "no swarmstack file provided at [$SWARMSTACKFILE]" "DEBUG"
+
+    if [ -z "$SWARMSTACKFILE_DEFAULT" ]; then
+      act-log-message "no swarmstack file provided at [$SWARMSTACKFILE] and no default set using SWARMSTACKFILE_DEFAULT!" "ERROR"
+      exit 1
+    else
+      act-log-message "using default swarmstack file provided at [$SWARMSTACKFILE] from [$SWARMSTACKFILE_DEFAULT]!" "INFO"
+      curl -L -s -o "$SWARMSTACKFILE" "$SWARMSTACKFILE_DEFAULT"
+      USED_DEFAULT_SWARMCONFIG=true
+    fi
+  fi
 
   # generate deployment configuration
   act-common-deploy-generate-configuration $DEPLOYMENT_ENVIRONMENT
@@ -36,16 +62,15 @@ function main()
   act-common-container-registry-login
 
   # deploy stack (placeholders are replaced by the .env file provided to the stack file)
-  echo "-> run deployment [SWARM_ID:p${NCI_PROJECT_ID}-${DEPLOYMENT_ENVIRONMENT}] ..."
   set +e
   docker stack deploy --compose-file $SWARMSTACK_FILE --with-registry-auth $DEPLOYMENT_ID
   deploymentResult=$?
   set -e
   if [ "$deploymentResult" -ne "0" ]; then
-    echo "-> deployment failed ..."
-    exit 1
+    act-log-message "Failed to run deployment!" "ERROR"
+    exit $deploymentResult
   else
-    echo "-> deployment succeeded."
+    act-log-message "Deployment executed succesfully!" "INFO"
   fi
 }
 
@@ -61,7 +86,7 @@ case "${1:-}" in
     echo "* SWARMSTACK_FILE: provide a custom file with a docker swarm stack definition. (defaults to swarm.yml)"
     ;;
   *)
-    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"

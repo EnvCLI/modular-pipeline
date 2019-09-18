@@ -5,13 +5,14 @@ set -euo pipefail
 function act-java-common-detect
 {
   if test -f "build.gradle"; then
+    act-log-message "Found a gradle project." "DEBUG"
     export BUILD_SYSTEM=gradle
   elif test -f "pom.xml"; then
+    act-log-message "Found a maven project." "DEBUG"
     export BUILD_SYSTEM=maven
   else
+    act-log-message "Could not detect java build system, please use either gradle or maven!" "ERROR"
     export BUILD_SYSTEM=unknown
-    echo "--> error: unknown build system!"
-    echo "Supported are: gradle, maven"
     exit 1
   fi
 }
@@ -29,9 +30,9 @@ function act-java-common-gradle
     fi
 
     # run build (This essentially downloads a copy of Gradle to build the project with.)
-    envcli run java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} $@
+    run-in-container java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} $@
   else
-    echo "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html"
+    act-log-message "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html" "ERROR"
     exit 1
   fi
 }
@@ -43,14 +44,14 @@ function act-java-common-maven
   M2_HOME=${M2_HOME:-/root/.m2}
   MAVEN_CONFIG=${MAVEN_CONFIG:-}
   MAVEN_DEFAULTVERSION=${MAVEN_DEFAULTVERSION:-3.6.2}
-  
+
   # maven wrapper
   if test -f "mvnw"; then
     MAVEN_CALL=("-Dmaven.home=${M2_HOME}" "-Dmaven.multiModuleProjectDirectory=/project" "-classpath" ".mvn/wrapper/maven-wrapper.jar" "org.apache.maven.wrapper.MavenWrapperMain")
-    
+
     # - make sure the maven wrapper is present
     if test -f ".mvn/wrapper/maven-wrapper.jar"; then
-      echo "--> Maven wrapper .mvn/wrapper/maven-wrapper.jar is already present." 
+      echo "--> Maven wrapper .mvn/wrapper/maven-wrapper.jar is already present."
     else
       echo "--> Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
       mkdir -p .mvn/wrapper
@@ -59,16 +60,16 @@ function act-java-common-maven
 
     # - check for maven wrapper properties file
     if test -f ".mvn/wrapper/maven-wrapper.properties"; then
-      echo "--> Maven wrapper configuration .mvn/wrapper/maven-wrapper.properties found." 
+      act-log-message "Maven wrapper configuration .mvn/wrapper/maven-wrapper.properties found." "DEBUG"
     else
-      echo "--> Warning: Couldn't find .mvn/wrapper/maven-wrapper.properties, using maven $MAVEN_DEFAULTVERSION as default!"
+      act-log-message "Couldn't find .mvn/wrapper/maven-wrapper.properties, using maven $MAVEN_DEFAULTVERSION as default!" "WARN"
       echo "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/$MAVEN_DEFAULTVERSION/apache-maven-$MAVEN_DEFAULTVERSION-bin.zip" >> .mvn/wrapper/maven-wrapper.properties
     fi
 
     # run build
-    envcli run java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
+    run-in-container java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
   else
-    echo "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper"
+    act-log-message "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper" "ERROR"
     exit 1
   fi
 }

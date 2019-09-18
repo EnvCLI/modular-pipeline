@@ -9,51 +9,59 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
+  act-log-message "Will deploy using method: ${DEPLOYMENT_TYPE}" "INFO"
+
   # deployment target: none
   if [[ ${DEPLOYMENT_TYPE} == "none" ]]; then
-    echo "-> not running deployment, no DEPLOYMENT_TYPE set!"
+    act-log-message "not running deployment, no DEPLOYMENT_TYPE set!" "NONE"
     exit 0
   fi
 
-  # deployment target
-  local DEPLOYMENT_ENVIRONMENT=${1:-}
-  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
-    echo "error: no target environment specified when calling deploy stage!"
+  # deployment namespace
+  local DEPLOYMENT_NAMESPACE=${1:-$DEPLOYMENT_NAMESPACE}
+  if [ -z "$DEPLOYMENT_NAMESPACE" ]; then
+    act-log-message "no target environment specified when calling deploy stage!" "ERROR"
     exit 1
   fi
-  local DEPLOYMENT_ID=${2:-p${NCI_PROJECT_ID}-${DEPLOYMENT_ENVIRONMENT}}
-  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT] ..."
 
-  # by deployment type
+  # deployment id
+  local DEPLOYMENT_ID=${2:-$DEPLOYMENT_ID}
+
+  # deployment target
+  local DEPLOYMENT_ENVIRONMENT=${3:-$DEPLOYMENT_ENVIRONMENT}
+  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
+    act-log-message "no target environment specified when calling deploy stage!" "ERROR"
+    exit 1
+  fi
+
+  act-log-message "deploying environment [$DEPLOYMENT_ENVIRONMENT] ..." "INFO"
+
+  # deploymentType: docker swarm
   if [[ ${DEPLOYMENT_TYPE} == "swarm" ]]; then
-    echo "-> deployment will use swarm stacks ..."
-
-    # configuration
-    export SWARMSTACK_FILE=${SWARMSTACK_FILE:-swarm.yml}
-
-    # pull swarm stack by template
-    if [ ! -f $SWARMSTACK_FILE ]; then
-      # retrieve swarm stack template file by project type of the project didn't provide one
-      if [[ ${PROJECT_TYPE} =~ ^.*-service$ ]]; then
-        echo "-> download swarm template for build stack $PROJECT_TYPE and setting SWARMSTACK_FILE."
-        curl -L -s -o "dist/swarm-deployment.yml" "$MPI_RESOURCES_MIRROR/swarm-service.yml"
-        export SWARMSTACK_FILE=dist/swarm-deployment.yml
-      else
-        echo "error: project type $PROJECT_TYPE is not supported yet! Please request support or provide your own swarm.yml."
-        exit 1
-      fi
+    # web based services
+    if [[ ${PROJECT_TYPE} =~ ^.*-http$ ]]; then
+      export SWARMSTACKFILE_DEFAULT="$MPI_RESOURCES_MIRROR/swarm-http.yml"
     fi
 
     # run deployment
-    action-swarm-deploy $DEPLOYMENT_ENVIRONMENT $DEPLOYMENT_ID
-  elif [[ ${DEPLOYMENT_TYPE} == "helm" ]]; then
-    echo "-> deployment will use helm charts ..."
-
-    # run deployment
-    action-helm-deploy $DEPLOYMENT_ENVIRONMENT $DEPLOYMENT_ID
-  else
-    echo "warning: deployment type ${DEPLOYMENT_TYPE} is not supported!"
+    action-swarm-deploy "$DEPLOYMENT_NAMESPACE" "$DEPLOYMENT_ENVIRONMENT" "$DEPLOYMENT_ID"
+    exit 0
   fi
+
+  # deploymentType: helm
+  if [[ ${DEPLOYMENT_TYPE} == "helm" ]]; then
+    # web based services
+    if [[ ${PROJECT_TYPE} =~ ^.*-http$ ]]; then
+      DEPLOYMENT_CHART=philippheuer/webservice
+    fi
+
+    action-helm-deploy "$DEPLOYMENT_NAMESPACE" "$DEPLOYMENT_ENVIRONMENT" "$DEPLOYMENT_ID" "$DEPLOYMENT_CHART"
+    exit 0
+  fi
+
+  # no match
+  act-log-message "deployment type ${DEPLOYMENT_TYPE} is not supported!" "ERROR"
+  exit 1
 }
 
 # entrypoint
@@ -66,7 +74,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging"
     ;;
   *)
-    echo "Running stage [$STAGE_NAME]"
+    act-log-message "Running stage [$STAGE_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$STAGE_NAME"
     main "$@"

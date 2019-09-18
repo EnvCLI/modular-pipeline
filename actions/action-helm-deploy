@@ -18,57 +18,78 @@ function main()
   export DOCKER_DRIVER="${DOCKER_DRIVER:-overlay2}"
 
   # parameters
-  # - environment
-  local DEPLOYMENT_ENVIRONMENT=${1:-$DEPLOYMENT_ENVIRONMENT}
-  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
-    echo "error: no target environment specified when calling deploy stage!"
+  # - namespaces
+  local DEPLOYMENT_NAMESPACE=${1:-$DEPLOYMENT_NAMESPACE}
+  if [ -z "$DEPLOYMENT_NAMESPACE" ]; then
+    act-log-message "error: no deployment namespace specified! Plase set [DEPLOYMENT_NAMESPACE] or provide it as 1st argument when calling action-helm-deploy!" "ERROR"
     exit 1
   fi
+  # - deployment id
   local DEPLOYMENT_ID=${2:-$DEPLOYMENT_ID}
   if [ -z "$DEPLOYMENT_ID" ]; then
-    echo "error: no deployment id specified!"
+    act-log-message "no deployment id specified! Plase set [DEPLOYMENT_ID] or provide it as 2nd argument when calling action-helm-deploy!" "ERROR"
     exit 1
   fi
-  echo "-> deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..."
-  # - namespaces
-  local DEPLOYMENT_NAMESPACE=${2:-$DEPLOYMENT_NAMESPACE}
-  if [ -z "$DEPLOYMENT_NAMESPACE" ]; then
-    echo "error: no deployment namespace specified!"
+  # - environment
+  local DEPLOYMENT_ENVIRONMENT=${3:-$DEPLOYMENT_ENVIRONMENT}
+  if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
+    act-log-message "no target environment specified. Plase set [DEPLOYMENT_ENVIRONMENT] or provide it as 3rd argument when calling action-helm-deploy!" "ERROR"
     exit 1
   fi
-  export TILLER_NAMESPACE=${DEPLOYMENT_NAMESPACE}
+  act-log-message "deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..." "DEBUG"
+
   # - access
   export DEPLOYMENT_CLUSTER_ADMIN=${DEPLOYMENT_CLUSTER_ADMIN:-"false"}
   if [[ -z "${KUBECONFIG_CONTENT:-}" ]]; then
-    echo "You need to provide a kubeconfig in the env variable KUBECONFIG_CONTENT to connect to your kubernetes cluster!"
+    act-log-message "Please encode your kubeconfig as base64 and set it as environment variable [KUBECONFIG_CONTENT] to allow the pipeline to access a k8s cluster!" "ERROR"
     return 1
   fi
+
   # - chart
-  local DEPLOYMENT_CHART=${DEPLOYMENT_CHART:-stable/wordpress} # todo: remove default
+  local DEPLOYMENT_CHART=${4:-$DEPLOYMENT_CHART}
+  if [ -z "$DEPLOYMENT_CHART" ]; then
+    act-log-message "error: no deployment chart specified! Plase set [DEPLOYMENT_CHART] or provide it as 4th argument when calling action-helm-deploy!" "ERROR"
+    exit 1
+  fi
   local DEPLOYMENT_CHART_VERSION=${DEPLOYMENT_CHART_VERSION:-}
 
   # download the chart / add the required repositories
-  act-common-kubernetes-download-chart $DEPLOYMENT_CHART
+  act-common-kubernetes-download-chart "$DEPLOYMENT_CHART"
 
   # make sure the target namespace exists
-  act-common-kubernetes-ensure-namespace $DEPLOYMENT_NAMESPACE
+  act-common-kubernetes-ensure-namespace "$DEPLOYMENT_NAMESPACE"
 
   # init tiller
-  act-common-kubernetes-initialize-tiller $DEPLOYMENT_NAMESPACE
+  act-common-kubernetes-initialize-tiller "$DEPLOYMENT_NAMESPACE"
 
   # generate deployment configuration
-  act-common-deploy-generate-configuration $DEPLOYMENT_ENVIRONMENT
+  act-common-deploy-generate-configuration "$DEPLOYMENT_ENVIRONMENT"
   # values.yaml -f .helm/default.yaml
 
-  # run deployment
+  # deploy the helm chart
+  #
+  # * tiller-namespace: the namespace helms service side component tiller runs in
+  # * namespace: the target namespace we deploy into
+  # * install: install the specified chart, if it is not deployed yet
+  # * force: overwrite conflicting resources if required (some have immutable attributes)
+  # * version: the version of the chart that should be used
+  #
+  act-log-message "deploying using chart [${DEPLOYMENT_CHART}:${DEPLOYMENT_CHART_VERSION:-latest}] into namespace [$DEPLOYMENT_NAMESPACE] as [$DEPLOYMENT_ID]" "INFO"
   if [ -z "${DEPLOYMENT_CHART_VERSION}" ]; then
-    ## without version
-    echo " - Deploying chart ${DEPLOYMENT_CHART} into ${DEPLOYMENT_NAMESPACE}"
-    envcli run helm upgrade --install --force --namespace ${DEPLOYMENT_NAMESPACE} $DEPLOY_SLUG ${DEPLOYMENT_CHART}
+    run-in-container helm upgrade \
+      --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
+      --namespace "${DEPLOYMENT_NAMESPACE}" \
+      --install \
+      --force \
+      "$DEPLOYMENT_ID" "${DEPLOYMENT_CHART}"
   else
-    ## with version
-    echo " - Deploying chart ${DEPLOYMENT_CHART} - ${DEPLOYMENT_CHART_VERSION} into ${DEPLOYMENT_NAMESPACE}"
-    envcli run helm upgrade --install --force --namespace ${DEPLOYMENT_NAMESPACE} --version ${DEPLOYMENT_CHART_VERSION} $DEPLOY_SLUG ${DEPLOYMENT_CHART}
+    run-in-container helm upgrade \
+      --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
+      --namespace "${DEPLOYMENT_NAMESPACE}" \
+      --version "${DEPLOYMENT_CHART_VERSION}" \
+      --install \
+      --force \
+      "$DEPLOYMENT_ID" "${DEPLOYMENT_CHART}"
   fi
 }
 
@@ -87,7 +108,7 @@ case "${1:-}" in
     echo "* DEPLOYMENT_CHART_VERSION: helm chart version, using latest by default."
     ;;
   *)
-    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"

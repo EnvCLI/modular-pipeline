@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# container registry login
+function act-common-container-registry-login()
+{
+  act-log-message "trying to login to container registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
+
+  if [[ -n "$NCI_CONTAINERREGISTRY_USERNAME" ]]; then
+    docker login -u "$NCI_CONTAINERREGISTRY_USERNAME" -p "$NCI_CONTAINERREGISTRY_PASSWORD" "$NCI_CONTAINERREGISTRY_HOST"
+  else
+    act-log-message "Failed to login to container registry! No credentials provided!" "ERROR"
+    exit 1
+  fi
+}
+
+# container registry login
+function act-common-container-registry-push()
+{
+  act-log-message "pushing image to remote registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
+  docker push "${1:-}"
+}

@@ -19,7 +19,8 @@ function main()
 
   # detect build system
   act-java-common-detect
-  echo "-> execute: build"
+
+  # run build
   if echo "$BUILD_SYSTEM" | grep -q 'gradle'; then
     # gradle
     act-java-common-gradle clean assemble
@@ -36,10 +37,6 @@ function main()
 
     # copy artifacts to ARTIFACT_DIR
     cp -R target/*.jar $ARTIFACT_DIR
-  else
-    echo "--> error: unknown build system!"
-    echo "Supported are: gradle, maven"
-    exit 1
   fi
 }
 
@@ -53,7 +50,7 @@ case "${1:-}" in
     echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
     ;;
   *)
-    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"

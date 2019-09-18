@@ -3,44 +3,68 @@
 # debug mode
 DEBUG=${DEBUG:-false}
 if [ "$DEBUG" == "true" ]; then
-    echo "-> Debugging mode enabled ..."
-    set -x
+  echo "-> Debugging mode enabled ..."
+  set -x
 fi
 
 # global variables
 MPI_RESOURCES_MIRROR=https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/resources
 
+# func: logging
+declare -A levels=([TRACE]=0 [DEBUG]=1 [INFO]=2 [WARN]=3 [ERROR]=4)
+function act-log-message() {
+  local log_message=$1
+  local log_priority=$2
+
+  # check if level exists
+  [[ ${levels[$log_priority]} ]] || return 1
+
+  # check if level is enough
+  (( ${levels[$log_priority]} < ${levels[${SCRIPT_LOG_LEVEL:-INFO}]} )) && return 0
+
+  # log the message
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${log_priority} : ${log_message}"
+}
+
+# func: run
+function run-command() {
+  act-log-message "Command $*" "TRACE"
+  eval "$@"
+}
+
+# func: run in container
+function run-in-container() {
+  eval run-command envcli run "$@"
+}
+
 # func: prepare
-function act-common-prepare()
-{
+function act-common-prepare() {
   # source in .ci/env
   if [ -f ".ci/env" ]; then
-    if [ "${VERBOSE:-false}" == "true" ]; then
-      echo "-> loading environment from .ci/env"
-    fi
+    act-log-message "loading environment from .ci/env" "DEBUG"
     export $(grep -v '^#' .ci/env | xargs)
   fi
 
   # prerequisites
+  # - docker
+  if ! command -v docker > /dev/null; then
+    act-log-message "docker is required but missing!" "ERROR"
+    exit 1
+  fi
   # - envcli
   if ! command -v envcli > /dev/null; then
-    echo "-> envcli not available. Please run the modular pipeline installation script!"
+    act-log-message "-> envcli not available. Please run theinstallation script!" "ERROR"
     exit 1
   fi
   # - normalizeci
   if ! command -v normalizeci > /dev/null; then
-    echo "-> normalizeci not available. Please run the modular pipeline installation script!"
-    exit 1
-  fi
-  # - docker
-  if ! command -v docker > /dev/null; then
-    echo "-> docker not available. Please install docker!"
+    act-log-message "-> normalizeci not available. Please run the installation script!" "ERROR"
     exit 1
   fi
 
   # find container runtime (if docker info fails)
   if ! docker info &>/dev/null; then
-    echo "-> trying to find a working container runtime ..."
+    act-log-message "trying to find a working container runtime ..." "DEBUG"
 
     # set DOCKER_HOST
     set +u
@@ -48,26 +72,22 @@ function act-common-prepare()
     local CPORT=2375
 
     if [ -z "$DOCKER_HOST" ] && [ "$KUBERNETES_PORT" ]; then
-      echo "-> detected kubernetes usage, using localhost"
+      act-log-message "detected kubernetes usage, using localhost" "DEBUG"
       CHOST=localhost
     fi
     if [ "$DOCKER_TLS_CERTDIR" ]; then
-      echo "-> detected docker tls cert usage, using port 2376"
+      act-log-message "detected docker tls cert usage, using port 2376" "DEBUG"
       CPORT=2376
     fi
 
     export DOCKER_HOST="tcp://${CHOST}:${CPORT}"
     set -u
   else
-    if [ "${VERBOSE:-false}" == "true" ]; then
-      echo "-> container runtime is ready for use"
-    fi
+    act-log-message "container runtime is ready for use" "TRACE"
   fi
 
   # normalize ci variables
-  if [ "${VERBOSE:-false}" == "true" ]; then
-    echo "-> execute: normalizeci"
-  fi
+  act-log-message "run normalizeci" "TRACE"
   eval $(normalizeci)
 
   # ensure required variables are set
@@ -85,29 +105,9 @@ function act-common-prepare()
 # func: run hook / $1 = hook name
 function act-common-hook()
 {
-    # repository hooks
-    if test -f "$NCI_PROJECT_DIR/.ci/$1.sh"; then
-        echo "-> execute: repository hook \`$1\`"
-        $NCI_PROJECT_DIR/.ci/$1.sh
-    fi
-}
-
-# container registry login
-function act-common-container-registry-login()
-{
-  echo "-> trying to login to container registry $NCI_CONTAINERREGISTRY_HOST ..."
-
-  if [[ -n "$NCI_CONTAINERREGISTRY_USERNAME" ]]; then
-    docker login -u "$NCI_CONTAINERREGISTRY_USERNAME" -p "$NCI_CONTAINERREGISTRY_PASSWORD" "$NCI_CONTAINERREGISTRY_HOST"
-  else
-    echo "Failed to login to container registry! No credentials provided!"
-    exit 1
+  # repository hooks
+  if test -f "$NCI_PROJECT_DIR/.ci/$1.sh"; then
+    act-log-message "execute: repository hook [${1}]" "INFO"
+    $NCI_PROJECT_DIR/.ci/$1.sh
   fi
-}
-
-# container registry login
-function act-common-container-registry-push()
-{
-  echo "-> pushing image to remote registry $NCI_CONTAINERREGISTRY_HOST ..."
-  docker push "${1:-}"
 }

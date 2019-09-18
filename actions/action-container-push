@@ -6,6 +6,7 @@ ACTION_NAME="push"
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
 source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/action-common-container"
 
 # main
 function main()
@@ -31,7 +32,7 @@ case "${1:-}" in
     echo "* DOCKERFILE_PATH: Path of the dockerfile, by default the current working directory."
     ;;
   *)
-    echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"

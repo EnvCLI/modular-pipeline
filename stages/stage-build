@@ -9,26 +9,26 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
-  # by project type
-  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
-    # golang
-    action-go-build
-  elif [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
-    # java
-    action-java-build
-  elif [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
-    # container
+  # container
+  if [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
     action-container-build
-  else
-    echo "warn: project type ${PROJECT_TYPE} is not supported!"
     exit 0
   fi
 
-  # optimization support
-  if [[ ${UPX_ENABLE:-false} == "true" ]]; then
-    # optimize binary using upx
-    action-optimize-upx
+  # golang
+  if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
+    action-go-build
+    exit 0
   fi
+
+  # java
+  if [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
+    action-java-build
+    exit 0
+  fi
+
+  # no match
+  act-log-message "project type ${PROJECT_TYPE} is not supported!" "WARN"
 }
 
 # entrypoint
@@ -41,7 +41,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging"
     ;;
   *)
-    echo "Running stage [$STAGE_NAME]"
+    act-log-message "Running stage [$STAGE_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$STAGE_NAME"
     main "$@"

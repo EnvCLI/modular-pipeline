@@ -9,10 +9,10 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
-  # container image
+  # container
   if test -f "dist/container-image/main.tar"; then
     # import image
-    echo "--> publishing container image from dist/container-image/main.tar"
+    act-log-message "publishing container image from dist/container-image/main.tar" "INFO"
     docker load -i dist/container-image/main.tar
 
     # publish
@@ -37,7 +37,7 @@ case "${1:-}" in
     echo "* DEBUG: Can be set to true to enable debugging"
     ;;
   *)
-    echo "Running stage [$STAGE_NAME]"
+    act-log-message "Running stage [$STAGE_NAME]" "INFO"
     act-common-prepare
     act-common-hook "pre-$STAGE_NAME"
     main "$@"
