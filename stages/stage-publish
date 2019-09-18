@@ -19,10 +19,10 @@ function main()
     action-container-push
   fi
 
-  # by deployment type
+  # bintray
   if [[ ${DEPLOYMENT_TYPE} == "bintray" ]]; then
     # for cli and libraries, TODO: add filter later
-    echo "-> will publish a bintray package with the artifacts ..."
+    act-log-message "publishing bintray artifacts from dist/" "INFO"
     action-bintray-publish
   fi
 }
