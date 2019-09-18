@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="html"
+ACTION_NAME="test"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # configuration
+  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+
+  # make sure the directory exists
+  mkdir -p $ARTIFACT_DIR
+
+  # get dependencies
+  run-in-container htmlproofer "$ARTIFACT_DIR" --allow-hash-href --check-html --empty-alt-ignore --disable-external
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "HTML Test"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
+    ;;
+  *)
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

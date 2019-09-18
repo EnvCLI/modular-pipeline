@@ -22,6 +22,13 @@ function main()
     exit 0
   fi
 
+  # hugo
+  if [[ ${PROJECT_TYPE} =~ ^hugo-http$ ]]; then
+    export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/html-http.dockerfile"
+    action-container-build
+    exit 0
+  fi
+
   # no match
   act-log-message "project type ${PROJECT_TYPE} is not supported by package yet!" "WARN"
 }

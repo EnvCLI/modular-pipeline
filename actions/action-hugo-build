@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="hugo"
+ACTION_NAME="build"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # configuration
+  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+  HUGO_SOURCE=${HUGO_SOURCE:-.}
+
+  # make sure the directory exists
+  mkdir -p $ARTIFACT_DIR
+
+  # get dependencies
+  if test -f config.toml; then
+    run-in-container hugo --source "$HUGO_SOURCE" --destination "$ARTIFACT_DIR" --minify --gc --baseURL http://localhost
+  else
+    act-log-message "Hugo needs a config.toml!" "ERROR"
+    exit 1
+  fi
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Hugo Build"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
+    ;;
+  *)
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

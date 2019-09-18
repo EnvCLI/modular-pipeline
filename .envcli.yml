@@ -45,6 +45,13 @@ images:
   provides:
   - upx
   image: docker.io/envcli/upx:latest
+# Static Site Generators
+- name: hugo
+  description: The worlds fastest framework for building websites.
+  provides:
+  - hugo
+  - htmlproofer
+  image: docker.io/cibuilds/hugo:0.58.2
 # Infrastructure
 # - Kubernetes
 - name: KubeCTL
