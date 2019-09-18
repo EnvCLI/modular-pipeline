@@ -35,7 +35,7 @@ fi
 echo "-> getting envcli ..."
 if ! [ -x "$(command -v envcli)" ]; then
   echo "--> installing envcli into $TARGET_DIR"
-  curl -L -s -o "$TARGET_DIR/envcli" "https://dl.bintray.com/envcli/golang/envcli/v0.6.0/envcli_${OS}_${ARCH}"
+  curl -L -s -o "$TARGET_DIR/envcli" "https://dl.bintray.com/envcli/golang/envcli/v0.6.1/envcli_${OS}_${ARCH}"
   chmod +x "$TARGET_DIR/envcli"
 fi
 echo "-> configuring envcli"

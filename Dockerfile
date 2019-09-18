@@ -25,7 +25,7 @@ RUN echo "System Packages ..." &&\
     apk add --no-cache curl bash &&\
     echo "Tools ..." &&\
     echo "-> Getting EnvCLI ..." &&\
-    curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.0/envcli_linux_amd64 &&\
+    curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.1/envcli_linux_amd64 &&\
     chmod +x /usr/local/bin/envcli &&\
     echo "-> EnvCLI Configuration" &&\
     mkdir -p /etc/envcli &&\
