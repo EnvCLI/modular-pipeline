@@ -1,0 +1,3 @@
+# pipeline config
+PROJECT_TYPE=container-cli
+DEPLOYMENT_TYPE=none
