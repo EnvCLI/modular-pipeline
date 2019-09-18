@@ -33,25 +33,28 @@ if echo "$INSTALL_MODE" | grep -q 'project'; then
 fi
 
 # preq: envcli
-echo "-> getting envcli ..."
+echo "-> checking for envcli"
 if ! [ -x "$(command -v envcli)" ]; then
   echo "--> installing envcli into $TARGET_DIR"
   curl -L -s -o "$TARGET_DIR/envcli" "https://dl.bintray.com/envcli/golang/envcli/v0.6.1/envcli_${OS}_${ARCH}"
   chmod +x "$TARGET_DIR/envcli"
 fi
+
 echo "-> configuring envcli"
-mkdir -p "$CONFIG_DIR"
-envcli config set global-configuration-path "$CONFIG_DIR"
-chmod 644 "$TARGET_DIR/.envclirc"
-if echo "$INSTALL_FROM" | grep -q 'remote'; then
-  curl -L -s -o "$CONFIG_DIR/.envcli.yml" "$DOWNLOAD_MIRROR/.envcli.yml"
-elif echo "$INSTALL_FROM" | grep -q 'local'; then
-  cp "$LOCAL_PATH/.envcli.yml" "$CONFIG_DIR/.envcli.yml"
-fi
-chmod 644 "$CONFIG_DIR/.envcli.yml"
+#mkdir -p "$CONFIG_DIR"
+#envcli config set global-configuration-path "$CONFIG_DIR"
+#chmod 644 "$TARGET_DIR/.envclirc"
+#if ! test -f "$CONFIG_DIR/.envcli.yml"; then
+#  if echo "$INSTALL_FROM" | grep -q 'remote'; then
+#    curl -L -s -o "$CONFIG_DIR/.envcli.yml" "$DOWNLOAD_MIRROR/.envcli.yml"
+#  elif echo "$INSTALL_FROM" | grep -q 'local'; then
+#    cp "$LOCAL_PATH/.envcli.yml" "$CONFIG_DIR/.envcli.yml"
+#  fi
+#  chmod 644 "$CONFIG_DIR/.envcli.yml"
+#fi
 
 # req: normalizeci
-echo "-> getting normalize-ci ..."
+echo "-> checking for normalizeci ..."
 if ! [ -x "$(command -v normalizeci)" ]; then
   curl -L -s -o "$TARGET_DIR/normalizeci" "https://dl.bintray.com/envcli/golang/normalize-ci/v0.1.0/${OS}_${ARCH}"
   chmod +x "$TARGET_DIR/normalizeci"
@@ -68,6 +71,7 @@ ACTION_LIST=(
   "action-common-go"
   "action-common-java"
   "action-ci-debug"
+  "action-go-run"
   "action-go-test"
   "action-go-build"
   "action-java-test"
