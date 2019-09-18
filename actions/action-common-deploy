@@ -19,7 +19,9 @@ function act-common-deploy-generate-configuration
   fi
 
   # get all available variables (sourced or set)
-  readarray -t ALL_VARIABLES < <(compgen -v)
+  compgen -v > dist/tmp-deployvars.env
+  readarray -t ALL_VARIABLES < dist/tmp-deployvars.env
+  rm dist/tmp-deployvars.env
 
   # prepare deploylent labels
   # - replicas
