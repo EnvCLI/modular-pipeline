@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="python"
+ACTION_NAME="build"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # configuration
+  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+
+  # make sure the directory exists
+  mkdir -p $ARTIFACT_DIR
+
+  # get dependencies
+  # - legacy
+  if test -f requirements.txt; then
+    act-log-message "The recommended way to manage your dependency is pipenv!" "WARN"
+    run-in-container pip install -r requirements.txt
+  fi
+  # - modern
+  if test -f requirements.txt; then
+    run-in-container pipenv install
+  fi
+
+  # compile .py files
+  run-in-container python -m compileall .
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Python Build"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
+    ;;
+  *)
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

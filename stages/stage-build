@@ -33,6 +33,12 @@ function main()
     exit 0
   fi
 
+  # python
+  if [[ ${PROJECT_TYPE} =~ ^python-.*$ ]]; then
+    action-python-build
+    exit 0
+  fi
+
   # no match
   act-log-message "project type ${PROJECT_TYPE} is not supported!" "WARN"
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 echo "Installing modular pipeline components"
+DOWNLOAD_MIRROR=${DOWNLOAD_MIRROR:-https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master}
 
 # configuration
 LOCAL_PATH=${BASH_SOURCE%/*}
@@ -43,7 +44,7 @@ mkdir -p "$CONFIG_DIR"
 envcli config set global-configuration-path "$CONFIG_DIR"
 chmod 644 "$TARGET_DIR/.envclirc"
 if echo "$INSTALL_FROM" | grep -q 'remote'; then
-  curl -L -s -o "$CONFIG_DIR/.envcli.yml" "https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/.envcli.yml"
+  curl -L -s -o "$CONFIG_DIR/.envcli.yml" "$DOWNLOAD_MIRROR/.envcli.yml"
 elif echo "$INSTALL_FROM" | grep -q 'local'; then
   cp "$LOCAL_PATH/.envcli.yml" "$CONFIG_DIR/.envcli.yml"
 fi
@@ -71,6 +72,10 @@ ACTION_LIST=(
   "action-go-build"
   "action-java-test"
   "action-java-build"
+  "action-python-build"
+  "action-python-run"
+  "action-hugo-build"
+  "action-html-test"
   "action-optimize-upx"
   "action-container-build"
   "action-container-push"
@@ -81,7 +86,7 @@ ACTION_LIST=(
 for i in "${ACTION_LIST[@]}"; do
   echo "--> action: $i"
   if echo "$INSTALL_FROM" | grep -q 'remote'; then
-    curl -L -s -o "$TARGET_DIR/$i" "https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/actions/$i"
+    curl -L -s -o "$TARGET_DIR/$i" "$DOWNLOAD_MIRROR/actions/$i"
   elif echo "$INSTALL_FROM" | grep -q 'local'; then
     cp "$LOCAL_PATH/actions/$i" "$TARGET_DIR/$i"
   fi
@@ -103,7 +108,7 @@ STAGE_LIST=(
 for i in "${STAGE_LIST[@]}"; do
   echo "--> stage: $i"
   if echo "$INSTALL_FROM" | grep -q 'remote'; then
-    curl -L -s -o "$TARGET_DIR/$i" "https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/stages/$i"
+    curl -L -s -o "$TARGET_DIR/$i" "$DOWNLOAD_MIRROR/stages/$i"
   elif echo "$INSTALL_FROM" | grep -q 'local'; then
     cp "$LOCAL_PATH/stages/$i" "$TARGET_DIR/$i"
   fi
