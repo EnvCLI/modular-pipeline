@@ -19,8 +19,11 @@
 # Base Image
 ############################################################
 
+# Build Args
+ARG BASE_IMAGE
+
 # Base Image
-FROM adoptopenjdk/openjdk11-openj9:jre-11.0.4_11_openj9-0.15.1-alpine
+FROM ${BASE_IMAGE:-adoptopenjdk/openjdk11-openj9:jre-11.0.4_11_openj9-0.15.1-alpine}
 
 ############################################################
 # Installation
@@ -40,4 +43,13 @@ ADD dist/*.jar /app.jar
 EXPOSE 8080/tcp
 
 # Execution
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-XX:-TieredCompilation", "-XX:+UseStringDeduplication", "-XX:+UseG1GC", "-XX:OnOutOfMemoryError=\"kill -TERM $p; sleep 10; kill -9 %p\"", "-jar", "/app.jar" ]
+CMD [ \
+  "java", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-XX:-TieredCompilation", \
+  "-XX:+UseStringDeduplication", \
+  "-XX:+UseG1GC", \
+  "-XX:OnOutOfMemoryError=\"kill -TERM $p; sleep 10; kill -9 %p\"", \
+  "-jar", \
+  "/app.jar" \
+]

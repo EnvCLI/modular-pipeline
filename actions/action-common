@@ -12,7 +12,7 @@ MPI_RESOURCES_MIRROR=https://raw.githubusercontent.com/EnvCLI/modular-pipeline/m
 
 # func: logging
 declare -A levels=([TRACE]=0 [DEBUG]=1 [INFO]=2 [WARN]=3 [ERROR]=4)
-function act-log-message() {
+act-log-message() {
   local log_message=$1
   local log_priority=$2
 
@@ -27,18 +27,18 @@ function act-log-message() {
 }
 
 # func: run
-function run-command() {
+run-command() {
   act-log-message "Command $*" "TRACE"
   eval "$@"
 }
 
 # func: run in container
-function run-in-container() {
+run-in-container() {
   eval run-command envcli run "$@"
 }
 
 # func: prepare
-function act-common-prepare() {
+act-common-prepare() {
   # source in .ci/env
   if [ -f ".ci/env" ]; then
     act-log-message "loading environment from .ci/env" "DEBUG"
@@ -94,6 +94,10 @@ function act-common-prepare() {
   export PROJECT_TYPE=${PROJECT_TYPE:-none}
   export DEPLOYMENT_TYPE=${DEPLOYMENT_TYPE:-none}
 
+  # global properties
+  export ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
+  export ARTIFACT_BUILD_ARCHS=${ARTIFACT_BUILD_ARCHS:-linux_amd64}
+
   # proxy
   export HTTP_PROXY=${HTTP_PROXY:-}
   export HTTPS_PROXY=${HTTPS_PROXY:-}
@@ -103,8 +107,7 @@ function act-common-prepare() {
 }
 
 # func: run hook / $1 = hook name
-function act-common-hook()
-{
+act-common-hook() {
   # repository hooks
   if test -f "$NCI_PROJECT_DIR/.ci/$1.sh"; then
     act-log-message "execute: repository hook [${1}]" "INFO"

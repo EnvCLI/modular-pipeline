@@ -9,11 +9,15 @@ act-go-common-build() {
   GOARM=
 
   # arm architectures -> https://github.com/golang/go/wiki/GoArm#supported-architectures
-  if echo "$2" | grep -q 'armv7'; then
+  if echo "$2" | grep -q 'arm32v6'; then
+    ARTIFACT_ARCH=arm
+    GOARM=6
+  fi
+  if echo "$2" | grep -q 'arm32v7'; then
     ARTIFACT_ARCH=arm
     GOARM=7
   fi
-  if echo "$2" | grep -q 'armv8'; then
+  if echo "$2" | grep -q 'arm64v8'; then
     ARTIFACT_ARCH=arm64
   fi
 

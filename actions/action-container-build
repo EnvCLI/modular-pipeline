@@ -17,6 +17,7 @@ function main()
   DOCKERFILE_URL_DEFAULT=${DOCKERFILE_URL_DEFAULT:-}
   CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
   CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
+  ARTIFACT_BUILD_ARCHS=${ARTIFACT_BUILD_ARCHS:-linux_amd64}
 
   # support for DOCKERFILE_URL_DEFAULT
   if ! test -f "$DOCKERFILE_PATH/$DOCKERFILE_NAME"; then
@@ -33,21 +34,15 @@ function main()
   fi
 
   # build
-  docker build \
-    --no-cache \
-    --build-arg http_proxy=$HTTP_PROXY \
-    --build-arg https_proxy=$HTTPS_PROXY \
-    --build-arg proxy_host=$PROXY_HOST \
-    --build-arg proxy_port=$PROXY_PORT \
-    -f $DOCKERFILE_NAME \
-    -t $CONTAINER_REPO:$CONTAINER_TAG \
-    $DOCKERFILE_PATH
-  echo "--> image build success ..."
+  IFS=',' read -r -a artifactBuildArchArray <<< $(echo "$ARTIFACT_BUILD_ARCHS")
+  for VALUE in "${artifactBuildArchArray[@]}"; do
+    IFS='_' read -r -a row <<< "$VALUE"
+    local buildOS="${row[0]}"
+    local buildArch="${row[1]}"
 
-  # save image
-  mkdir -p dist/container-image
-  docker save $CONTAINER_REPO:$CONTAINER_TAG > dist/container-image/main.tar
-  echo "--> stored image into dist/container-image/main.tar"
+    # run build
+    build-container "$buildOS" "$buildArch"
+  done
 
   # remove default dockerfile if used
   if echo "${USED_DEFAULT_DOCKER:-false}" | grep -q 'true'; then

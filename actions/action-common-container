@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
 # container registry login
-function act-common-container-registry-login()
-{
+act-common-container-registry-login() {
   act-log-message "trying to login to container registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
 
   if [[ -n "$NCI_CONTAINERREGISTRY_USERNAME" ]]; then
@@ -12,6 +15,140 @@ function act-common-container-registry-login()
     act-log-message "Failed to login to container registry! No credentials provided!" "ERROR"
     exit 1
   fi
+}
+
+# Public: Parse the from statement of the dockerfile
+#
+# Takes the filepath to a dockerfile as argument and will search for
+# the FROM line. It will then check if it contains the BASE_IMAGE as
+# default var and extract the default value.
+# This will export the following 2 variables:
+# - CONTAINER_BASE_IMAGE_REPOSITORY
+# - CONTAINER_BASE_IMAGE_TAG
+#
+# $1 - The dockerfile that should be analysed (ie. Dockerfile)
+#
+# Examples
+#
+#   parse-dockerfile-from "Dockerfile"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+parse-dockerfile-from() {
+  declare dockerfile="$1"
+
+  IFS=':' read -r -a baseImageArray <<< $(cat "$dockerfile" | grep "FROM \${BASE_IMAGE:-" | cut -c 20- | tr -d '}')
+  export CONTAINER_BASE_IMAGE_REPOSITORY=${baseImageArray[0]}
+  export CONTAINER_BASE_IMAGE_TAG=${baseImageArray[1]}
+}
+
+# Public: Parse the manifest of a container image
+#
+# Takes a container image as argument and evaluates the manifest. Will then export
+# a variable for each entry as `MANIFEST_DIGEST_linux_amd64` which contains the
+# digest of the image for that specific os/architecture.
+#
+# $1 - The container image that should be analysed (ie. docker.io/alpine:latest)
+#
+# Examples
+#
+#   parse-container-manifest "docker.io/alpine:latest"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+parse-container-manifest() {
+  declare containerImage="$1"
+
+  local temporaryManifestFile="tmp-manifest.json"
+  local temporaryManifestResultFile=$(mktemp)
+  docker manifest inspect "$containerImage" > "$temporaryManifestFile"
+  envcli run jq '.manifests[] | [.platform.os,.platform.architecture,.platform.variant,.digest] | @csv' "$temporaryManifestFile" | tr -d '\\"' > "$temporaryManifestResultFile"
+  readarray -t manifestArchs < $temporaryManifestResultFile
+
+  # for each manifest entry
+  for KEY in "${manifestArchs[@]}"; do
+    act-log-message "processing base image manifest line: [$KEY]" "DEBUG"
+
+    IFS=', ' read -r -a row <<< "$KEY"
+    local manifestOS="${row[0]}"
+    local manifestArch="${row[1]}"
+    local manifestVariant="${row[2]}"
+    local manifestDigest="${row[3]}"
+
+    # overwrite values to be conform the pipeline spec
+    if echo "${manifestArch}_${manifestVariant}" | grep -q 'arm_v6'; then
+      manifestArch=arm32v6
+    elif echo "${manifestArch}_${manifestVariant}" | grep -q 'arm_v7'; then
+      manifestArch=arm32v7
+    elif echo "${manifestArch}_${manifestVariant}" | grep -q 'arm64_v8'; then
+      manifestArch=arm64v8
+    fi
+    act-log-message "setting property [${manifestOS}_${manifestArch}] to [${manifestDigest}]" "DEBUG"
+
+    # store for later use when overwriting BASE_IMAGE via build arg
+    export "MANIFEST_DIGEST_${manifestOS}_${manifestArch}=$manifestDigest"
+  done
+}
+
+# Public: Create a manifest to point at images with different archs
+#
+# Takes a primary manifest
+#
+# $1 - The container image that should be analysed (ie. docker.io/alpine:latest)
+#
+# Examples
+#
+#   create-container-manifest "docker.io/alpine:latest"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+create-container-manifest() {
+  declare containerImage="$1"
+
+  docker manifest create --amend $CONTAINER_REPO:$CONTAINER_TAG \
+  ownyourbits/example-x86 \
+  ownyourbits/example-armhf \
+  ownyourbits/example-arm64
+
+  docker manifest annotate ownyourbits/example ownyourbits/example-x86   --os linux --arch amd64
+  docker manifest annotate ownyourbits/example ownyourbits/example-armhf --os linux --arch arm
+  docker manifest annotate ownyourbits/example ownyourbits/nextcloudpi-arm64 --os linux --arch arm64v8
+
+  docker manifest push -p ownyourbits/example
+}
+
+# artifact generation
+build-container() {
+  declare buildOS="$1" buildArch="$2"
+
+  # parse the dockerfile to find the base image (+split repo / tag)
+  parse-dockerfile-from "$DOCKERFILE_PATH/$DOCKERFILE_NAME"
+  act-log-message "container image - repository: $CONTAINER_BASE_IMAGE_REPOSITORY" "DEBUG"
+  act-log-message "container image - tag: $CONTAINER_BASE_IMAGE_TAG" "DEBUG"
+
+  # parse the manifest of the base image, to check what is supported
+  act-log-message "parsing manifest of the base image [$CONTAINER_REPO:$CONTAINER_TAG]" "INFO"
+  parse-container-manifest "$CONTAINER_BASE_IMAGE_REPOSITORY:$CONTAINER_BASE_IMAGE_TAG"
+  local digestVarName="MANIFEST_DIGEST_${buildOS}_${buildArch}"
+  local overwriteWithTag=${!digestVarName}
+
+  # build
+  act-log-message "building image [$CONTAINER_REPO:$CONTAINER_TAG] for target platform [${buildOS}_${buildArch}]" "INFO"
+  act-log-message "will overwrite base image with: [$CONTAINER_REPO@$overwriteWithTag]" "DEBUG"
+  run-command docker build \
+    --no-cache \
+    --build-arg "BASE_IMAGE=${CONTAINER_BASE_IMAGE_REPOSITORY}@${overwriteWithTag}" \
+    --build-arg "http_proxy=$HTTP_PROXY" \
+    --build-arg "https_proxy=$HTTPS_PROXY" \
+    --build-arg "proxy_host=$PROXY_HOST" \
+    --build-arg "proxy_port=$PROXY_PORT" \
+    -f $DOCKERFILE_NAME \
+    -t $CONTAINER_REPO:$CONTAINER_TAG-${buildOS}-${buildArch} \
+    $DOCKERFILE_PATH
+  act-log-message "image build success, tagged as [$CONTAINER_REPO:$CONTAINER_TAG-${buildOS}-${buildArch}]" "INFO"
+
+  # save image
+  #mkdir -p dist/container-image
+  #local artifactName="main-$ARTIFACT"
+  #run-command docker save $CONTAINER_REPO:$CONTAINER_TAG > dist/container-image/${artifactName}.tar
+  #act-log-message "stored image into dist/container-image/${artifactName}" "INFO"
 }
 
 # container registry login

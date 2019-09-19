@@ -1,9 +1,12 @@
 ############################################################
-# Dockerfile
+# Base Image
 ############################################################
 
-# Set the base image
-FROM docker.io/docker:19
+# Build Args
+ARG BASE_IMAGE
+
+# Base Image
+FROM ${BASE_IMAGE:-docker.io/library/docker:19}
 
 ############################################################
 # Configuration

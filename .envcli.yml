@@ -82,3 +82,9 @@ images:
     directory: /root/.kube
   - name: helm
     directory: /root/.helm
+# Scripting
+- name: jq
+  description: jq is a lightweight and flexible command-line JSON processor
+  provides:
+  - jq
+  image: docker.io/fluidattacks/alpine-kaniko
