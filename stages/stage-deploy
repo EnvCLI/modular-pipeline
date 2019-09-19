@@ -13,7 +13,7 @@ function main()
 
   # deployment target: none
   if [[ ${DEPLOYMENT_TYPE} == "none" ]]; then
-    act-log-message "not running deployment, no DEPLOYMENT_TYPE set!" "NONE"
+    act-log-message "not running deployment, no DEPLOYMENT_TYPE set!" "INFO"
     exit 0
   fi
 
