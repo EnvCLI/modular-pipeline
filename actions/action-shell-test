@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ACTION_CATEGORY="shell"
+ACTION_NAME="test"
+
+# common
+LOCAL_PATH=${BASH_SOURCE%/*}
+source "$LOCAL_PATH/action-common"
+
+# main
+function main()
+{
+  # configuration
+  TEST_DIR=${TEST_DIR:-tests}
+
+  # get dependencies
+  run-in-container bats --tap --recursive $TEST_DIR
+}
+
+# entrypoint
+case "${1:-}" in
+  help)
+    echo "Bash Automated Testing System Tests"
+    echo ""
+    echo "Environment:"
+    echo "* DEBUG: Can be set to true to enable debugging"
+    ;;
+  *)
+    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
+    act-common-prepare
+    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    main "$@"
+    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+;;
+esac

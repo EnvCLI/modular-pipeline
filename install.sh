@@ -80,6 +80,7 @@ ACTION_LIST=(
   "action-python-run"
   "action-hugo-build"
   "action-html-test"
+  "action-shell-test"
   "action-optimize-upx"
   "action-container-build"
   "action-container-push"

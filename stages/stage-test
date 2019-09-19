@@ -9,6 +9,12 @@ source "$LOCAL_PATH/action-common"
 # main
 function main()
 {
+  # bash
+  if [[ ${PROJECT_TYPE} =~ ^bash-.*$ ]]; then
+    action-shell-test
+    exit 0
+  fi
+
   # container
   if [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
     act-log-message "no tests for containers yet ..." "WARN"

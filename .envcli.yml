@@ -30,6 +30,12 @@ images:
   cache:
   - name: node-10
     directory: /root/.npm
+# Shell
+- name: bats
+  description: Bash Automated Testing System
+  provides:
+  - bats
+  image: docker.io/bats/bats:latest
 # Lint
 # - Shell
 - name: shellcheck
