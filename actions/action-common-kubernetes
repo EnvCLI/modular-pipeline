@@ -5,21 +5,21 @@ set -euo pipefail
 function act-common-kubernetes-ensure-namespace {
   local TARGET_NAMESPACE=${1:-}
   if [ -z "$TARGET_NAMESPACE" ]; then
-    act-log-message "no target namespace specified as first argument when calling func act-common-kubernetes-ensure-namespace" "ERROR"
+    _log_message "no target namespace specified as first argument when calling func act-common-kubernetes-ensure-namespace" "ERROR"
     exit 1
   fi
 
-  act-log-message "making sure namespace $TARGET_NAMESPACE exists ..." "DEBUG"
+  _log_message "making sure namespace $TARGET_NAMESPACE exists ..." "DEBUG"
   set +e
-  run-in-container kubectl get namespace "$TARGET_NAMESPACE" >> /dev/null
+  _run_in_container kubectl get namespace "$TARGET_NAMESPACE" >> /dev/null
   local getNamespaceStatus=$?
   set -e
   if [ "$getNamespaceStatus" -ne "0" ]; then
     ## create namespace
-    act-log-message "creating namespace $TARGET_NAMESPACE" "INFO"
-    run-in-container kubectl create namespace "$TARGET_NAMESPACE"
+    _log_message "creating namespace $TARGET_NAMESPACE" "INFO"
+    _run_in_container kubectl create namespace "$TARGET_NAMESPACE"
   else
-    act-log-message "namespace exists. skipping creation ..." "DEBUG"
+    _log_message "namespace exists. skipping creation ..." "DEBUG"
   fi
 }
 
@@ -29,33 +29,33 @@ function act-common-kubernetes-download-chart
   local CHART_ID=${1:-}
 
   # prepare helm cli
-  act-log-message "Initializing Helm ..." "DEBUG"
-  run-in-container helm init --client-only --skip-refresh &> /dev/null
+  _log_message "Initializing Helm ..." "DEBUG"
+  _run_in_container helm init --client-only --skip-refresh &> /dev/null
 
   # print variable content
   local CHART_REPOSITORY=$(echo $CHART_ID | cut -d '/' -f 1)
 
   # Check if the repository is known / needs to be added for the deployment to work
-  act-log-message "Chart Repository: ${CHART_REPOSITORY}" "DEBUG"
+  _log_message "Chart Repository: ${CHART_REPOSITORY}" "DEBUG"
   if [ "$CHART_REPOSITORY" != "stable" ]; then
     ## if the repo isn't stable/ then we're using a custom repository that we need to initialize
-    act-log-message "Using custom chart repository: ${CHART_REPOSITORY}" "DEBUG"
+    _log_message "Using custom chart repository: ${CHART_REPOSITORY}" "DEBUG"
 
     if [ "$CHART_REPOSITORY" == "incubator" ]; then
-      run-in-container helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com &> /dev/null
+      _run_in_container helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com &> /dev/null
     elif [ "$CHART_REPOSITORY" == "rancher-stable" ]; then
-      run-in-container helm repo add rancher-stable https://releases.rancher.com/server-charts/stable &> /dev/null
+      _run_in_container helm repo add rancher-stable https://releases.rancher.com/server-charts/stable &> /dev/null
     elif [ "$CHART_REPOSITORY" == "appscode" ]; then
-      run-in-container helm repo add appscode https://charts.appscode.com/stable &> /dev/null
+      _run_in_container helm repo add appscode https://charts.appscode.com/stable &> /dev/null
     elif [ "$CHART_REPOSITORY" == "gitlab" ]; then
-      run-in-container helm repo add gitlab https://charts.gitlab.io &> /dev/null
+      _run_in_container helm repo add gitlab https://charts.gitlab.io &> /dev/null
     elif [ "$CHART_REPOSITORY" == "jetstack" ]; then
-      run-in-container helm repo add jetstack https://charts.jetstack.io &> /dev/null
+      _run_in_container helm repo add jetstack https://charts.jetstack.io &> /dev/null
     elif [ "$CHART_REPOSITORY" == "philippheuer" ]; then
-      run-in-container helm repo add philippheuer https://philippheuer.gitlab.io/kubernetes-charts &> /dev/null
+      _run_in_container helm repo add philippheuer https://philippheuer.gitlab.io/kubernetes-charts &> /dev/null
     fi
   fi
-  run-in-container helm repo update &> /dev/null
+  _run_in_container helm repo update &> /dev/null
 }
 
 # initialize tiller
@@ -63,31 +63,31 @@ function act-common-kubernetes-initialize-tiller
 {
   # check if tiller was already initialized
   set +e
-  run-in-container kubectl get serviceaccount --namespace ${DEPLOYMENT_NAMESPACE} tiller >> /dev/null
+  _run_in_container kubectl get serviceaccount --namespace ${DEPLOYMENT_NAMESPACE} tiller >> /dev/null
   local getTillerServiceAccountStatus=$?
   set -e
   if [ "$getTillerServiceAccountStatus" -ne "0" ]; then
-    act-log-message "Service account missing, creating tiller service account ..." "DEBUG"
+    _log_message "Service account missing, creating tiller service account ..." "DEBUG"
 
     ## Service Account
-    run-in-container kubectl create serviceaccount --namespace ${DEPLOYMENT_NAMESPACE} tiller
+    _run_in_container kubectl create serviceaccount --namespace ${DEPLOYMENT_NAMESPACE} tiller
 
     ## Service Account Permissions (namespace admin or cluster admin, depending on $DEPLOYMENT_CLUSTER_ADMIN)
     if [ "$DEPLOYMENT_CLUSTER_ADMIN" == "true" ]; then
-      act-log-message "Granting tiller cluster admin role." "INFO"
-      run-in-container kubectl create clusterrolebinding ${DEPLOYMENT_NAMESPACE}-tiller-rule \
+      _log_message "Granting tiller cluster admin role." "INFO"
+      _run_in_container kubectl create clusterrolebinding ${DEPLOYMENT_NAMESPACE}-tiller-rule \
         --clusterrole=cluster-admin \
         --serviceaccount=${DEPLOYMENT_NAMESPACE}:tiller
     else
-      act-log-message "Granting tiller namespace admin role." "INFO"
-      run-in-container kubectl create rolebinding ${DEPLOYMENT_NAMESPACE}-tiller-binding \
+      _log_message "Granting tiller namespace admin role." "INFO"
+      _run_in_container kubectl create rolebinding ${DEPLOYMENT_NAMESPACE}-tiller-binding \
         --namespace=${DEPLOYMENT_NAMESPACE} \
         --clusterrole=admin \
         --serviceaccount=${DEPLOYMENT_NAMESPACE}:tiller
     fi
 
     ## Install Tiller
-    run-in-container helm init \
+    _run_in_container helm init \
       --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
       --service-account tiller \
       --history-max 3 \
@@ -95,6 +95,6 @@ function act-common-kubernetes-initialize-tiller
       --wait >> /dev/null
     #--override 'spec.template.spec.containers[0].command'='{/tiller,--storage=secret}' \
   else
-    act-log-message "Tiller is initialized. skipping setup ..." "DEBUG"
+    _log_message "Tiller is initialized. skipping setup ..." "DEBUG"
   fi
 }

@@ -5,7 +5,7 @@ ACTION_NAME="build"
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
-source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/pipeline-common"
 
 # main
 function main()
@@ -19,16 +19,16 @@ function main()
   # get dependencies
   # - legacy
   if test -f requirements.txt; then
-    act-log-message "The recommended way to manage your dependency is pipenv!" "WARN"
-    run-in-container pip install -r requirements.txt
+    _log_message "The recommended way to manage your dependency is pipenv!" "WARN"
+    _run_in_container pip install -r requirements.txt
   fi
   # - modern
   if test -f requirements.txt; then
-    run-in-container pipenv install
+    _run_in_container pipenv install
   fi
 
   # compile .py files
-  run-in-container python -m compileall .
+  _run_in_container python -m compileall .
 }
 
 # entrypoint
@@ -41,10 +41,10 @@ case "${1:-}" in
     echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
     ;;
   *)
-    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
-    act-common-prepare
-    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    _log_message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
+    _prepare
+    _run_hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"
-    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+    _run_hook "post-$ACTION_CATEGORY-$ACTION_NAME"
 ;;
 esac

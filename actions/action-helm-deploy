@@ -5,7 +5,7 @@ ACTION_NAME="deploy"
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
-source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/pipeline-common"
 source "$LOCAL_PATH/action-common-deploy"
 source "$LOCAL_PATH/action-common-kubernetes"
 
@@ -21,34 +21,34 @@ function main()
   # - namespaces
   local DEPLOYMENT_NAMESPACE=${1:-$DEPLOYMENT_NAMESPACE}
   if [ -z "$DEPLOYMENT_NAMESPACE" ]; then
-    act-log-message "error: no deployment namespace specified! Plase set [DEPLOYMENT_NAMESPACE] or provide it as 1st argument when calling action-helm-deploy!" "ERROR"
+    _log_message "error: no deployment namespace specified! Plase set [DEPLOYMENT_NAMESPACE] or provide it as 1st argument when calling action-helm-deploy!" "ERROR"
     exit 1
   fi
   # - deployment id
   local DEPLOYMENT_ID=${2:-$DEPLOYMENT_ID}
   if [ -z "$DEPLOYMENT_ID" ]; then
-    act-log-message "no deployment id specified! Plase set [DEPLOYMENT_ID] or provide it as 2nd argument when calling action-helm-deploy!" "ERROR"
+    _log_message "no deployment id specified! Plase set [DEPLOYMENT_ID] or provide it as 2nd argument when calling action-helm-deploy!" "ERROR"
     exit 1
   fi
   # - environment
   local DEPLOYMENT_ENVIRONMENT=${3:-$DEPLOYMENT_ENVIRONMENT}
   if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
-    act-log-message "no target environment specified. Plase set [DEPLOYMENT_ENVIRONMENT] or provide it as 3rd argument when calling action-helm-deploy!" "ERROR"
+    _log_message "no target environment specified. Plase set [DEPLOYMENT_ENVIRONMENT] or provide it as 3rd argument when calling action-helm-deploy!" "ERROR"
     exit 1
   fi
-  act-log-message "deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..." "DEBUG"
+  _log_message "deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..." "DEBUG"
 
   # - access
   export DEPLOYMENT_CLUSTER_ADMIN=${DEPLOYMENT_CLUSTER_ADMIN:-"false"}
   if [[ -z "${KUBECONFIG_CONTENT:-}" ]]; then
-    act-log-message "Please encode your kubeconfig as base64 and set it as environment variable [KUBECONFIG_CONTENT] to allow the pipeline to access a k8s cluster!" "ERROR"
+    _log_message "Please encode your kubeconfig as base64 and set it as environment variable [KUBECONFIG_CONTENT] to allow the pipeline to access a k8s cluster!" "ERROR"
     return 1
   fi
 
   # - chart
   local DEPLOYMENT_CHART=${4:-$DEPLOYMENT_CHART}
   if [ -z "$DEPLOYMENT_CHART" ]; then
-    act-log-message "error: no deployment chart specified! Plase set [DEPLOYMENT_CHART] or provide it as 4th argument when calling action-helm-deploy!" "ERROR"
+    _log_message "error: no deployment chart specified! Plase set [DEPLOYMENT_CHART] or provide it as 4th argument when calling action-helm-deploy!" "ERROR"
     exit 1
   fi
   local DEPLOYMENT_CHART_VERSION=${DEPLOYMENT_CHART_VERSION:-}
@@ -74,16 +74,16 @@ function main()
   # * force: overwrite conflicting resources if required (some have immutable attributes)
   # * version: the version of the chart that should be used
   #
-  act-log-message "deploying using chart [${DEPLOYMENT_CHART}:${DEPLOYMENT_CHART_VERSION:-latest}] into namespace [$DEPLOYMENT_NAMESPACE] as [$DEPLOYMENT_ID]" "INFO"
+  _log_message "deploying using chart [${DEPLOYMENT_CHART}:${DEPLOYMENT_CHART_VERSION:-latest}] into namespace [$DEPLOYMENT_NAMESPACE] as [$DEPLOYMENT_ID]" "INFO"
   if [ -z "${DEPLOYMENT_CHART_VERSION}" ]; then
-    run-in-container helm upgrade \
+    _run_in_container helm upgrade \
       --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
       --namespace "${DEPLOYMENT_NAMESPACE}" \
       --install \
       --force \
       "$DEPLOYMENT_ID" "${DEPLOYMENT_CHART}"
   else
-    run-in-container helm upgrade \
+    _run_in_container helm upgrade \
       --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
       --namespace "${DEPLOYMENT_NAMESPACE}" \
       --version "${DEPLOYMENT_CHART_VERSION}" \
@@ -108,10 +108,10 @@ case "${1:-}" in
     echo "* DEPLOYMENT_CHART_VERSION: helm chart version, using latest by default."
     ;;
   *)
-    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
-    act-common-prepare
-    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    _log_message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
+    _prepare
+    _run_hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"
-    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+    _run_hook "post-$ACTION_CATEGORY-$ACTION_NAME"
 ;;
 esac

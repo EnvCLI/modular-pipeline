@@ -1,3 +1,6 @@
 # pipeline config
 PROJECT_TYPE=container-cli
 DEPLOYMENT_TYPE=none
+
+# registry
+NCI_CONTAINERREGISTRY_REPOSITORY=docker.io/envcli/modular-pipeline

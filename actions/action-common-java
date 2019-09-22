@@ -5,13 +5,13 @@ set -euo pipefail
 function act-java-common-detect
 {
   if test -f "build.gradle"; then
-    act-log-message "Found a gradle project." "DEBUG"
+    _log_message "Found a gradle project." "DEBUG"
     export BUILD_SYSTEM=gradle
   elif test -f "pom.xml"; then
-    act-log-message "Found a maven project." "DEBUG"
+    _log_message "Found a maven project." "DEBUG"
     export BUILD_SYSTEM=maven
   else
-    act-log-message "Could not detect java build system, please use either gradle or maven!" "ERROR"
+    _log_message "Could not detect java build system, please use either gradle or maven!" "ERROR"
     export BUILD_SYSTEM=unknown
     exit 1
   fi
@@ -30,9 +30,9 @@ function act-java-common-gradle
     fi
 
     # run build (This essentially downloads a copy of Gradle to build the project with.)
-    run-in-container java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} $@
+    _run_in_container java $JAVA_PROXY_OPTS ${GRADLE_CALL[@]} $@
   else
-    act-log-message "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html" "ERROR"
+    _log_message "Gradle projects require the gradle wrapper to be commited into the repository! Check out https://docs.gradle.org/current/userguide/gradle_wrapper.html" "ERROR"
     exit 1
   fi
 }
@@ -60,16 +60,16 @@ function act-java-common-maven
 
     # - check for maven wrapper properties file
     if test -f ".mvn/wrapper/maven-wrapper.properties"; then
-      act-log-message "Maven wrapper configuration .mvn/wrapper/maven-wrapper.properties found." "DEBUG"
+      _log_message "Maven wrapper configuration .mvn/wrapper/maven-wrapper.properties found." "DEBUG"
     else
-      act-log-message "Couldn't find .mvn/wrapper/maven-wrapper.properties, using maven $MAVEN_DEFAULTVERSION as default!" "WARN"
+      _log_message "Couldn't find .mvn/wrapper/maven-wrapper.properties, using maven $MAVEN_DEFAULTVERSION as default!" "WARN"
       echo "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/$MAVEN_DEFAULTVERSION/apache-maven-$MAVEN_DEFAULTVERSION-bin.zip" >> .mvn/wrapper/maven-wrapper.properties
     fi
 
     # run build
-    run-in-container java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
+    _run_in_container java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
   else
-    act-log-message "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper" "ERROR"
+    _log_message "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper" "ERROR"
     exit 1
   fi
 }

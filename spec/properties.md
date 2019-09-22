@@ -23,3 +23,9 @@ Supported values:
 - darwin_amd64
 
 The value should be transformed as needed for golang / docker / and others.
+
+## TMP_DIR
+
+The scripts will use a temporary folder by default for any temporary files `tmp`, which will be created in the project root by default.
+
+You can overwrite this by setting `TMP_DIR`.

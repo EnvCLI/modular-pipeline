@@ -5,7 +5,7 @@ ACTION_NAME="run"
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
-source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/pipeline-common"
 
 # main
 function main()
@@ -18,7 +18,7 @@ function main()
   mkdir -p $ARTIFACT_DIR
 
   # compile .py files
-  run-in-container python $MAIN_FILE
+  _run_in_container python $MAIN_FILE
 }
 
 # entrypoint
@@ -31,10 +31,10 @@ case "${1:-}" in
     echo "* ARTIFACT_DIR: The target directory for generated artifact files, defaults to /dist"
     ;;
   *)
-    act-log-message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
-    act-common-prepare
-    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    _log_message "Running action [$ACTION_CATEGORY.$ACTION_NAME]" "INFO"
+    _prepare
+    _run_hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"
-    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+    _run_hook "post-$ACTION_CATEGORY-$ACTION_NAME"
 ;;
 esac

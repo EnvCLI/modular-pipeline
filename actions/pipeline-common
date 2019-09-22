@@ -12,7 +12,7 @@ MPI_RESOURCES_MIRROR=https://raw.githubusercontent.com/EnvCLI/modular-pipeline/m
 
 # func: logging
 declare -A levels=([TRACE]=0 [DEBUG]=1 [INFO]=2 [WARN]=3 [ERROR]=4)
-act-log-message() {
+_log_message() {
   local log_message=$1
   local log_priority=$2
 
@@ -27,44 +27,44 @@ act-log-message() {
 }
 
 # func: run
-run-command() {
-  act-log-message "Command $*" "TRACE"
+_run_command() {
+  _log_message "Command $*" "TRACE"
   eval "$@"
 }
 
 # func: run in container
-run-in-container() {
-  eval run-command envcli run "$@"
+_run_in_container() {
+  eval _run_command envcli run "$@"
 }
 
 # func: prepare
-act-common-prepare() {
+_prepare() {
   # source in .ci/env
   if [ -f ".ci/env" ]; then
-    act-log-message "loading environment from .ci/env" "DEBUG"
+    _log_message "loading environment from .ci/env" "DEBUG"
     export $(grep -v '^#' .ci/env | xargs)
   fi
 
   # prerequisites
   # - docker
   if ! command -v docker > /dev/null; then
-    act-log-message "docker is required but missing!" "ERROR"
+    _log_message "docker is required but missing!" "ERROR"
     exit 1
   fi
   # - envcli
   if ! command -v envcli > /dev/null; then
-    act-log-message "-> envcli not available. Please run theinstallation script!" "ERROR"
+    _log_message "-> envcli not available. Please run theinstallation script!" "ERROR"
     exit 1
   fi
   # - normalizeci
   if ! command -v normalizeci > /dev/null; then
-    act-log-message "-> normalizeci not available. Please run the installation script!" "ERROR"
+    _log_message "-> normalizeci not available. Please run the installation script!" "ERROR"
     exit 1
   fi
 
   # find container runtime (if docker info fails)
   if ! docker info &>/dev/null; then
-    act-log-message "trying to find a working container runtime ..." "DEBUG"
+    _log_message "trying to find a working container runtime as the current one doesn't work ..." "DEBUG"
 
     # set DOCKER_HOST
     set +u
@@ -72,23 +72,25 @@ act-common-prepare() {
     local CPORT=2375
 
     if [ -z "$DOCKER_HOST" ] && [ "$KUBERNETES_PORT" ]; then
-      act-log-message "detected kubernetes usage, using localhost" "DEBUG"
+      _log_message "detected kubernetes usage, using localhost" "DEBUG"
       CHOST=localhost
     fi
     if [ "$DOCKER_TLS_CERTDIR" ]; then
-      act-log-message "detected docker tls cert usage, using port 2376" "DEBUG"
+      _log_message "detected docker tls cert usage, using port 2376" "DEBUG"
       CPORT=2376
     fi
 
     export DOCKER_HOST="tcp://${CHOST}:${CPORT}"
     set -u
   else
-    act-log-message "container runtime is ready for use" "TRACE"
+    _log_message "container runtime is ready for use" "TRACE"
   fi
 
   # normalize ci variables
-  act-log-message "run normalizeci" "TRACE"
-  eval $(normalizeci)
+  if [ -z ${NCI+x} ]; then
+    _log_message "run normalizeci" "TRACE"
+    eval $(normalizeci)
+  fi
 
   # ensure required variables are set
   export PROJECT_TYPE=${PROJECT_TYPE:-none}
@@ -97,6 +99,12 @@ act-common-prepare() {
   # global properties
   export ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
   export ARTIFACT_BUILD_ARCHS=${ARTIFACT_BUILD_ARCHS:-linux_amd64}
+  export TMP_DIR=${TMP_DIR:-tmp}
+  mkdir -p "$ARTIFACT_DIR" "$TMP_DIR"
+
+  # container properties
+  export CONTAINER_REPO="${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}"
+  export CONTAINER_TAG="${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}"
 
   # proxy
   export HTTP_PROXY=${HTTP_PROXY:-}
@@ -106,11 +114,25 @@ act-common-prepare() {
   export JAVA_PROXY_OPTS="-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT"
 }
 
-# func: run hook / $1 = hook name
-act-common-hook() {
-  # repository hooks
-  if test -f "$NCI_PROJECT_DIR/.ci/$1.sh"; then
-    act-log-message "execute: repository hook [${1}]" "INFO"
-    $NCI_PROJECT_DIR/.ci/$1.sh
+# Public: Checks if a hook with the specified name exists in the current project
+#
+# Will check the current directory for a file called `.ci/hooks/hookName.sh`.
+#
+# $1 - The name of the hook to be executed. (pre_build, post_build, ...)
+#
+# Examples
+#
+#   _run_hook "pre-build"
+#
+# Returns the exit code of the last command executed or 0 otherwise
+_run_hook() {
+  declare hookName="$1"
+
+  # check if file exist and run it
+  local hookFile="${NCI_PROJECT_DIR}/.ci/hooks/${hookName}.sh"
+  if test -f "${hookFile}"; then
+    _log_message "execute: repository hook [${hookName}]" "INFO"
+    "${hookFile}"
   fi
 }
+

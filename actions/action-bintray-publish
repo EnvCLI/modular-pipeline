@@ -5,7 +5,7 @@ ACTION_NAME="publish"
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
-source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/pipeline-common"
 
 # main
 function main()
@@ -40,9 +40,9 @@ case "${1:-}" in
     ;;
   *)
     echo "Running action [$ACTION_CATEGORY.$ACTION_NAME]"
-    act-common-prepare
-    act-common-hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
+    _prepare
+    _run_hook "pre-$ACTION_CATEGORY-$ACTION_NAME"
     main "$@"
-    act-common-hook "post-$ACTION_CATEGORY-$ACTION_NAME"
+    _run_hook "post-$ACTION_CATEGORY-$ACTION_NAME"
 ;;
 esac

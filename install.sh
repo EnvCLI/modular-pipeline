@@ -64,11 +64,10 @@ fi
 echo "-> getting pipeline scripts ..."
 # - actions
 ACTION_LIST=(
-  "action-common"
+  "pipeline-common"
   "action-common-deploy"
   "action-common-container"
   "action-common-kubernetes"
-  "action-common-go"
   "action-common-java"
   "action-ci-debug"
   "action-go-run"

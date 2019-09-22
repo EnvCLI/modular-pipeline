@@ -3,16 +3,16 @@ set -euo pipefail
 
 # common
 LOCAL_PATH=${BASH_SOURCE%/*}
-source "$LOCAL_PATH/action-common"
+source "$LOCAL_PATH/pipeline-common"
 
 # container registry login
 act-common-container-registry-login() {
-  act-log-message "trying to login to container registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
+  _log_message "trying to login to container registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
 
   if [[ -n "$NCI_CONTAINERREGISTRY_USERNAME" ]]; then
     docker login -u "$NCI_CONTAINERREGISTRY_USERNAME" -p "$NCI_CONTAINERREGISTRY_PASSWORD" "$NCI_CONTAINERREGISTRY_HOST"
   else
-    act-log-message "Failed to login to container registry! No credentials provided!" "ERROR"
+    _log_message "Failed to login to container registry! No credentials provided!" "ERROR"
     exit 1
   fi
 }
@@ -57,7 +57,7 @@ parse-dockerfile-from() {
 parse-container-manifest() {
   declare containerImage="$1"
 
-  local temporaryManifestFile="tmp-manifest.json"
+  local temporaryManifestFile="$TMP_DIR/manifest.json"
   local temporaryManifestResultFile=$(mktemp)
   docker manifest inspect "$containerImage" > "$temporaryManifestFile"
   envcli run jq '.manifests[] | [.platform.os,.platform.architecture,.platform.variant,.digest] | @csv' "$temporaryManifestFile" | tr -d '\\"' > "$temporaryManifestResultFile"
@@ -65,7 +65,7 @@ parse-container-manifest() {
 
   # for each manifest entry
   for KEY in "${manifestArchs[@]}"; do
-    act-log-message "processing base image manifest line: [$KEY]" "DEBUG"
+    _log_message "processing base image manifest line: [$KEY]" "DEBUG"
 
     IFS=', ' read -r -a row <<< "$KEY"
     local manifestOS="${row[0]}"
@@ -81,7 +81,7 @@ parse-container-manifest() {
     elif echo "${manifestArch}_${manifestVariant}" | grep -q 'arm64_v8'; then
       manifestArch=arm64v8
     fi
-    act-log-message "setting property [${manifestOS}_${manifestArch}] to [${manifestDigest}]" "DEBUG"
+    _log_message "setting property [${manifestOS}_${manifestArch}] to [${manifestDigest}]" "DEBUG"
 
     # store for later use when overwriting BASE_IMAGE via build arg
     export "MANIFEST_DIGEST_${manifestOS}_${manifestArch}=$manifestDigest"
@@ -92,68 +92,98 @@ parse-container-manifest() {
 #
 # Takes a primary manifest
 #
-# $1 - The container image that should be analysed (ie. docker.io/alpine:latest)
+# $1 - The container image that should be created (the manifest)
+# $2 - The archs that the manifest should contain
 #
 # Examples
 #
-#   create-container-manifest "docker.io/alpine:latest"
+#   create-container-manifest "docker.io/alpine:latest" "linux_amd64,linux_arm64v8"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-create-container-manifest() {
-  declare containerImage="$1"
+create_container_manifest() {
+  declare manifestName="$1" containerBuildArchs="$2"
+  _log_message "generating manifest [${manifestName}] pointing at [${containerBuildArchs}]" "DEBUG"
 
-  docker manifest create --amend $CONTAINER_REPO:$CONTAINER_TAG \
-  ownyourbits/example-x86 \
-  ownyourbits/example-armhf \
-  ownyourbits/example-arm64
+  # args with all images contained in the manifest
+  declare -a manifestArgs
 
-  docker manifest annotate ownyourbits/example ownyourbits/example-x86   --os linux --arch amd64
-  docker manifest annotate ownyourbits/example ownyourbits/example-armhf --os linux --arch arm
-  docker manifest annotate ownyourbits/example ownyourbits/nextcloudpi-arm64 --os linux --arch arm64v8
+  # build
+  IFS=',' read -r -a artifactBuildArchArray <<< $(echo "$containerBuildArchs")
+  for VALUE in "${artifactBuildArchArray[@]}"; do
+    IFS='_' read -r -a row <<< "$VALUE"
+    local buildOS="${row[0]}"
+    local buildArch="${row[1]}"
+    local variant="${buildOS}_${buildArch}"
+    local imageName="${manifestName}_${variant}"
 
-  docker manifest push -p ownyourbits/example
+    _log_message "adding variant ${imageName} to manifestArgs for manifest creation" "DEBUG"
+    manifestArgs=( "${manifestArgs[@]}" "$imageName" )
+  done
+
+  # create manifest
+  _run_command docker manifest create --amend "${manifestName}" "${manifestArgs[@]}"
+  _log_message "created manifest ${imageName} with variants [${manifestArgs[@]}]" "INFO"
+
+  # manifest annotations
+  IFS=',' read -r -a artifactBuildArchArray <<< $(echo "$containerBuildArchs")
+  for VALUE in "${artifactBuildArchArray[@]}"; do
+    IFS='_' read -r -a row <<< "$VALUE"
+    local buildOS="${row[0]}"
+    local buildArch="${row[1]}"
+    local variant="${buildOS}_${buildArch}"
+    local imageName="${manifestName}_${variant}"
+
+    _log_message "setting image annotation for [${imageName}] with [${variant}]" "DEBUG"
+    if echo "$variant" | grep -q 'linux_amd64'; then
+      _run_command docker manifest annotate "$manifestName" "$imageName" \
+        --os linux \
+        --arch amd64
+    elif echo "$variant" | grep -q 'linux_arm64v8'; then
+      _run_command docker manifest annotate "$manifestName" "$imageName" \
+        --os linux \
+        --arch arm64 \
+        --variant v8
+    fi
+  done
+
+  # docker manifest push -p ownyourbits/example
 }
 
 # artifact generation
 build-container() {
-  declare buildOS="$1" buildArch="$2"
-
-  # parse the dockerfile to find the base image (+split repo / tag)
-  parse-dockerfile-from "$DOCKERFILE_PATH/$DOCKERFILE_NAME"
-  act-log-message "container image - repository: $CONTAINER_BASE_IMAGE_REPOSITORY" "DEBUG"
-  act-log-message "container image - tag: $CONTAINER_BASE_IMAGE_TAG" "DEBUG"
+  declare imageRepo="$1" imageTag="$2" baseImageRepo="$3" baseImageTag="$4" buildOS="$5" buildArch="$6"
 
   # parse the manifest of the base image, to check what is supported
-  act-log-message "parsing manifest of the base image [$CONTAINER_REPO:$CONTAINER_TAG]" "INFO"
-  parse-container-manifest "$CONTAINER_BASE_IMAGE_REPOSITORY:$CONTAINER_BASE_IMAGE_TAG"
+  _log_message "parsing manifest of the base image [$baseImageRepo:$baseImageTag]" "INFO"
+  parse-container-manifest "$baseImageRepo:$baseImageTag"
   local digestVarName="MANIFEST_DIGEST_${buildOS}_${buildArch}"
   local overwriteWithTag=${!digestVarName}
 
   # build
-  act-log-message "building image [$CONTAINER_REPO:$CONTAINER_TAG] for target platform [${buildOS}_${buildArch}]" "INFO"
-  act-log-message "will overwrite base image with: [$CONTAINER_REPO@$overwriteWithTag]" "DEBUG"
-  run-command docker build \
+  _log_message "building image [$imageRepo:$imageTag] for target platform [${buildOS}_${buildArch}]" "INFO"
+  _log_message "will overwrite base image with: [$baseImageRepo@$overwriteWithTag]" "DEBUG"
+  _run_command docker build \
     --no-cache \
-    --build-arg "BASE_IMAGE=${CONTAINER_BASE_IMAGE_REPOSITORY}@${overwriteWithTag}" \
+    --build-arg "BASE_IMAGE=${baseImageRepo}@${overwriteWithTag}" \
     --build-arg "http_proxy=$HTTP_PROXY" \
     --build-arg "https_proxy=$HTTPS_PROXY" \
     --build-arg "proxy_host=$PROXY_HOST" \
     --build-arg "proxy_port=$PROXY_PORT" \
     -f $DOCKERFILE_NAME \
-    -t $CONTAINER_REPO:$CONTAINER_TAG-${buildOS}-${buildArch} \
+    -t ${imageRepo}:${imageTag}_${buildOS}_${buildArch} \
     $DOCKERFILE_PATH
-  act-log-message "image build success, tagged as [$CONTAINER_REPO:$CONTAINER_TAG-${buildOS}-${buildArch}]" "INFO"
+  _log_message "image build success, tagged as [${imageRepo}:${imageTag}_${buildOS}_${buildArch}]" "INFO"
 
   # save image
-  #mkdir -p dist/container-image
-  #local artifactName="main-$ARTIFACT"
-  #run-command docker save $CONTAINER_REPO:$CONTAINER_TAG > dist/container-image/${artifactName}.tar
-  #act-log-message "stored image into dist/container-image/${artifactName}" "INFO"
+  mkdir -p "${TMP_DIR}/container-image"
+  local artifactName="${imageTag}_${buildOS}_${buildArch}"
+  _run_command docker save "${imageRepo}:${imageTag}_${buildOS}_${buildArch}" > ${TMP_DIR}/container-image/${artifactName}.tar
+  _log_message "stored image into ${TMP_DIR}/container-image/${artifactName}" "INFO"
 }
 
 # container registry login
 function act-common-container-registry-push()
 {
-  act-log-message "pushing image to remote registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
+  _log_message "pushing image to remote registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
   docker push "${1:-}"
 }
