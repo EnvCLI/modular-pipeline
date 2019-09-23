@@ -40,7 +40,7 @@ function main()
   fi
 
   # no match
-  act-log-message "project type ${PROJECT_TYPE} is not supported!" "WARN"
+  _log_message "project type ${PROJECT_TYPE} is not supported!" "WARN"
 }
 
 # entrypoint

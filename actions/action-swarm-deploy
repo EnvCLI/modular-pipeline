@@ -35,8 +35,6 @@ function main()
 
   _log_message "deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..." "INFO"
   export SWARMSTACKFILE=${SWARMSTACKFILE:-swarm.yml}
-  export CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
-  export CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
 
   # support for SWARMSTACKFILE_DEFAULT
   if ! test -f "$SWARMSTACKFILE"; then
@@ -63,7 +61,7 @@ function main()
 
   # deploy stack (placeholders are replaced by the .env file provided to the stack file)
   set +e
-  docker stack deploy --compose-file $SWARMSTACK_FILE --with-registry-auth $DEPLOYMENT_ID
+  _run_command  docker stack deploy --compose-file $SWARMSTACK_FILE --with-registry-auth $DEPLOYMENT_ID
   deploymentResult=$?
   set -e
   if [ "$deploymentResult" -ne "0" ]; then

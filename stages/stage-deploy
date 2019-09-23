@@ -9,18 +9,18 @@ source "$LOCAL_PATH/pipeline-common"
 # main
 function main()
 {
-  act-log-message "Will deploy using method: ${DEPLOYMENT_TYPE}" "INFO"
+  _log_message "Will deploy using method: ${DEPLOYMENT_TYPE}" "INFO"
 
   # deployment target: none
   if [[ ${DEPLOYMENT_TYPE} == "none" ]]; then
-    act-log-message "not running deployment, no DEPLOYMENT_TYPE set!" "INFO"
+    _log_message "not running deployment, no DEPLOYMENT_TYPE set!" "INFO"
     exit 0
   fi
 
   # deployment namespace
   local DEPLOYMENT_NAMESPACE=${1:-$DEPLOYMENT_NAMESPACE}
   if [ -z "$DEPLOYMENT_NAMESPACE" ]; then
-    act-log-message "no target environment specified when calling deploy stage!" "ERROR"
+    _log_message "no target environment specified when calling deploy stage!" "ERROR"
     exit 1
   fi
 
@@ -30,16 +30,16 @@ function main()
   # deployment target
   local DEPLOYMENT_ENVIRONMENT=${3:-$DEPLOYMENT_ENVIRONMENT}
   if [ -z "$DEPLOYMENT_ENVIRONMENT" ]; then
-    act-log-message "no target environment specified when calling deploy stage!" "ERROR"
+    _log_message "no target environment specified when calling deploy stage!" "ERROR"
     exit 1
   fi
 
-  act-log-message "deploying environment [$DEPLOYMENT_ENVIRONMENT] ..." "INFO"
+  _log_message "deploying environment [$DEPLOYMENT_ENVIRONMENT] ..." "INFO"
 
   # deploymentType: docker swarm
-  if [[ ${DEPLOYMENT_TYPE} == "swarm" ]]; then
+  if echo "${DEPLOYMENT_TYPE}" | grep -q 'swarm'; then
     # web based services
-    if [[ ${PROJECT_TYPE} =~ ^.*-http$ ]]; then
+    if echo "${DEPLOYMENT_VARIANT}" | grep -q 'http'; then
       export SWARMSTACKFILE_DEFAULT="$MPI_RESOURCES_MIRROR/swarm-http.yml"
     fi
 
@@ -49,9 +49,9 @@ function main()
   fi
 
   # deploymentType: helm
-  if [[ ${DEPLOYMENT_TYPE} == "helm" ]]; then
+  if echo "${DEPLOYMENT_TYPE}" | grep -q 'helm'; then
     # web based services
-    if [[ ${PROJECT_TYPE} =~ ^.*-http$ ]]; then
+    if echo "${DEPLOYMENT_VARIANT}" | grep -q 'http'; then
       DEPLOYMENT_CHART=philippheuer/webservice
     fi
 
@@ -60,7 +60,7 @@ function main()
   fi
 
   # no match
-  act-log-message "deployment type ${DEPLOYMENT_TYPE} is not supported!" "ERROR"
+  _log_message "deployment type ${DEPLOYMENT_TYPE} is not supported!" "ERROR"
   exit 1
 }
 

@@ -9,7 +9,7 @@ source "$LOCAL_PATH/pipeline-common"
 # main
 function main()
 {
-  act-log-message "no checks supported yet ..." "INFO"
+  _log_message "no checks supported yet ..." "INFO"
 }
 
 # entrypoint

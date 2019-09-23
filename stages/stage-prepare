@@ -11,26 +11,26 @@ function main()
 {
   # container
   if [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
-    act-log-message "does not need any preparation." "INFO"
+    _log_message "does not need any preparation." "INFO"
     exit 0
   fi
 
   # container
   if [[ ${PROJECT_TYPE} =~ ^golang-.*$ ]]; then
-    act-log-message "pulling images ..." "INFO"
+    _log_message "pulling images ..." "INFO"
     envcli pull-image go upx
     exit 0
   fi
 
   # java
   if [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
-    act-log-message "pulling images ..." "INFO"
+    _log_message "pulling images ..." "INFO"
     envcli pull-image java
     exit 0
   fi
 
   # no match
-  act-log-message "project type ${PROJECT_TYPE} does not support prepare yet!" "WARN"
+  _log_message "project type ${PROJECT_TYPE} does not support prepare yet!" "WARN"
 }
 
 # entrypoint

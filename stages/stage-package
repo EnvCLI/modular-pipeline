@@ -11,7 +11,7 @@ function main()
 {
   # don't package library projects for any language
   if [[ ${PROJECT_TYPE} =~ ^.*-library$ ]]; then
-    act-log-message "package can not be called for library projects, since they don't have a runtime environment that needs to be build!" "INFO"
+    _log_message "package can not be called for library projects, since they don't have a runtime environment that needs to be build!" "INFO"
     exit 0
   fi
 
@@ -30,7 +30,7 @@ function main()
   fi
 
   # no match
-  act-log-message "project type ${PROJECT_TYPE} is not supported by package yet!" "WARN"
+  _log_message "project type ${PROJECT_TYPE} is not supported by package yet!" "WARN"
 }
 
 # entrypoint

@@ -12,7 +12,7 @@ function main()
   # container
   if test -f "dist/container-image/main.tar"; then
     # import image
-    act-log-message "publishing container image from dist/container-image/main.tar" "INFO"
+    _log_message "publishing container image from dist/container-image/main.tar" "INFO"
     docker load -i dist/container-image/main.tar
 
     # publish
@@ -22,7 +22,7 @@ function main()
   # bintray
   if [[ ${DEPLOYMENT_TYPE} == "bintray" ]]; then
     # for cli and libraries, TODO: add filter later
-    act-log-message "publishing bintray artifacts from dist/" "INFO"
+    _log_message "publishing bintray artifacts from dist/" "INFO"
     action-bintray-publish
   fi
 }

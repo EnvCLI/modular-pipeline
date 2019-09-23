@@ -17,7 +17,7 @@ function main()
 
   # container
   if [[ ${PROJECT_TYPE} =~ ^container-.*$ ]]; then
-    act-log-message "no tests for containers yet ..." "WARN"
+    _log_message "no tests for containers yet ..." "WARN"
     exit 0
   fi
 
@@ -34,7 +34,7 @@ function main()
   fi
 
   # no match
-  act-log-message "project type ${PROJECT_TYPE} does not support tests yet!" "WARN"
+  _log_message "project type ${PROJECT_TYPE} does not support tests yet!" "WARN"
 }
 
 # entrypoint

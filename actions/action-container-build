@@ -17,7 +17,7 @@ function main()
   DOCKERFILE_URL_DEFAULT="${DOCKERFILE_URL_DEFAULT:-}"
 
   # use buildkit
-  DOCKER_BUILDKIT=1
+  export DOCKER_BUILDKIT=1
 
   # support for DOCKERFILE_URL_DEFAULT
   if ! test -f "$DOCKERFILE_PATH/$DOCKERFILE_NAME"; then

@@ -9,7 +9,7 @@ source "$LOCAL_PATH/pipeline-common"
 # main
 function main()
 {
-  act-log-message "No auditing tools supported yet." "INFO"
+  _log_message "No auditing tools supported yet." "INFO"
 }
 
 # entrypoint
