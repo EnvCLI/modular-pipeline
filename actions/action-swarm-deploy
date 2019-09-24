@@ -34,7 +34,9 @@ function main()
   fi
 
   _log_message "deploying environment [$DEPLOYMENT_ENVIRONMENT - ID: $DEPLOYMENT_ID] ..." "INFO"
+  # configuration
   export SWARMSTACKFILE=${SWARMSTACKFILE:-swarm.yml}
+  export SWARMSTACK_ENV_FILE="deploy.env"
 
   # support for SWARMSTACKFILE_DEFAULT
   if ! test -f "$SWARMSTACKFILE"; then
@@ -45,23 +47,24 @@ function main()
       exit 1
     else
       _log_message "using default swarmstack file provided at [$SWARMSTACKFILE] from [$SWARMSTACKFILE_DEFAULT]!" "INFO"
-      curl -L -s -o "$SWARMSTACKFILE" "$SWARMSTACKFILE_DEFAULT"
+      curl -L -s -o "${TMP_DIR}/swarm.yml" "$SWARMSTACKFILE_DEFAULT"
       USED_DEFAULT_SWARMCONFIG=true
     fi
+  else
+    cp $SWARMSTACKFILE "${TMP_DIR}/swarm.yml"
   fi
 
   # generate deployment configuration
-  act-common-deploy-generate-configuration $DEPLOYMENT_ENVIRONMENT
+  _generate_deployment_configuration "$DEPLOYMENT_ENVIRONMENT"
 
-  # configuration
-  export SWARMSTACK_FILE=${SWARMSTACK_FILE:-swarm.yml}
-
-  # container registry login (swarm passes the current registry auth to pull the image)
-  act-common-container-registry-login
+  # container registry login (swarm passes the current registry auth to pull the image if present)
+  if [[ -n "$NCI_CONTAINERREGISTRY_HOST" ]]; then
+    container_registry_login
+  fi
 
   # deploy stack (placeholders are replaced by the .env file provided to the stack file)
   set +e
-  _run_command  docker stack deploy --compose-file $SWARMSTACK_FILE --with-registry-auth $DEPLOYMENT_ID
+  _run_command docker stack deploy --compose-file "${TMP_DIR}/swarm.yml" --with-registry-auth "${DEPLOYMENT_NAMESPACE}_${DEPLOYMENT_ID}"
   deploymentResult=$?
   set -e
   if [ "$deploymentResult" -ne "0" ]; then
@@ -79,8 +82,9 @@ case "${1:-}" in
     echo ""
     echo "Environment:"
     echo "* DEBUG: Can be set to true to enable debugging"
-    echo "* DEPLOYMENT_ENVIRONMENT: name of the environment (as slug, ie. production, development, ...)"
+    echo "* DEPLOYMENT_NAMESPACE: the namespace of the deployment"
     echo "* DEPLOYMENT_ID: unique deployment id"
+    echo "* DEPLOYMENT_ENVIRONMENT: name of the environment (as slug, ie. production, development, ...)"
     echo "* SWARMSTACK_FILE: provide a custom file with a docker swarm stack definition. (defaults to swarm.yml)"
     ;;
   *)

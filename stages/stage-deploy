@@ -34,13 +34,13 @@ function main()
     exit 1
   fi
 
-  _log_message "deploying environment [$DEPLOYMENT_ENVIRONMENT] ..." "INFO"
+  _log_message "deploying Namespace[${DEPLOYMENT_NAMESPACE}] ID[${DEPLOYMENT_ID}] Environment[$DEPLOYMENT_ENVIRONMENT] ..." "INFO"
 
   # deploymentType: docker swarm
   if echo "${DEPLOYMENT_TYPE}" | grep -q 'swarm'; then
     # web based services
     if echo "${DEPLOYMENT_VARIANT}" | grep -q 'http'; then
-      export SWARMSTACKFILE_DEFAULT="$MPI_RESOURCES_MIRROR/swarm-http.yml"
+      export SWARMSTACKFILE_DEFAULT="${DEPLOYMENT_CHART:-${MPI_RESOURCES_MIRROR}/swarm-http.yml}"
     fi
 
     # run deployment
@@ -52,7 +52,7 @@ function main()
   if echo "${DEPLOYMENT_TYPE}" | grep -q 'helm'; then
     # web based services
     if echo "${DEPLOYMENT_VARIANT}" | grep -q 'http'; then
-      DEPLOYMENT_CHART=philippheuer/webservice
+      DEPLOYMENT_CHART="${DEPLOYMENT_CHART:-philippheuer/webservice}"
     fi
 
     action-helm-deploy "$DEPLOYMENT_NAMESPACE" "$DEPLOYMENT_ENVIRONMENT" "$DEPLOYMENT_ID" "$DEPLOYMENT_CHART"

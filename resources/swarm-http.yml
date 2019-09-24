@@ -3,11 +3,11 @@
 ##
 version: '3.3'
 services:
-  service:
+  http:
     # Image
     image: $CONTAINER_REPO:$CONTAINER_TAG
     # Environment
-    env_file: deploy.env
+    env_file: $SWARMSTACK_ENV_FILE
     # Networks
     networks:
       - traefik_net

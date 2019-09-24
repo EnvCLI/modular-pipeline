@@ -5,12 +5,26 @@ set -euo pipefail
 LOCAL_PATH=${BASH_SOURCE%/*}
 source "$LOCAL_PATH/pipeline-common"
 
-# container registry login
-act-common-container-registry-login() {
-  _log_message "trying to login to container registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
+# Public: Authenticate against a container registry
+#
+# This will sign in to a remote container registry.
+#
+# $1 - The registry hostname
+# $2 - The registry username
+# $3 - The registry password
+#
+# Examples
+#
+#   container_registry_login "hostname" "user" "pass"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+container_registry_login() {
+  declare registryHost="$1" registryUsername="$2" registryPassword="$3"
 
-  if [[ -n "$NCI_CONTAINERREGISTRY_USERNAME" ]]; then
-    docker login -u "$NCI_CONTAINERREGISTRY_USERNAME" -p "$NCI_CONTAINERREGISTRY_PASSWORD" "$NCI_CONTAINERREGISTRY_HOST"
+  _log_message "trying to login to container registry $registryHost ..." "INFO"
+
+  if [[ -n "$registryUsername" ]]; then
+    _run_command docker login -u "$registryUsername" -p "$registryPassword" "$registryHost"
   else
     _log_message "Failed to login to container registry! No credentials provided!" "ERROR"
     exit 1
@@ -33,7 +47,7 @@ act-common-container-registry-login() {
 #   parse-dockerfile-from "Dockerfile"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-parse-dockerfile-from() {
+parse_dockerfile_from() {
   declare dockerfile="$1"
 
   IFS=':' read -r -a baseImageArray <<< $(cat "$dockerfile" | grep "FROM \${BASE_IMAGE:-" | cut -c 20- | tr -d '}')
@@ -54,7 +68,7 @@ parse-dockerfile-from() {
 #   parse-container-manifest "docker.io/alpine:latest"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-parse-container-manifest() {
+parse_container_manifest() {
   declare containerImage="$1"
 
   local temporaryManifestFile="$TMP_DIR/manifest.json"
@@ -150,7 +164,7 @@ create_container_manifest() {
 }
 
 # artifact generation
-build-container() {
+build_container() {
   declare imageRepo="$1" imageTag="$2" baseImageRepo="$3" baseImageTag="$4" buildOS="$5" buildArch="$6"
 
   # parse the manifest of the base image, to check what is supported
@@ -182,8 +196,10 @@ build-container() {
 }
 
 # container registry login
-function act-common-container-registry-push()
+function container_registry_push()
 {
-  _log_message "pushing image to remote registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
-  docker push "${1:-}"
+  declare imageRepo="$1" imageTag="$2"
+
+  _log_message "pushing image [${imageRepo}:${imageTag}] to remote registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
+  docker push "${imageRepo}:${imageTag}"
 }

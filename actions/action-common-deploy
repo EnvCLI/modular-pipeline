@@ -2,9 +2,8 @@
 set -euo pipefail
 
 # generates the deployment configuration (.env)
-function act-common-deploy-generate-configuration
-{
-  local DEPLOYMENT_ENVIRONMENT=${1:-}
+_generate_deployment_configuration() {
+  declare deploymentEnvironment="$1"
 
   # source in .env configuration properties with defaults
   # - common .env file
@@ -13,15 +12,15 @@ function act-common-deploy-generate-configuration
     export $(grep -v '^#' .env | xargs)
   fi
   # - environment-specific .env file
-  if [ -f ".env-$DEPLOYMENT_ENVIRONMENT" ]; then
-    echo "-> loading environment from .env-$DEPLOYMENT_ENVIRONMENT"
-    export $(grep -v '^#' ".env-$DEPLOYMENT_ENVIRONMENT" | xargs)
+  if [ -f ".env-${deploymentEnvironment}" ]; then
+    echo "-> loading environment from .env-${deploymentEnvironment}"
+    export $(grep -v '^#' ".env-${deploymentEnvironment}" | xargs)
   fi
 
   # get all available variables (sourced or set)
-  compgen -v > dist/tmp-deployvars.env
-  readarray -t ALL_VARIABLES < dist/tmp-deployvars.env
-  rm dist/tmp-deployvars.env
+  compgen -v > ${TMP_DIR}/deployvars.env
+  readarray -t ALL_VARIABLES < ${TMP_DIR}/deployvars.env
+  rm ${TMP_DIR}/deployvars.env
 
   # prepare deploylent labels
   # - replicas
@@ -33,7 +32,7 @@ function act-common-deploy-generate-configuration
   export RESOURCES_HARD_MEMORY=${RESOURCES_HARD_MEMORY:-512M}
 
   # prepare deployment variables
-  rm dist/deploy.env >> /dev/null || true # remove if already present
+  rm ${TMP_DIR}/deploy.env >> /dev/null || true # remove if already present
   for KEY in "${ALL_VARIABLES[@]}"; do
     VALUE=${!KEY:-}
 
@@ -55,6 +54,6 @@ function act-common-deploy-generate-configuration
     fi
 
     # .env for deployments
-    echo "$KEY=$VALUE" >> dist/deploy.env
+    echo "$KEY=$VALUE" >> ${TMP_DIR}/deploy.env
   done
 }
