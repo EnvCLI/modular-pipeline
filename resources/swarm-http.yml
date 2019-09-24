@@ -24,7 +24,7 @@ services:
         traefik.port: "8080"
         traefik.protocol: "http"
         traefik.frontend.entryPoints: "http"
-        traefik.frontend.rule: "Host:$CI_ENVIRONMENT_URL_HOST"
+        traefik.frontend.rule: "Host:$HTTP_ENDPOINT_HOST"
         traefik.docker.network: "traefik_net"
       resources:
         limits:

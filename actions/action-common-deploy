@@ -8,12 +8,12 @@ _generate_deployment_configuration() {
   # source in .env configuration properties with defaults
   # - common .env file
   if [ -f ".env" ]; then
-    echo "-> loading environment from .env"
+    _log_message "loading environment from .env" "INFO"
     export $(grep -v '^#' .env | xargs)
   fi
   # - environment-specific .env file
   if [ -f ".env-${deploymentEnvironment}" ]; then
-    echo "-> loading environment from .env-${deploymentEnvironment}"
+    _log_message "loading environment from .env-${deploymentEnvironment}" "INFO"
     export $(grep -v '^#' ".env-${deploymentEnvironment}" | xargs)
   fi
 
@@ -30,6 +30,13 @@ _generate_deployment_configuration() {
   export RESOURCES_HARD_CPU=${RESOURCES_HARD_CPU:-1.00}
   export RESOURCES_SOFT_MEMORY=${RESOURCES_SOFT_MEMORY:-128M}
   export RESOURCES_HARD_MEMORY=${RESOURCES_HARD_MEMORY:-512M}
+
+  # deployment url
+  export HTTP_ENDPOINT_DEFAULT="${PROJECT_NAME:-NCI_PROJECT_SLUG}-${deploymentEnvironment}"
+  export HTTP_ENDPOINT="${HTTP_ENDPOINT:-$HTTP_ENDPOINT_DEFAULT}"
+  export HTTP_ENDPOINT_HOST=$(__get_hostname_from_url "$HTTP_ENDPOINT")
+  export HTTP_ENDPOINT_PATH=$(__get_path_from_url "$HTTP_ENDPOINT")
+  _log_message "exposing http endpopint at [${HTTP_ENDPOINT}]" "DEBUG"
 
   # prepare deployment variables
   rm ${TMP_DIR}/deploy.env >> /dev/null || true # remove if already present
@@ -56,4 +63,18 @@ _generate_deployment_configuration() {
     # .env for deployments
     echo "$KEY=$VALUE" >> ${TMP_DIR}/deploy.env
   done
+}
+
+# get hostname from url
+__get_hostname_from_url() {
+  declare url="$1"
+
+  echo $url | sed -e "s/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/"
+}
+
+# get path from url
+__get_path_from_url() {
+  declare url="$1"
+
+  echo $url | grep / | cut -d/ -f4-
 }
