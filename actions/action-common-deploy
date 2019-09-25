@@ -20,7 +20,7 @@ _generate_deployment_configuration() {
   # get all available variables (sourced or set)
   compgen -v > ${TMP_DIR}/deployvars.env
   readarray -t ALL_VARIABLES < ${TMP_DIR}/deployvars.env
-  rm ${TMP_DIR}/deployvars.env
+  rm ${TMP_DIR}/deployvars.env &> /dev/null || true # remove if already present
 
   # prepare deploylent labels
   # - replicas
@@ -39,7 +39,7 @@ _generate_deployment_configuration() {
   _log_message "exposing http endpopint at [${HTTP_ENDPOINT}]" "DEBUG"
 
   # prepare deployment variables
-  rm ${TMP_DIR}/deploy.env >> /dev/null || true # remove if already present
+  rm ${TMP_DIR}/deploy.env &> /dev/null || true # remove if already present
   for KEY in "${ALL_VARIABLES[@]}"; do
     VALUE=${!KEY:-}
 
@@ -48,15 +48,15 @@ _generate_deployment_configuration() {
         continue
     fi
     # script vars
-    if [[ $KEY =~ ^ALL_VARIABLES|KEY|VALUE|BUILD_STACK|DEPLOY_STACK|DEPLOY_TEMPLATE|KUBECONFIG_CONTENT|DISABLE_BUILD|DISABLE_PACKAGE$ ]]; then
+    if [[ $KEY =~ ^(ALL_VARIABLES|KEY|VALUE|PROJECT_TYPE|DEPLOYMENT_TYPE|DEPLOYMENT_VARIANT|deploymentEnvironment|GIT_DEPTH|GIT_STRATEGY|CONTAINER_REPO|CONTAINER_TAG|MPI_RESOURCES_MIRROR|KUBECONFIG_CONTENT|DISABLE_BUILD|DISABLE_PACKAGE)$ ]]; then
         continue
     fi
     # gitlab variables, for feature flags FF see https://docs.gitlab.com/runner/configuration/feature-flags.html
-    if [[ $KEY =~ ^FF_.*|CI|CI_.*|GITLAB_CI|GITLAB_FEATURES|GIT_SSL_NO_VERIFY|HELM_VERSION|KUBERNETES_VERSION|KUBE_INGRESS_BASE_DOMAIN|VERSION$ ]]; then
+    if [[ $KEY =~ ^(FF_.*|CI|CI_.*|GITLAB_CI|GITLAB_FEATURES|GIT_SSL_NO_VERIFY|HELM_VERSION|KUBERNETES_VERSION|KUBE_INGRESS_BASE_DOMAIN|VERSION)$ ]]; then
         continue
     fi
     # os vars
-    if [[ $KEY =~ ^ALL_VARIABLES|KEY|VALUE|PWD|SUDO_COMMAND|LC_.*|FUNCNAME|EPOCHREALTIME|DOCKER_.*|SSH_CLIENT|SSH_CONNECTION|SSH_TTY|LESSCLOSE|WSLENV|WSL_DISTRO_NAME|XDG_DATA_DIRS|COMP_WORDBREAKS|LS_COLORS|PROMPT_COMMAND|XDG_RUNTIME_DIR|PS[0-9]|SHELL|LOGNAME|OPTERR|OPTIND|OSTYPE|PATH|SHELLOPTS|UID|USER|colors|MACHTYPE|MAIL|LESSOPEN|IFS|ID|HOSTTYPE|HOSTNAME|HOME|HIST.*|GROUPS|COLUMNS|DIRSTACK|LANG|LINES|LINENO|PPID|PIPESTATUS|RANDOM|SECONDS|SHLVL|TERM|BASH.*$ ]]; then
+    if [[ $KEY =~ ^(PWD|SUDO_COMMAND|LC_.*|FUNCNAME|EPOCHREALTIME|DOCKER_.*|SSH_CLIENT|SSH_CONNECTION|SSH_TTY|LESSCLOSE|WSLENV|WSL_DISTRO_NAME|XDG_DATA_DIRS|COMP_WORDBREAKS|LS_COLORS|PROMPT_COMMAND|XDG_RUNTIME_DIR|PS[0-9]|SHELL|LOGNAME|OPTERR|OPTIND|OSTYPE|PATH|SHELLOPTS|UID|USER|colors|MACHTYPE|MAIL|LESSOPEN|IFS|ID|HOSTTYPE|HOSTNAME|HOME|HIST.*|GROUPS|COLUMNS|DIRSTACK|LANG|LINES|LINENO|PPID|PIPESTATUS|RANDOM|SECONDS|SHLVL|TERM|BASH.*)$ ]]; then
         continue
     fi
 
