@@ -10,10 +10,10 @@ source "$LOCAL_PATH/pipeline-common"
 function main()
 {
   # container
-  if test -f "dist/container-image/main.tar"; then
+  if test -f "${TMP_DIR}/container-image/main.tar"; then
     # import image
-    _log_message "publishing container image from dist/container-image/main.tar" "INFO"
-    docker load -i dist/container-image/main.tar
+    _log_message "publishing container image from ${TMP_DIR}/container-image/main.tar" "INFO"
+    docker load -i "${TMP_DIR}/container-image/main.tar"
 
     # publish
     action-container-push

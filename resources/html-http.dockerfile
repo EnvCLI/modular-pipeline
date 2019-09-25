@@ -34,7 +34,7 @@ RUN apk add --no-cache curl bash &&\
 USER 101
 
 # copy files from rootfs to the container
-ADD dist/* /usr/share/nginx/html/
+ADD dist /usr/share/nginx/html
 
 ############################################################
 # Execution

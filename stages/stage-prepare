@@ -22,6 +22,16 @@ function main()
     exit 0
   fi
 
+  # deployment
+  if [[ ${PROJECT_TYPE} =~ ^deployment*$ ]]; then
+    # check for invalid combinations
+    if [[ ${DEPLOYMENT_TYPE} =~ ^none*$ ]]; then
+      _log_message "project type [${PROJECT_TYPE}] is not supported with deployment type [${DEPLOYMENT_TYPE}]!" "ERROR"
+      exit 1
+    fi
+    exit 0
+  fi
+
   # java
   if [[ ${PROJECT_TYPE} =~ ^java-.*$ ]]; then
     _log_message "pulling images ..." "INFO"

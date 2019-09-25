@@ -11,15 +11,11 @@ source "$LOCAL_PATH/action-common-container"
 # main
 function main()
 {
-  # configuration
-  CONTAINER_REPO=${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}
-  CONTAINER_TAG=${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}
-
   # login to registry
-  act-common-container-registry-login
+  container_registry_login "$NCI_CONTAINERREGISTRY_HOST" "$NCI_CONTAINERREGISTRY_USERNAME" "$NCI_CONTAINERREGISTRY_PASSWORD"
 
   # push image
-  act-common-container-registry-push "${CONTAINER_REPO}:${CONTAINER_TAG}"
+  container_registry_push "${CONTAINER_REPO}:${CONTAINER_TAG}"
 }
 
 # entrypoint

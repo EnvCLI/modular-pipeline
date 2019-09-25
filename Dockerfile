@@ -25,7 +25,7 @@ COPY stages/* /usr/local/bin/
 ############################################################
 
 RUN echo "System Packages ..." &&\
-    apk add --no-cache curl bash &&\
+    apk add --no-cache curl bash gettext &&\
     echo "Tools ..." &&\
     echo "-> Getting EnvCLI ..." &&\
     curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.1/envcli_linux_amd64 &&\

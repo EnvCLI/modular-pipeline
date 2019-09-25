@@ -59,8 +59,11 @@ function main()
 
   # container registry login (swarm passes the current registry auth to pull the image if present)
   if [[ -n "$NCI_CONTAINERREGISTRY_HOST" ]]; then
-    container_registry_login
+    container_registry_login "$NCI_CONTAINERREGISTRY_HOST" "$NCI_CONTAINERREGISTRY_USERNAME" "$NCI_CONTAINERREGISTRY_PASSWORD"
   fi
+
+  # print deployment yml
+  _log_message "rendered swarm yml: [$(envsubst < ${TMP_DIR}/swarm.yml)]" "DEBUG"
 
   # deploy stack (placeholders are replaced by the .env file provided to the stack file)
   set +e
