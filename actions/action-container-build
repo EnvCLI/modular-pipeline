@@ -16,9 +16,6 @@ function main()
   DOCKERFILE_NAME="${DOCKERFILE_NAME:-Dockerfile}"
   DOCKERFILE_URL_DEFAULT="${DOCKERFILE_URL_DEFAULT:-}"
 
-  # use buildkit
-  export DOCKER_BUILDKIT=1
-
   # support for DOCKERFILE_URL_DEFAULT
   if ! test -f "$DOCKERFILE_PATH/$DOCKERFILE_NAME"; then
     _log_message "no local dockerfile provided at [$DOCKERFILE_PATH/$DOCKERFILE_NAME]!" "DEBUG"
@@ -34,7 +31,7 @@ function main()
   fi
 
   # parse the dockerfile to find the base image (+split repo / tag)
-  parse-dockerfile-from "$DOCKERFILE_PATH/$DOCKERFILE_NAME"
+  container_parse_dockerfile_baseimage "$DOCKERFILE_PATH/$DOCKERFILE_NAME"
   _log_message "container image - repository: $CONTAINER_BASE_IMAGE_REPOSITORY" "DEBUG"
   _log_message "container image - tag: $CONTAINER_BASE_IMAGE_TAG" "DEBUG"
 
@@ -46,7 +43,7 @@ function main()
     local buildArch="${row[1]}"
 
     # run build
-    build-container "$CONTAINER_REPO" "$CONTAINER_TAG" "$CONTAINER_BASE_IMAGE_REPOSITORY" "$CONTAINER_BASE_IMAGE_TAG" "$buildOS" "$buildArch"
+    container_build "$CONTAINER_REPO" "$CONTAINER_TAG" "$CONTAINER_BASE_IMAGE_REPOSITORY" "$CONTAINER_BASE_IMAGE_TAG" "$buildOS" "$buildArch"
   done
 
   # create manifest

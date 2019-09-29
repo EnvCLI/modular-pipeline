@@ -44,10 +44,10 @@ container_registry_login() {
 #
 # Examples
 #
-#   parse-dockerfile-from "Dockerfile"
+#   container_parse_dockerfile_baseimage "Dockerfile"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-parse_dockerfile_from() {
+container_parse_dockerfile_baseimage() {
   declare dockerfile="$1"
 
   IFS=':' read -r -a baseImageArray <<< $(cat "$dockerfile" | grep "FROM \${BASE_IMAGE:-" | cut -c 20- | tr -d '}')
@@ -65,10 +65,10 @@ parse_dockerfile_from() {
 #
 # Examples
 #
-#   parse-container-manifest "docker.io/alpine:latest"
+#   container_parse_manifest "docker.io/alpine:latest"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-parse_container_manifest() {
+container_parse_manifest() {
   declare containerImage="$1"
 
   local temporaryManifestFile="$TMP_DIR/manifest.json"
@@ -114,7 +114,7 @@ parse_container_manifest() {
 #   create-container-manifest "docker.io/alpine:latest" "linux_amd64,linux_arm64v8"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-create_container_manifest() {
+container_create_manifest() {
   declare manifestName="$1" containerBuildArchs="$2"
   _log_message "generating manifest [${manifestName}] pointing at [${containerBuildArchs}]" "DEBUG"
 
@@ -163,15 +163,33 @@ create_container_manifest() {
   # docker manifest push -p ownyourbits/example
 }
 
-# artifact generation
-build_container() {
+# Public: Build a container image
+#
+# This will build a container image for a specified target os/arch
+#
+# $1 - The container image repo
+# $2 - The container image tag
+# $3 - The base image repo
+# $4 - The base image tag
+# $5 - The target os
+# $6 - The target arch
+#
+# Examples
+#
+#   container_build "example" "latest" "docker.io/alpine" "latest" "linux" "amd64"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+container_build() {
   declare imageRepo="$1" imageTag="$2" baseImageRepo="$3" baseImageTag="$4" buildOS="$5" buildArch="$6"
 
   # parse the manifest of the base image, to check what is supported
   _log_message "parsing manifest of the base image [$baseImageRepo:$baseImageTag]" "INFO"
-  parse-container-manifest "$baseImageRepo:$baseImageTag"
+  container_parse_manifest "$baseImageRepo:$baseImageTag"
   local digestVarName="MANIFEST_DIGEST_${buildOS}_${buildArch}"
   local overwriteWithTag=${!digestVarName}
+
+  # buildkit
+  export DOCKER_BUILDKIT=1
 
   # build
   _log_message "building image [$imageRepo:$imageTag] for target platform [${buildOS}_${buildArch}]" "INFO"
@@ -188,18 +206,91 @@ build_container() {
     $DOCKERFILE_PATH
   _log_message "image build success, tagged as [${imageRepo}:${imageTag}_${buildOS}_${buildArch}]" "INFO"
 
-  # save image
+  # detect image base
+  container_generate_os_package_list "${imageRepo}:${imageTag}_${buildOS}_${buildArch}"
+
+  # save imageg
   mkdir -p "${TMP_DIR}/container-image"
   local artifactName="${imageTag}_${buildOS}_${buildArch}"
   _run_command docker save "${imageRepo}:${imageTag}_${buildOS}_${buildArch}" > ${TMP_DIR}/container-image/${artifactName}.tar
   _log_message "stored image into ${TMP_DIR}/container-image/${artifactName}" "INFO"
 }
 
-# container registry login
-function container_registry_push()
+# Public: Push to container registry
+#
+# This will push the specified image to the remote registry.
+#
+# $1 - The container image
+#
+# Examples
+#
+#   container_registry_push "docker.io/alpine:latest"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+container_registry_push()
 {
-  declare imageRepo="$1" imageTag="$2"
+  declare containerImage="$1"
 
-  _log_message "pushing image [${imageRepo}:${imageTag}] to remote registry $NCI_CONTAINERREGISTRY_HOST ..." "INFO"
-  docker push "${imageRepo}:${imageTag}"
+  _log_message "pushing image [${containerImage}] to remote registry ..." "INFO"
+  docker push "${containerImage}"
+}
+
+# Public: Detect container base os
+#
+# Gets the os id of the base os, can be used to run os-specific action in a container.
+# Will set CONTAINER_BASE_OS to one of the following values:
+# - alpine
+# - debian
+# - ubuntu
+# - fedora
+# - centos
+# - rhel
+#
+# $1 - The container image that should be created (the manifest)
+#
+# Examples
+#
+#   detect_container_base_os "docker.io/alpine:latest"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+container_detect_base_os() {
+  declare containerImage="$1"
+
+  local releaseId=$(docker run -it --rm ${containerImage} cat /etc/os-release | grep -oP '(?<=^ID=).+' | tr -d '"' | tr -d '\r')
+  _log_message "image [${containerImage}] has base os [${releaseId}]" "INFO"
+
+  export CONTAINER_BASE_OS="${releaseId}"
+}
+
+# Public: Generate a list of system packages installed in a container image
+#
+# This will generate a list of installed system packages installed in a container image.
+# Will create a file in TMP_DIR named container_os_packages.txt
+#
+# $1 - The container image
+#
+# Examples
+#
+#   generate_os_package_list "docker.io/alpine:latest"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+container_generate_os_package_list() {
+  declare containerImage="$1"
+
+  # sets CONTAINER_BASE_OS
+  container_detect_base_os "$containerImage"
+
+  # run os specific commands
+  if [ "${CONTAINER_BASE_OS}" == "alpine" ]; then
+    docker run --rm --entrypoint= "$containerImage" apk info --no-cache -v | grep -v '^fetch http' | sort > "${TMP_DIR}/container_os_packages.txt"
+    docker run --rm --entrypoint= "$containerImage" apk upgrade --latest | grep 'Upgrading ' | awk '{ print substr($0, index($0,$3)) }' | sort > "${TMP_DIR}/container_os_packages_available.txt"
+  elif [ "${CONTAINER_BASE_OS}" == "debian" ] | [ "${CONTAINER_BASE_OS}" == "ubuntu" ]; then
+    docker run --rm --entrypoint= "$containerImage" dpkg-query -f '${Package};${Version} ${Status}\n' -W "*" | awk '$NF == "installed"{print $1}' | sort > "${TMP_DIR}/container_os_packages.txt"
+    docker run --rm --entrypoint= "$containerImage" sh -c 'apt-get -qq update && apt-get -s upgrade' | awk -F'[][() ]+' '/^Inst/{printf "%s;%s;%s\n", $2,$3,$4}' | sort > "${TMP_DIR}/container_os_packages_available.txt"
+  elif [ "${CONTAINER_BASE_OS}" == "fedora" ] | [ "${CONTAINER_BASE_OS}" == "centos" ] | [ "${CONTAINER_BASE_OS}" == "rhel" ]; then
+    docker run --rm --entrypoint= "$containerImage" yum list installed -q | sed '1d' | awk '{ print $1 ";" $2 }' | sort > "${TMP_DIR}/container_os_packages.txt"
+    docker run --rm --entrypoint= "$containerImage" yum list updates -q | sed '1d' | awk '{ print $1 ";" $2 }' | sort > "${TMP_DIR}/container_os_packages_available.txt"
+  else
+    _log_message "base os [${CONTAINER_BASE_OS}] not supported for automated package updates!" "INFO"
+  fi
 }

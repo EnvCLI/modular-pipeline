@@ -83,7 +83,7 @@ _prepare() {
 
   # normalize ci variables
   if [ -z ${NCI+x} ]; then
-    _log_message "run normalizeci" "TRACE"
+    _log_message "normalizing ci variables" "TRACE"
     eval $(envcli run normalizeci)
   fi
 
