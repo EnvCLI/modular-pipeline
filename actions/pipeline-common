@@ -56,11 +56,6 @@ _prepare() {
     _log_message "-> envcli not available. Please run theinstallation script!" "ERROR"
     exit 1
   fi
-  # - normalizeci
-  if ! command -v normalizeci > /dev/null; then
-    _log_message "-> normalizeci not available. Please run the installation script!" "ERROR"
-    exit 1
-  fi
 
   # find container runtime (if docker info fails)
   if ! docker info &>/dev/null; then
@@ -89,7 +84,7 @@ _prepare() {
   # normalize ci variables
   if [ -z ${NCI+x} ]; then
     _log_message "run normalizeci" "TRACE"
-    eval $(normalizeci)
+    eval $(envcli run normalizeci)
   fi
 
   # ensure required variables are set

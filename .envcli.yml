@@ -83,6 +83,11 @@ images:
   - name: helm
     directory: /root/.helm
 # Scripting
+- name: normalizeci
+  description: A tool to turn the continious integration / deployment variables into a common format for generally usable scripts without any dependencies.
+  provides:
+  - normalizeci
+  image: docker.io/envcli/normalizeci:latest
 - name: jq
   description: jq is a lightweight and flexible command-line JSON processor
   provides:
