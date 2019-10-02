@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#! /usr/bin/env bash
 set -e
 echo "Installing modular pipeline components"
 DOWNLOAD_MIRROR=${DOWNLOAD_MIRROR:-https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master}
@@ -8,7 +8,7 @@ LOCAL_PATH=${BASH_SOURCE%/*}
 INSTALL_FROM=${INSTALL_FROM:-remote}
 INSTALL_MODE=${INSTALL_MODE:-system} # system or project (prject creates a .ci/bin dir and imports it into PATH)
 CONFIG_DIR=${CONFIG_DIR:-/etc/envcli}
-TARGET_DIR=${TARGET_DIR:-/usr/local/bin}
+TARGET_DIR=${TARGET_DIR:-/usr/local/bin} # can be overwritten to install to any PATH, for example: /C/Program Files/EnvCLI/bin
 
 # detect os and arch
 case "$(uname -s)" in
@@ -36,7 +36,7 @@ fi
 echo "-> checking for envcli"
 if ! [ -x "$(command -v envcli)" ]; then
   echo "--> installing envcli into $TARGET_DIR"
-  curl -L -s -o "$TARGET_DIR/envcli" "https://dl.bintray.com/envcli/golang/envcli/v0.6.1/envcli_${OS}_${ARCH}"
+  curl -L -s -o "$TARGET_DIR/envcli" "https://dl.bintray.com/envcli/golang/envcli/v0.6.1/${OS}_${ARCH}"
   chmod +x "$TARGET_DIR/envcli"
 fi
 
@@ -52,13 +52,6 @@ echo "-> configuring envcli"
 #  fi
 #  chmod 644 "$CONFIG_DIR/.envcli.yml"
 #fi
-
-# req: normalizeci
-echo "-> checking for normalizeci ..."
-if ! [ -x "$(command -v normalizeci)" ]; then
-  curl -L -s -o "$TARGET_DIR/normalizeci" "https://dl.bintray.com/envcli/golang/normalize-ci/v0.1.0/${OS}_${ARCH}"
-  chmod +x "$TARGET_DIR/normalizeci"
-fi
 
 # pipeline
 echo "-> getting pipeline scripts ..."
