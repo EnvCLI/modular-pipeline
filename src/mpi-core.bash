@@ -64,7 +64,7 @@ source "$MPI_ROOT_PATH/action-helper/action-helper.bash"
       @mpi.log_message "INFO" "Action [${actionName}] completed in [$(expr $endAt - $startAt)] seconds."
       ;;
     stage)
-      declare stageName="$2" scriptFile="$MPI_ROOT_PATH/stages/stage-${stageName}.bash"
+      declare stageName="$2" scriptFile="$MPI_ROOT_PATH/stages/stage-${2}.bash"
       if [ ! -f "$scriptFile" ]; then
         @mpi.log_message "ERROR" "Action [${actionName}] does not exist!"
         return 1
