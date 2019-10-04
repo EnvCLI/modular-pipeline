@@ -54,30 +54,29 @@ set -euo pipefail
   MAVEN_DEFAULTVERSION=${MAVEN_DEFAULTVERSION:-3.6.2}
 
   # maven wrapper
-  if test -f "mvnw"; then
-    MAVEN_CALL=("-Dmaven.home=${M2_HOME}" "-Dmaven.multiModuleProjectDirectory=/project" "-classpath" ".mvn/wrapper/maven-wrapper.jar" "org.apache.maven.wrapper.MavenWrapperMain")
-
-    # - make sure the maven wrapper is present
-    if test -f ".mvn/wrapper/maven-wrapper.jar"; then
-      @mpi.log_message "DEBUG" "Maven wrapper .mvn/wrapper/maven-wrapper.jar is already present."
-    else
-      @mpi.log_message "INFO" "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
-      mkdir -p .mvn/wrapper
-      curl -L -s -o .mvn/wrapper/maven-wrapper.jar https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.5/maven-wrapper-0.5.5.jar
-    fi
-
-    # - check for maven wrapper properties file
-    if test -f ".mvn/wrapper/maven-wrapper.properties"; then
-      @mpi.log_message "DEBUG" "Maven wrapper configuration .mvn/wrapper/maven-wrapper.properties found."
-    else
-      @mpi.log_message "WARN" "Couldn't find .mvn/wrapper/maven-wrapper.properties, using maven $MAVEN_DEFAULTVERSION as default!"
-      echo "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/$MAVEN_DEFAULTVERSION/apache-maven-$MAVEN_DEFAULTVERSION-bin.zip" >> .mvn/wrapper/maven-wrapper.properties
-    fi
-
-    # run build
-    @mpi.container_command java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
-  else
-    @mpi.log_message "ERROR" "Maven projects require the maven wrapper to be commited into the repository! Check out https://www.baeldung.com/maven-wrapper"
-    exit 1
+  if ! test -f "mvnw"; then
+    @mpi.log_message "WARN" "Maven projects should have the maven wrapper commited into the repository! Check out https://www.baeldung.com/maven-wrapper"
   fi
+
+  MAVEN_CALL=("-Dmaven.home=${M2_HOME}" "-Dmaven.multiModuleProjectDirectory=/project" "-classpath" ".mvn/wrapper/maven-wrapper.jar" "org.apache.maven.wrapper.MavenWrapperMain")
+
+  # - make sure the maven wrapper is present
+  if test -f ".mvn/wrapper/maven-wrapper.jar"; then
+    @mpi.log_message "DEBUG" "Maven wrapper .mvn/wrapper/maven-wrapper.jar is already present."
+  else
+    @mpi.log_message "INFO" "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
+    mkdir -p .mvn/wrapper
+    curl -L -s -o .mvn/wrapper/maven-wrapper.jar https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.5/maven-wrapper-0.5.5.jar
+  fi
+
+  # - check for maven wrapper properties file
+  if test -f ".mvn/wrapper/maven-wrapper.properties"; then
+    @mpi.log_message "DEBUG" "Maven wrapper configuration .mvn/wrapper/maven-wrapper.properties found."
+  else
+    @mpi.log_message "WARN" "Couldn't find .mvn/wrapper/maven-wrapper.properties, using maven $MAVEN_DEFAULTVERSION as default!"
+    echo "distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/$MAVEN_DEFAULTVERSION/apache-maven-$MAVEN_DEFAULTVERSION-bin.zip" >> .mvn/wrapper/maven-wrapper.properties
+  fi
+
+  # run build
+  @mpi.container_command java $JAVA_PROXY_OPTS ${MAVEN_CALL[@]} $MAVEN_CONFIG $@
 }

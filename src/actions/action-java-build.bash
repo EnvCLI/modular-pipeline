@@ -12,7 +12,7 @@ function main()
   # run build
   if echo "$BUILD_SYSTEM" | grep -q 'gradle'; then
     # gradle
-    @mpi.java.gradle clean assemble
+    @mpi.java.gradle clean assemble --no-daemon
 
     # copy artifacts to ARTIFACT_DIR
     cp -R build/libs/*.jar $ARTIFACT_DIR

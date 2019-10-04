@@ -11,7 +11,7 @@ function main()
 
   # run tests
   if echo "$BUILD_SYSTEM" | grep -q 'gradle'; then
-    @mpi.java.gradle test
+    @mpi.java.gradle test --no-daemon
   elif echo "$BUILD_SYSTEM" | grep -q 'maven'; then
     set +e
     @mpi.java.mvn clean test
