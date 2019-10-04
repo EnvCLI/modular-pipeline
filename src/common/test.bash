@@ -4,7 +4,7 @@
 #
 # Returns the exit code of the last command executed or 0 otherwise.
 @mpi.test_setup() {
-  export SCRIPT_LOG_LEVEL=ERROR
+  export SCRIPT_LOG_LEVEL=TRACE
 }
 
 # Public: Test Teardown Script

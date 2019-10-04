@@ -11,9 +11,16 @@
 #
 # Returns the exit code of the last command executed or 0 otherwise
 @mpi.run_command() {
-  @mpi.log_message "TRACE" "Command $*"
-  eval "$@"
-  return $?
+  # quote all args
+  allargs=
+  for arg in "$@"; do
+      arg="${arg//\\/\\\\}"
+      allargs="$allargs \"${arg//\"/\\\"}\""
+  done
+
+  @mpi.log_message "TRACE" "Command $allargs"
+  eval "$allargs"
+  return "$?"
 }
 
 # Public: Runs a container command

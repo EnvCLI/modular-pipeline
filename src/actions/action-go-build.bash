@@ -36,7 +36,7 @@ _build_go() {
 
   @mpi.log_message "INFO" "Generating golang artifact $ARTIFACT [$NCI_COMMIT_REF_RELEASE] ..."
   # shellcheck disable=SC2086
-  @mpi.run_command envcli run --env GOOS=$ARTIFACT_OS --env GOARCH=$ARTIFACT_ARCH --env GOARM=$GOARM --env CGO_ENABLED=0 go build -o "$ARTIFACT_DIR/$ARTIFACT" "-ldflags=-w -X main.Version=$NCI_COMMIT_REF_RELEASE -X main.CommitHash=$NCI_COMMIT_SHA" ./src
+  @mpi.container_command --env GOOS=$ARTIFACT_OS --env GOARCH=$ARTIFACT_ARCH --env GOARM=$GOARM --env CGO_ENABLED=0 go build -o "$ARTIFACT_DIR/$ARTIFACT" -ldflags "-w -X main.version=$NCI_COMMIT_REF_RELEASE -X main.commit=$NCI_COMMIT_SHA -X main.date=`date -u +%Y%m%d.%H%M%S`" ./src
   @mpi.log_message "INFO" "Successfully generated artifact $ARTIFACT_DIR/$ARTIFACT [$(ls -lh $ARTIFACT_DIR/$ARTIFACT | cut -d " " -f5)]"
 }
 
