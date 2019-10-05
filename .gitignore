@@ -11,7 +11,6 @@ tmp/*
 # java
 *.class
 
-
 # gradle
 **/build/*
 **/.gradle/*

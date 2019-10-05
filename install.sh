@@ -34,7 +34,7 @@ else
   fi
 
   echo "Downloading ..."
-  tmpDir=$(mktemp --directory)
+  tmpDir=$(mktemp -d)
   curl -L -s -o "$tmpDir/pipeline.zip" "$downloadUrl"
   unzip -q $tmpDir/pipeline.zip -d $tmpDir
   MPI_ROOT=$(realpath $tmpDir/modular-pipeline*)

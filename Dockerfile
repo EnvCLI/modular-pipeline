@@ -16,8 +16,7 @@ ENV VERSION "0.0.1"
 ############################################################
 # Artifacts
 ############################################################
-COPY .envcli.yml /etc/envcli/.envcli.yml
-COPY src /usr/local
+COPY . /tmp/mpi
 
 ############################################################
 # Installation
@@ -29,13 +28,9 @@ RUN echo "System Packages ..." &&\
     echo "-> Getting EnvCLI ..." &&\
     curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.2/envcli_linux_amd64 &&\
     chmod +x /usr/local/bin/envcli &&\
-    echo "-> EnvCLI Configuration" &&\
-    mkdir -p /etc/envcli &&\
-    envcli config set global-configuration-path /etc/envcli &&\
-    chmod 644 /etc/envcli/.envcli.yml &&\
-    echo "-> Getting NormalizeCI ..." &&\
-    curl -L -s -o /usr/local/bin/normalizeci https://dl.bintray.com/envcli/golang/normalize-ci/v0.1.1/linux_amd64 &&\
-    chmod +x /usr/local/bin/normalizeci &&\
+    echo "-> Pipeline" &&\
+    /tmp/mpi/install.sh /usr/local &&\
+    rm -rf /tmp/mpi &&\
     echo "-> Installing EnvCLI Aliases" &&\
     envcli install-aliases &&\
     echo "-> Executable permissions" &&\
