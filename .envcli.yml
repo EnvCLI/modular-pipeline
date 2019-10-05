@@ -30,6 +30,16 @@ images:
   cache:
   - name: node-10
     directory: /root/.npm
+# - Python
+- name: python
+  description: Python is a programming language that lets you work quickly and integrate systems more effectively.
+  provides:
+  - python
+  - pip
+  image: docker.io/library/python:3-alpine
+  cache:
+  - name: python-3.7
+    directory: /usr/local/lib/python3.7/site-packages
 # Shell
 - name: bats
   description: Bash Automated Testing System
