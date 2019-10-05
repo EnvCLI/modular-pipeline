@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+
+. "${0%/*}/../libexec/mpi/mpi-core.bash"
+@mpi "$@"

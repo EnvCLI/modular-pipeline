@@ -17,7 +17,7 @@ ENV VERSION "0.0.1"
 # Artifacts
 ############################################################
 COPY .envcli.yml /etc/envcli/.envcli.yml
-COPY src /usr/local/bin/
+COPY src /usr/local
 
 ############################################################
 # Installation

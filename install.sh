@@ -1,46 +1,15 @@
 #! /usr/bin/env bash
 set -e
-echo "Installing modular pipeline components"
-DOWNLOAD_MIRROR=${DOWNLOAD_MIRROR:-https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master}
-
-# configuration
-LOCAL_PATH=${BASH_SOURCE%/*}
-INSTALL_FROM=${INSTALL_FROM:-remote}
-INSTALL_MODE=${INSTALL_MODE:-system} # system or project (prject creates a .ci/bin dir and imports it into PATH)
-CONFIG_DIR=${CONFIG_DIR:-/etc/envcli}
-TARGET_DIR=${TARGET_DIR:-/usr/local/bin} # can be overwritten to install to any PATH, for example: /C/Program Files/EnvCLI/bin
-
-# detect os and arch
-case "$(uname -s)" in
-  Linux*)     OS=linux;;
-  Darwin*)    OS=darwin;;
-  CYGWIN*)    OS=windows;;
-  MINGW*)     OS=windows;;
-  *)          OS="UNKNOWN:$(uname -s)"
-esac
-case "$(uname -m)" in
-  x86_64*)    ARCH=amd64;;
-  i386*)      ARCH=386;;
-  *)          ARCH="UNKNOWN:$(uname -m)"
-esac
-
-# support for user-mode setup
-if echo "$INSTALL_MODE" | grep -q 'project'; then
-  TARGET_DIR="$(pwd)/.ci/bin"
-  mkdir -p "$(pwd)/.ci/bin"
-  PATH=$PATH:$(pwd)/.ci/bin
-  export PATH
-fi
+echo "Installing modular pipeline ..."
+downloadUrl=${downloadUrl:-https://github.com/EnvCLI/modular-pipeline/archive/master.zip}
 
 # preq: envcli
-echo "-> checking for envcli"
 if ! [ -x "$(command -v envcli)" ]; then
-  echo "--> installing envcli into $TARGET_DIR"
-  curl -L -s -o "$TARGET_DIR/envcli" "https://dl.bintray.com/envcli/golang/envcli/v0.6.1/${OS}_${ARCH}"
-  chmod +x "$TARGET_DIR/envcli"
+  echo "ERROR: please install envcli on your host machine!"
+  exit 1
 fi
 
-echo "-> configuring envcli"
+#echo "-> configuring envcli"
 #mkdir -p "$CONFIG_DIR"
 #envcli config set global-configuration-path "$CONFIG_DIR"
 #chmod 644 "$TARGET_DIR/.envclirc"
@@ -53,61 +22,46 @@ echo "-> configuring envcli"
 #  chmod 644 "$CONFIG_DIR/.envcli.yml"
 #fi
 
-# pipeline
-echo "-> getting pipeline scripts ..."
-# - actions
-ACTION_LIST=(
-  "pipeline-common"
-  "action-common-deploy"
-  "action-common-container"
-  "action-common-kubernetes"
-  "action-common-java"
-  "action-ci-debug"
-  "action-go-run"
-  "action-go-test"
-  "action-go-build"
-  "action-java-test"
-  "action-java-build"
-  "action-python-build"
-  "action-python-run"
-  "action-hugo-build"
-  "action-html-test"
-  "action-shell-test"
-  "action-optimize-upx"
-  "action-container-build"
-  "action-container-push"
-  "action-bintray-publish"
-  "action-swarm-deploy"
-  "action-helm-deploy"
-)
-for i in "${ACTION_LIST[@]}"; do
-  echo "--> action: $i"
-  if echo "$INSTALL_FROM" | grep -q 'remote'; then
-    curl -L -s -o "$TARGET_DIR/$i" "$DOWNLOAD_MIRROR/actions/$i"
-  elif echo "$INSTALL_FROM" | grep -q 'local'; then
-    cp "$LOCAL_PATH/actions/$i" "$TARGET_DIR/$i"
+# arguments
+MPI_ROOT="${0%/*}"
+PATH_PREFIX="$1"
+
+if [[ -z "$PATH_PREFIX" ]]; then
+  printf '%s\n' \
+    "usage: $0 <prefix>" \
+    "  e.g. $0 /usr/local" >&2
+  exit 1
+fi
+
+# download
+if [[ -d "src" ]]; then
+  echo "Local installation ..."
+else
+  if ! [ -x "$(command -v curl)" ]; then
+    echo "ERROR: please install curl on your host machine!"
+    exit 1
   fi
-  chmod +x "$TARGET_DIR/$i"
-done
-# - stages
-STAGE_LIST=(
-  "stage-prepare"
-  "stage-build"
-  "stage-test"
-  "stage-package"
-  "stage-audit"
-  "stage-publish"
-  "stage-deploy"
-  "stage-performance"
-  "stage-cleanup"
-  "stage-all"
-)
-for i in "${STAGE_LIST[@]}"; do
-  echo "--> stage: $i"
-  if echo "$INSTALL_FROM" | grep -q 'remote'; then
-    curl -L -s -o "$TARGET_DIR/$i" "$DOWNLOAD_MIRROR/stages/$i"
-  elif echo "$INSTALL_FROM" | grep -q 'local'; then
-    cp "$LOCAL_PATH/stages/$i" "$TARGET_DIR/$i"
+  if ! [ -x "$(command -v unzip)" ]; then
+    echo "ERROR: please install unzip on your host machine!"
+    exit 1
   fi
-  chmod +x "$TARGET_DIR/$i"
-done
+
+  echo "Downloading ..."
+  tmpDir=$(mktemp --directory)
+  curl -L -s -o "$tmpDir/pipeline.zip" "$downloadUrl"
+  unzip -q $tmpDir/pipeline.zip -d $tmpDir
+  MPI_ROOT=$(realpath $tmpDir/modular-pipeline*)
+fi
+
+# installation
+install -d -m 755 "$PATH_PREFIX"/{bin,libexec/mpi/{common,pipeline,actions,stages,action-helper,cfg}}
+install -m 755 "$MPI_ROOT/src/bin"/* "$PATH_PREFIX/bin"
+install -m 755 "$MPI_ROOT/src/libexec/mpi"/*.bash "$PATH_PREFIX/libexec/mpi"
+install -m 755 "$MPI_ROOT/src/libexec/mpi/common"/* "$PATH_PREFIX/libexec/mpi/common"
+install -m 755 "$MPI_ROOT/src/libexec/mpi/pipeline"/* "$PATH_PREFIX/libexec/mpi/pipeline"
+install -m 755 "$MPI_ROOT/src/libexec/mpi/actions"/* "$PATH_PREFIX/libexec/mpi/actions"
+install -m 755 "$MPI_ROOT/src/libexec/mpi/stages"/* "$PATH_PREFIX/libexec/mpi/stages"
+install -m 755 "$MPI_ROOT/src/libexec/mpi/action-helper"/* "$PATH_PREFIX/libexec/mpi/action-helper"
+install -m 755 "$MPI_ROOT/.envcli.yml" "$PATH_PREFIX/libexec/mpi/cfg/.envcli.yml"
+
+echo "Installed MPI to $PATH_PREFIX/bin/mpi"

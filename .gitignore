@@ -3,3 +3,24 @@ dist/*
 
 # temporary files
 tmp/*
+
+# intellij
+**/.idea/*
+*.iml
+
+# java
+*.class
+
+
+# gradle
+**/build/*
+**/.gradle/*
+
+# maven
+**/target/*
+samples/java/maven/.mvn/wrapper/maven-wrapper.properties
+samples/java/maven/.mvn/wrapper/maven-wrapper.jar
+
+# python
+__pycache__
+*.pyc

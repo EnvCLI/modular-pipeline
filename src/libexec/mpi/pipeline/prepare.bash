@@ -56,7 +56,7 @@ set -euo pipefail
   # only run if NCI is not set yet
   if [ -z ${NCI+x} ]; then
     @mpi.log_message "TRACE" "normalizing ci variables"
-    eval $(envcli run normalizeci)
+    eval $(@mpi.container_command normalizeci)
   fi
 
   return 0
