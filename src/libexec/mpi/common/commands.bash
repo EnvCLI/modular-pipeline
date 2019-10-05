@@ -35,6 +35,6 @@
 #
 # Returns the exit code of the last command executed or 0 otherwise
 @mpi.container_command() {
-  @mpi.run_command "envcli" "run" "$@"
+  @mpi.run_command "envcli" "--config-include=${MPI_ROOT_PATH}/cfg/.envcli.yml" "run" "$@"
   return $?
 }

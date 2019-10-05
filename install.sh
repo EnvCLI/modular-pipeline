@@ -9,19 +9,6 @@ if ! [ -x "$(command -v envcli)" ]; then
   exit 1
 fi
 
-#echo "-> configuring envcli"
-#mkdir -p "$CONFIG_DIR"
-#envcli config set global-configuration-path "$CONFIG_DIR"
-#chmod 644 "$TARGET_DIR/.envclirc"
-#if ! test -f "$CONFIG_DIR/.envcli.yml"; then
-#  if echo "$INSTALL_FROM" | grep -q 'remote'; then
-#    curl -L -s -o "$CONFIG_DIR/.envcli.yml" "$DOWNLOAD_MIRROR/.envcli.yml"
-#  elif echo "$INSTALL_FROM" | grep -q 'local'; then
-#    cp "$LOCAL_PATH/.envcli.yml" "$CONFIG_DIR/.envcli.yml"
-#  fi
-#  chmod 644 "$CONFIG_DIR/.envcli.yml"
-#fi
-
 # arguments
 MPI_ROOT="${0%/*}"
 PATH_PREFIX="$1"
