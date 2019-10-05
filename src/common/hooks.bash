@@ -20,7 +20,9 @@
 
   # check if file exist and run it
   local hookFile="$hookDir/${hookName}.sh"
-  if test -f "${hookFile}"; then
+  @mpi.log_message "DEBUG" "checking for hook at $hookDir/${hookName}.sh"
+  if [ -f "${hookFile}" ]; then
+    @mpi.log_message "INFO" "running hook $hookDir/${hookName}.sh"
     "${hookFile}"
     return 0
   fi

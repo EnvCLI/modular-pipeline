@@ -40,7 +40,7 @@ function main()
   fi
 
   # no match
-  @mpi.log_message "WARN" "project type ${PROJECT_TYPE} is not supported!"
+  @mpi.log_message "WARN" "project type [${PROJECT_TYPE}] is not supported!"
 }
 
 # entrypoint
