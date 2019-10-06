@@ -70,7 +70,7 @@ set -euo pipefail
   local temporaryManifestFile="$TMP_DIR/manifest.json"
   local temporaryManifestResultFile=$(mktemp)
   docker manifest inspect "$containerImage" > "$temporaryManifestFile"
-  envcli run jq '.manifests[] | [.platform.os,.platform.architecture,.platform.variant,.digest] | @csv' "$temporaryManifestFile" | tr -d '\\"' > "$temporaryManifestResultFile"
+  @mpi.container_command jq '.manifests[] | [.platform.os,.platform.architecture,.platform.variant,.digest] | @csv' "$temporaryManifestFile" | tr -d '\\"' > "$temporaryManifestResultFile"
   readarray -t manifestArchs < $temporaryManifestResultFile
 
   # for each manifest entry
@@ -197,9 +197,9 @@ set -euo pipefail
     --build-arg "https_proxy=$HTTPS_PROXY" \
     --build-arg "proxy_host=$PROXY_HOST" \
     --build-arg "proxy_port=$PROXY_PORT" \
-    -f $DOCKERFILE_NAME \
+    -f $DOCKERFILE \
     -t ${imageRepo}:${imageTag}_${buildOS}_${buildArch} \
-    $DOCKERFILE_PATH
+    .
   @mpi.log_message "INFO" "image build success, tagged as [${imageRepo}:${imageTag}_${buildOS}_${buildArch}]"
 
   # detect image base
@@ -228,7 +228,7 @@ set -euo pipefail
   declare containerImage="$1"
 
   @mpi.log_message "INFO" "pushing image [${containerImage}] to remote registry ..."
-  docker push "${containerImage}"
+  @mpi.run_command docker push "${containerImage}"
 }
 
 # Public: Detect container base os
@@ -252,7 +252,7 @@ set -euo pipefail
 @mpi.container.detect_base_os() {
   declare containerImage="$1"
 
-  local releaseId=$(docker run -it --rm ${containerImage} cat /etc/os-release | grep -oP '(?<=^ID=).+' | tr -d '"' | tr -d '\r')
+  local releaseId=$(docker run -it --rm --user root ${containerImage} cat /etc/os-release | grep -oP '(?<=^ID=).+' | tr -d '"' | tr -d '\r')
   @mpi.log_message "INFO" "image [${containerImage}] has base os [${releaseId}]"
 
   export CONTAINER_BASE_OS="${releaseId}"
@@ -278,14 +278,14 @@ set -euo pipefail
 
   # run os specific commands
   if [ "${CONTAINER_BASE_OS}" == "alpine" ]; then
-    docker run --rm --entrypoint= "$containerImage" apk info --no-cache -v | grep -v '^fetch http' | sort > "${TMP_DIR}/container_os_packages.txt"
-    docker run --rm --entrypoint= "$containerImage" apk upgrade --latest | grep 'Upgrading ' | awk '{ print substr($0, index($0,$3)) }' | sort > "${TMP_DIR}/container_os_packages_available.txt"
+    @mpi.run_command docker run --rm --user root --entrypoint= "$containerImage" apk info --no-cache -v | grep -v '^fetch http' | sort > "${TMP_DIR}/container_os_packages.txt"
+    @mpi.run_command docker run --rm --user root --entrypoint= "$containerImage" apk upgrade --latest | grep 'Upgrading ' | awk '{ print substr($0, index($0,$3)) }' | sort > "${TMP_DIR}/container_os_packages_available.txt"
   elif [ "${CONTAINER_BASE_OS}" == "debian" ] | [ "${CONTAINER_BASE_OS}" == "ubuntu" ]; then
-    docker run --rm --entrypoint= "$containerImage" dpkg-query -f '${Package};${Version} ${Status}\n' -W "*" | awk '$NF == "installed"{print $1}' | sort > "${TMP_DIR}/container_os_packages.txt"
-    docker run --rm --entrypoint= "$containerImage" sh -c 'apt-get -qq update && apt-get -s upgrade' | awk -F'[][() ]+' '/^Inst/{printf "%s;%s;%s\n", $2,$3,$4}' | sort > "${TMP_DIR}/container_os_packages_available.txt"
+    @mpi.run_command docker run --rm --user root --entrypoint= "$containerImage" dpkg-query -f '${Package};${Version} ${Status}\n' -W "*" | awk '$NF == "installed"{print $1}' | sort > "${TMP_DIR}/container_os_packages.txt"
+    @mpi.run_command docker run --rm --user root --entrypoint= "$containerImage" sh -c 'apt-get -qq update && apt-get -s upgrade' | awk -F'[][() ]+' '/^Inst/{printf "%s;%s;%s\n", $2,$3,$4}' | sort > "${TMP_DIR}/container_os_packages_available.txt"
   elif [ "${CONTAINER_BASE_OS}" == "fedora" ] | [ "${CONTAINER_BASE_OS}" == "centos" ] | [ "${CONTAINER_BASE_OS}" == "rhel" ]; then
-    docker run --rm --entrypoint= "$containerImage" yum list installed -q | sed '1d' | awk '{ print $1 ";" $2 }' | sort > "${TMP_DIR}/container_os_packages.txt"
-    docker run --rm --entrypoint= "$containerImage" yum list updates -q | sed '1d' | awk '{ print $1 ";" $2 }' | sort > "${TMP_DIR}/container_os_packages_available.txt"
+    @mpi.run_command docker run --rm --user root --entrypoint= "$containerImage" yum list installed -q | sed '1d' | awk '{ print $1 ";" $2 }' | sort > "${TMP_DIR}/container_os_packages.txt"
+    @mpi.run_command docker run --rm --user root --entrypoint= "$containerImage" yum list updates -q | sed '1d' | awk '{ print $1 ";" $2 }' | sort > "${TMP_DIR}/container_os_packages_available.txt"
   else
     @mpi.log_message "INFO" "base os [${CONTAINER_BASE_OS}] not supported for automated package updates!"
   fi

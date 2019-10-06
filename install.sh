@@ -41,7 +41,7 @@ else
 fi
 
 # installation
-install -d -m 755 "$PATH_PREFIX"/{bin,libexec/mpi/{common,pipeline,actions,stages,action-helper,cfg}}
+install -d -m 755 "$PATH_PREFIX"/{bin,libexec/mpi/{common,pipeline,actions,stages,action-helper,cfg,resources}}
 install -m 755 "$MPI_ROOT/src/bin"/* "$PATH_PREFIX/bin"
 install -m 755 "$MPI_ROOT/src/libexec/mpi"/*.bash "$PATH_PREFIX/libexec/mpi"
 install -m 755 "$MPI_ROOT/src/libexec/mpi/common"/* "$PATH_PREFIX/libexec/mpi/common"
@@ -50,5 +50,6 @@ install -m 755 "$MPI_ROOT/src/libexec/mpi/actions"/* "$PATH_PREFIX/libexec/mpi/a
 install -m 755 "$MPI_ROOT/src/libexec/mpi/stages"/* "$PATH_PREFIX/libexec/mpi/stages"
 install -m 755 "$MPI_ROOT/src/libexec/mpi/action-helper"/* "$PATH_PREFIX/libexec/mpi/action-helper"
 install -m 755 "$MPI_ROOT/.envcli.yml" "$PATH_PREFIX/libexec/mpi/cfg/.envcli.yml"
+cp -R "$MPI_ROOT/resources"/* "$PATH_PREFIX/libexec/mpi/resources" && chmod -R 755 "$PATH_PREFIX/libexec/mpi/resources"
 
 echo "Installed MPI to $PATH_PREFIX/bin/mpi"

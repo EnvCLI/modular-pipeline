@@ -28,6 +28,7 @@ fi
 # ----
 # The variable will also be exported to make it available to subprocesses (python, golang, etc.) if needed.
 export MPI_ROOT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+export MPI_RESOURCE_PATH="${MPI_RESOURCE_PATH:-$MPI_ROOT_PATH/resources}"
 export MPI_TEST_PATH="${MPI_TEST_PATH:-$MPI_ROOT_PATH/tests}"
 
 # Include scripts

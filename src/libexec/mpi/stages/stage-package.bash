@@ -17,14 +17,14 @@ function main()
 
   # java
   if [[ ${PROJECT_TYPE} =~ ^java-http$ ]]; then
-    export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/java-http.dockerfile"
+    export DOCKERFILE_RESOURCE="java-http.dockerfile"
     @mpi action container-build
     return 0
   fi
 
   # hugo
   if [[ ${PROJECT_TYPE} =~ ^hugo-http$ ]]; then
-    export DOCKERFILE_URL_DEFAULT="$MPI_RESOURCES_MIRROR/html-http.dockerfile"
+    export DOCKERFILE_RESOURCE="html-http.dockerfile"
     @mpi action container-build
     return 0
   fi
