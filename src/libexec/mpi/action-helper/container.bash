@@ -190,6 +190,7 @@ set -euo pipefail
   # build
   @mpi.log_message "INFO" "building image [$imageRepo:$imageTag] for target platform [${buildOS}_${buildArch}]"
   @mpi.log_message "DEBUG" "will overwrite base image with: [$baseImageRepo@$overwriteWithTag]"
+  # - labels: https://github.com/opencontainers/image-spec/blob/master/annotations.md#pre-defined-annotation-keys
   @mpi.run_command docker build \
     --no-cache \
     --build-arg "BASE_IMAGE=${baseImageRepo}@${overwriteWithTag}" \
@@ -197,6 +198,9 @@ set -euo pipefail
     --build-arg "https_proxy=$HTTPS_PROXY" \
     --build-arg "proxy_host=$PROXY_HOST" \
     --build-arg "proxy_port=$PROXY_PORT" \
+    --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --label "org.opencontainers.image.version=$NCI_COMMIT_REF_RELEASE" \
+    --label "org.opencontainers.image.revision=$NCI_COMMIT_SHA" \
     -f $DOCKERFILE \
     -t ${imageRepo}:${imageTag}_${buildOS}_${buildArch} \
     .
