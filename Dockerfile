@@ -29,6 +29,7 @@ RUN echo "System Packages ..." &&\
     curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.2/envcli_linux_amd64 &&\
     chmod +x /usr/local/bin/envcli &&\
     echo "-> Pipeline" &&\
+    chmod -R 755 /tmp/mpi &&\
     /tmp/mpi/install.sh /usr/local &&\
     rm -rf /tmp/mpi &&\
     echo "-> Installing EnvCLI Aliases" &&\

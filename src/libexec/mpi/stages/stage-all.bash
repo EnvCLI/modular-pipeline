@@ -14,7 +14,7 @@ function main()
   @mpi stage prepare
   @mpi stage build
   @mpi stage test
-  @mpi stage  package
+  @mpi stage package
   @mpi stage audit
   @mpi stage publish
   @mpi stage deploy $DEPLOYMENT_ENVIRONMENT

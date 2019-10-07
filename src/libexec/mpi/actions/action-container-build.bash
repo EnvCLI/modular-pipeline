@@ -4,9 +4,9 @@ set -euo pipefail
 # Main Function
 #
 # Environment:
-#   DOCKERFILE_PATH: Path of the dockerfile. (default ./Dockerfile)
-#   DOCKERFILE_PATH_RESOURCES: Use the dockerfile out of the provided resources.
-#   DOCKERFILE_PATH_URL: Get the dockerfile from a remote url.
+#   DOCKERFILE: Path of the dockerfile. (default ./Dockerfile)
+#   DOCKERFILE_RESOURCES: Use the dockerfile out of the provided resources  (if no local dockerfile exists).
+#   DOCKERFILE_URL: Get the dockerfile from a remote url (if no local dockerfile exists).
 #
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()

@@ -21,7 +21,7 @@ if [[ -z "$PATH_PREFIX" ]]; then
 fi
 
 # download
-if [[ -d "src" ]]; then
+if [ -d "$MPI_ROOT/src" ]; then
   echo "Local installation ..."
 else
   if ! [ -x "$(command -v curl)" ]; then
