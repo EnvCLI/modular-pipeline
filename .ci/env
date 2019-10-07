@@ -1,5 +1,6 @@
-# pipeline config
-PROJECT_TYPE=container-cli
+PROJECT_TYPE=shell
+PACKAGE_TYPE=container
+PUBLISH_TYPE=container
 DEPLOYMENT_TYPE=none
 
 # registry

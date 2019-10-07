@@ -28,13 +28,13 @@ function main()
   fi
 
   # java
-  if [[ ${PROJECT_TYPE} =~ ^java*$ ]]; then
+  if [[ ${PROJECT_TYPE} =~ ^java$ ]]; then
     @mpi action java-build
     exit 0
   fi
 
   # python
-  if [[ ${PROJECT_TYPE} =~ ^python*$ ]]; then
+  if [[ ${PROJECT_TYPE} =~ ^python$ ]]; then
     @mpi action python-build
     exit 0
   fi

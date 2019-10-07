@@ -1,45 +1,73 @@
 # Stages
 
-## All Stages
+Stages are a collection of scripts to allow building projects with a set of predefined actions based on a few configuration properties.
 
-| Stage | Description |
+The following stages are available:
+
+- prepare
+- build
+- test
+- package
+- audit
+- publish
+- deploy
+- performance
+- cleanup
+
+## Configuration Properties
+
+| Environment | Default | Affected Stages | Description |
+| ------------- | ------------- | ------------- | ------------- |
+| PROJECT_TYPE | none | build, test | The PROJECT_TYPE decides how a project is build and tested. |
+| PACKAGE_TYPE | none | package | The PACKAGE_TYPE decides how a project should be packaged. |
+| PUBLISH_TYPE | none | publish | The PUBLISH_TYPE decides how a project is packaged and published. |
+| DEPLOYMENT_TYPE | none | deploy | The DEPLOYMENT_TYPE decides how a project is deployed. |
+| DEPLOYMENT_VARIANT | none | deploy | The DEPLOYMENT_VARIANT defines the kind of service that gets deployed (cron, webservice, ...) |
+| DEPLOYMENT_STRATEGY | none | deploy | The DEPLOYMENT_STRATEGY defines if deployments happen automatically or manually |
+
+Please take note that `none` is a valid value and can be used to skip those stages, ie. if you only want to make a deployment of a image from dockerhub.
+
+## PROJECT_TYPE
+
+| Value | Description |
 | ------------- | ------------- |
-| [prepare](stages/stage-prepare) | Will prepare the environment for pipeline execution, for example by downloading the needed docker images / etc. |
-| [build](stages/stage-build) | |
-| [test](stages/stage-test) | |
-| [package](stages/stage-package) | |
-| [audit](stages/stage-audit) | |
-| [publish](stages/stage-publish) | |
-| [deploy](stages/stage-deploy) | |
-| [performance](stages/stage-performance) | |
-| [cleanup](stages/stage-cleanup) | |
+| container | Container projects generally get build by their dockerfile. |
+| shell | Pure ShellScript Project. |
+| java | Java-based projects (maven/gradle) |
+| python | Python 3 projects |
+| golang | Golang projects |
+| hugo | A hugo project |
 
-## Configuration
+## PACKAGE_TYPE
 
-You can set the properties required by the stages in `.ci/env` to make them available locally and on ci execution.
+| Value | Description |
+| ------------- | ------------- |
+| container | Build a container image for the project. |
 
-```bash
-PROJECT_TYPE=java-service
-DEPLOYMENT_TYPE=none
-```
+## PUBLISH_TYPE
 
-## Project Types
+| Value | Description |
+| ------------- | ------------- |
+| container | Publish a container to a registry. |
 
-Project types follow the spec `name-type`.
+## DEPLOYMENT_TYPE
 
-Names:
+| Value | Description |
+| ------------- | ------------- |
+| swarm | Use a docker swarm stack to deploy the workload. |
+| helm | Use helm charts to deploy a kubernetes workload. |
+| ansible | Use ansible to deploy the workload. |
 
-- golang
-- java
-- container
+## DEPLOYMENT_VARIANT
 
-Types:
-- cli
-- service
-- library
+| Value | Description |
+| ------------- | ------------- |
+| http | A http/https-based service |
+| job | A cronjob that is scheduled for execution |
+| worker | A worker without any endpoints that processes tasks |
 
-## Deployment Types
+## DEPLOYMENT_STRATEGY
 
-- swarm
-- helm
-- bintray
+| Value | Description |
+| ------------- | ------------- |
+| manual-master | Manual deployments from master branch |
