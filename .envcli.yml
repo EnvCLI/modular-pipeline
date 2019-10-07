@@ -92,6 +92,18 @@ images:
     directory: /root/.kube
   - name: helm
     directory: /root/.helm
+# - Ansible
+- name: Ansible
+  description: Ansible is open source software that automates software provisioning, configuration management, and application deployment. Ansible connects via SSH, remote PowerShell or via other remote APIs.
+  provides:
+  - ansible
+  - ansible-playbook
+  - ansible-pull
+  image: docker.io/envcli/ansible:latest
+  shell: sh
+  cache:
+  - name: ssh
+    directory: /root/.ssh
 # Scripting
 - name: normalizeci
   description: A tool to turn the continious integration / deployment variables into a common format for generally usable scripts without any dependencies.
