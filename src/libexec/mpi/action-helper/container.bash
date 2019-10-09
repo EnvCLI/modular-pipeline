@@ -67,9 +67,10 @@ set -euo pipefail
 @mpi.container.parse_manifest() {
   declare containerImage="$1"
 
-  local temporaryManifestFile="$TMP_DIR/manifest.json"
+  local temporaryManifestFile="${TMP_DIR}/manifest.json"
   local temporaryManifestResultFile=$(mktemp)
-  docker manifest inspect "$containerImage" > "$temporaryManifestFile"
+  @mpi.log_message "DEBUG" "extracting manifest json of the base image ..."
+  @mpi.run_command docker manifest inspect "$containerImage" > "$temporaryManifestFile"
   @mpi.container_command jq '.manifests[] | [.platform.os,.platform.architecture,.platform.variant,.digest] | @csv' "$temporaryManifestFile" | tr -d '\\"' > "$temporaryManifestResultFile"
   readarray -t manifestArchs < $temporaryManifestResultFile
 

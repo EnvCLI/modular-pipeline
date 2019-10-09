@@ -16,6 +16,7 @@ teardown() {
 # Test Cases
 @test "@mpi.action.python-build - gradle" {
   cd "${SAMPLE_DIR}/python"
+  mkdir -p dist tmp
   run @mpi action python-build
   [[ $status -eq 0 ]]
 }

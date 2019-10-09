@@ -16,6 +16,7 @@ teardown() {
 # Test Cases
 @test "@mpi.action.go-build" {
   cd "${SAMPLE_DIR}/golang"
+  mkdir -p dist tmp
   run @mpi action go-build
   [[ $status -eq 0 ]]
 }
