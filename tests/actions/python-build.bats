@@ -2,7 +2,7 @@
 
 # Setup
 setup() {
-  . ${BATS_CWD}/src/mpi-core.bash
+  . ${BATS_CWD}/src/libexec/mpi/mpi-core.bash
   @mpi.test_setup
 }
 

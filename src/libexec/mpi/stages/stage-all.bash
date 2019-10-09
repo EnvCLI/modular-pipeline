@@ -16,9 +16,6 @@ function main()
   @mpi stage test
   @mpi stage package
   @mpi stage audit
-  @mpi stage publish
-  @mpi stage deploy $DEPLOYMENT_ENVIRONMENT
-  @mpi stage performance
   @mpi stage cleanup
 }
 
