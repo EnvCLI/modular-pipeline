@@ -48,7 +48,8 @@ Please take note that `none` is a valid value and can be used to skip those stag
 
 | Value | Description |
 | ------------- | ------------- |
-| container | Publish a container to a registry. |
+| containerregistry | Publish a container to a registry. |
+| bintray | Publish binary artifacts to bintray. |
 
 ## DEPLOYMENT_TYPE
 

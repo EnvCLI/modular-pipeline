@@ -1,6 +1,6 @@
 PROJECT_TYPE=shell
 PACKAGE_TYPE=container
-PUBLISH_TYPE=container
+PUBLISH_TYPE=containerregistry
 DEPLOYMENT_TYPE=none
 
 # registry

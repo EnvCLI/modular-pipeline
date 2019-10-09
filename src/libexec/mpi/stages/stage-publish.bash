@@ -9,14 +9,19 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()
 {
-  # container
-  if test -f "${TMP_DIR}/container-image/main.tar"; then
-    # import image
-    @mpi.log_message "INFO" "publishing container image from ${TMP_DIR}/container-image/main.tar"
-    @mpi.run_command docker load -i "${TMP_DIR}/container-image/main.tar"
+  # container registry
+  if [[ ${PUBLISH_TYPE} == "containerregistry" ]]; then
+    if test -f "${TMP_DIR}/container-image/main.tar"; then
+      # import image
+      @mpi.log_message "INFO" "publishing container image from ${TMP_DIR}/container-image/main.tar"
+      @mpi.run_command docker load -i "${TMP_DIR}/container-image/main.tar"
 
-    # publish
-    @mpi action container-push
+      # publish
+      @mpi action container-push
+    else
+      @mpi.log_message "INFO" "can't publish into container registry ..."
+      exit 1
+    fi
   fi
 
   # bintray

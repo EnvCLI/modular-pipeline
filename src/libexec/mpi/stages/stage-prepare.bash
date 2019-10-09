@@ -40,7 +40,7 @@ function main()
   fi
 
   # no match
-  @mpi.log_message "WARN" "project type [${PROJECT_TYPE}] does not support prepare yet!"
+  @mpi.log_message "DEBUG" "project type [${PROJECT_TYPE}] does not support prepare yet!"
 }
 
 # entrypoint
