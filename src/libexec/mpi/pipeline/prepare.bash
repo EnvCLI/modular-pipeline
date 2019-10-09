@@ -57,6 +57,11 @@ set -euo pipefail
   if [ -z ${NCI+x} ]; then
     @mpi.log_message "TRACE" "normalizing ci variables"
     eval $(@mpi.container_command normalizeci)
+
+    if [ -z ${NCI+x} ]; then
+      @mpi.log_message "ERROR" "normalized variables not available!"
+      exit 1
+    fi
   fi
 
   return 0
