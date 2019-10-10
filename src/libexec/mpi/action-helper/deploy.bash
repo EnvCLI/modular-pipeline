@@ -8,12 +8,12 @@ set -euo pipefail
   # source in .env configuration properties with defaults
   # - common .env file
   if [ -f ".env" ]; then
-    _log_message "loading environment from .env" "INFO"
+    @mpi.log_message "INFO" "loading environment from .env"
     export $(grep -v '^#' .env | xargs)
   fi
   # - environment-specific .env file
   if [ -f ".env-${deploymentEnvironment}" ]; then
-    _log_message "loading environment from .env-${deploymentEnvironment}" "INFO"
+    @mpi.log_message "INFO" "loading environment from .env-${deploymentEnvironment}"
     export $(grep -v '^#' ".env-${deploymentEnvironment}" | xargs)
   fi
 
@@ -36,7 +36,7 @@ set -euo pipefail
   export HTTP_ENDPOINT="${HTTP_ENDPOINT:-$HTTP_ENDPOINT_DEFAULT}"
   export HTTP_ENDPOINT_HOST=$(__get_hostname_from_url "$HTTP_ENDPOINT")
   export HTTP_ENDPOINT_PATH=$(__get_path_from_url "$HTTP_ENDPOINT")
-  _log_message "exposing http endpopint at [${HTTP_ENDPOINT}]" "DEBUG"
+  @mpi.log_message "DEBUG" "exposing http endpopint at [${HTTP_ENDPOINT}]"
 
   # prepare deployment variables
   rm ${TMP_DIR}/deploy.env &> /dev/null || true # remove if already present

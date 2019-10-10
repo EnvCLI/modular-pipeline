@@ -9,7 +9,7 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()
 {
-  # publish: container
+  # package: container
   if [[ ${PACKAGE_TYPE} =~ ^container$ ]]; then
     if [[ ${PROJECT_TYPE} =~ ^java$ ]]; then
       export DOCKERFILE_RESOURCE="java-http.dockerfile"

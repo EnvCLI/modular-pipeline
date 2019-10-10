@@ -28,7 +28,7 @@ function main()
   if [[ ${PUBLISH_TYPE} == "bintray" ]]; then
     # for cli and libraries, TODO: add filter later
     @mpi.log_message "INFO" "publishing bintray artifacts from dist/"
-    action-bintray-publish
+    @mpi action bintray-publish
   fi
 }
 

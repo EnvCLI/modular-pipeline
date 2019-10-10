@@ -102,6 +102,8 @@ set -euo pipefail
 
   # ensure required variables are set
   export PROJECT_TYPE=${PROJECT_TYPE:-none}
+  export PACKAGE_TYPE=${PACKAGE_TYPE:-none}
+  export PUBLISH_TYPE=${PUBLISH_TYPE:-none}
   export DEPLOYMENT_TYPE=${DEPLOYMENT_TYPE:-none}
 
   # global properties

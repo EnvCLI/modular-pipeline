@@ -44,7 +44,7 @@ function main()
     fi
 
     # run deployment
-    action-swarm-deploy "$DEPLOYMENT_NAMESPACE" "$DEPLOYMENT_ENVIRONMENT" "$DEPLOYMENT_ID"
+    @mpi action swarm-deploy "$DEPLOYMENT_NAMESPACE" "$DEPLOYMENT_ENVIRONMENT" "$DEPLOYMENT_ID"
     exit 0
   fi
 

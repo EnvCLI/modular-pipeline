@@ -4,9 +4,9 @@
 
 | Environment | Default | Description |
 | ------------- | ------------- | ------------- |
-| ARTIFACT_DIR | dist | Will prepare the environment for pipeline execution, for example by downloading the needed docker images / etc. |
-| ARTIFACT_BUILD_ARCHS | linux_amd64 | valid values are: [linux_386,linux_amd64,linux_armv7,linux_armv8,windows_386,windows_amd64,darwin_386,darwin_amd64] |
-| TMP_DIR | tmp | |
+| ARTIFACT_DIR | dist | The scripts will put all generated artifacts into this directory. |
+| ARTIFACT_BUILD_ARCHS | linux_amd64 | build archs - valid values are: [linux_386,linux_amd64,linux_armv7,linux_armv8,windows_386,windows_amd64,darwin_386,darwin_amd64] |
+| TMP_DIR | tmp | The scripts will put all temporary files into this directory. |
 | CONTAINER_REPO | $NCI_CONTAINERREGISTRY_REPOSITORY | |
 | CONTAINER_TAG | $NCI_COMMIT_REF_RELEASE | |
 | HTTP_PROXY |  | |
