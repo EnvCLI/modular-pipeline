@@ -19,13 +19,16 @@ services:
         parallelism: 1
         delay: 10s
       labels:
-        # Feature: Traefik Reverse Proxy
+        # Traefik V1.X
         traefik.enable: "true"
         traefik.port: "8080"
         traefik.protocol: "http"
         traefik.frontend.entryPoints: "http"
         traefik.frontend.rule: "Host:$HTTP_ENDPOINT_HOST"
+        ## Network
         traefik.docker.network: "traefik_net"
+        ## CORS
+        traefik.frontend.headers.customResponseHeaders: 'Access-Control-Allow-Origin:*||Access-Control-Allow-Headers:*'
       resources:
         limits:
           cpus: '$RESOURCES_HARD_CPU'
