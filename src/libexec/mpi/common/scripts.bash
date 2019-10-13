@@ -19,7 +19,7 @@
   interpreter="${interpreter%% *}"
 
   if [[ "$interpreter" == 'bash' || "$interpreter" == 'sh' ]]; then
-    . "$cmd_path" "$@"
+    @mpi.run_command . "$cmd_path" "$@"
   elif [[ -z "$interpreter" ]]; then
     echo "Could not parse interpreter from first line of $cmd_path.\n" >&2
     return 1

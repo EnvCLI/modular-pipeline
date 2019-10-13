@@ -83,13 +83,7 @@ set -euo pipefail
 
   # source in .ci/env
   if [ -f ".ci/env" ]; then
-    @mpi.log_message "DEBUG" "loading environment from .ci/env"
-    properties=$(grep -v '^#' .ci/env | sort)
-    for property in $properties; do
-      evalStatement=$(echo "export \"$property\"" | tr -d '\r' | tr -d '\n')
-      @mpi.log_message "DEBUG" "eval: $evalStatement"
-      eval "$evalStatement"
-    done
+    @mpi.load_env_from_file ".ci/env"
   fi
 
   # prerequisites
@@ -105,6 +99,7 @@ set -euo pipefail
   export PACKAGE_TYPE=${PACKAGE_TYPE:-none}
   export PUBLISH_TYPE=${PUBLISH_TYPE:-none}
   export DEPLOYMENT_TYPE=${DEPLOYMENT_TYPE:-none}
+  export DEPLOYMENT_VARIANT=${DEPLOYMENT_VARIANT:-none}
 
   # global properties
   export ARTIFACT_DIR=${ARTIFACT_DIR:-dist}

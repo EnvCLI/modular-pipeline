@@ -8,13 +8,11 @@ set -euo pipefail
   # source in .env configuration properties with defaults
   # - common .env file
   if [ -f ".env" ]; then
-    @mpi.log_message "INFO" "loading environment from .env"
-    export $(grep -v '^#' .env | xargs)
+    @mpi.load_env_from_file ".env"
   fi
   # - environment-specific .env file
   if [ -f ".env-${deploymentEnvironment}" ]; then
-    @mpi.log_message "INFO" "loading environment from .env-${deploymentEnvironment}"
-    export $(grep -v '^#' ".env-${deploymentEnvironment}" | xargs)
+    @mpi.load_env_from_file ".env-${deploymentEnvironment}"
   fi
 
   # get all available variables (sourced or set)
@@ -45,19 +43,13 @@ set -euo pipefail
 
     # special cases
     if [[ $KEY == "_" ]]; then
-        continue
+      continue
     fi
-    # script vars
-    if [[ $KEY =~ ^(ALL_VARIABLES|KEY|VALUE|PROJECT_TYPE|DEPLOYMENT_TYPE|DEPLOYMENT_VARIANT|deploymentEnvironment|GIT_DEPTH|GIT_STRATEGY|CONTAINER_REPO|CONTAINER_TAG|MPI_RESOURCES_MIRROR|KUBECONFIG_CONTENT|DISABLE_BUILD|DISABLE_PACKAGE)$ ]]; then
-        continue
-    fi
-    # gitlab variables, for feature flags FF see https://docs.gitlab.com/runner/configuration/feature-flags.html
-    if [[ $KEY =~ ^(FF_.*|CI|CI_.*|GITLAB_CI|GITLAB_FEATURES|GIT_SSL_NO_VERIFY|HELM_VERSION|KUBERNETES_VERSION|KUBE_INGRESS_BASE_DOMAIN|VERSION)$ ]]; then
-        continue
-    fi
-    # os vars
-    if [[ $KEY =~ ^(PWD|SUDO_COMMAND|LC_.*|FUNCNAME|EPOCHREALTIME|DOCKER_.*|SSH_CLIENT|SSH_CONNECTION|SSH_TTY|LESSCLOSE|WSLENV|WSL_DISTRO_NAME|XDG_DATA_DIRS|COMP_WORDBREAKS|LS_COLORS|PROMPT_COMMAND|XDG_RUNTIME_DIR|PS[0-9]|SHELL|LOGNAME|OPTERR|OPTIND|OSTYPE|PATH|SHELLOPTS|UID|USER|colors|MACHTYPE|MAIL|LESSOPEN|IFS|ID|HOSTTYPE|HOSTNAME|HOME|HIST.*|GROUPS|COLUMNS|DIRSTACK|LANG|LINES|LINENO|PPID|PIPESTATUS|RANDOM|SECONDS|SHLVL|TERM|BASH.*)$ ]]; then
-        continue
+
+    # do not add var if it is not present in MPI_DEPLOY_VARS
+    # @see common/variables.bash
+    if [[ ! $MPI_DEPLOY_VARS =~ .*"$KEY".* ]]; then
+      continue
     fi
 
     # .env for deployments

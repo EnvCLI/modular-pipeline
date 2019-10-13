@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # Public: Gets the filepath for the specified variable or overwrites it with a default
 #
@@ -44,4 +45,59 @@
 
   @mpi.run_command export "${varname}_PATH=$(dirname $(realpath "$defaultFileName"))"
   @mpi.run_command export "${varname}_FILENAME=$(basename $(realpath "$defaultFileName"))"
+}
+
+# Public: Load variables from file (or keep current env if set)
+#
+# This will load environment variables form a file.
+# Behavior:
+#  Will overwrite any existing variables.
+#  If you expect a variable to be provided by the ci system, you can set the value to `session.environment` to require it.
+#
+# $1 - File Path
+#
+# Examples
+#
+#   @mpi.load_env_from_file ".ci/env"
+#
+# Returns the exit code of the last command executed or 0 otherwise
+@mpi.load_env_from_file() {
+  declare fileName="${1}"
+  @mpi.log_message "TRACE" "@mpi.load_env_from_file : $fileName"
+  @mpi.log_message "DEBUG" "loading environment from ${fileName}"
+  MPI_DEPLOY_VARS=${MPI_DEPLOY_VARS:-}
+
+  # iterator over all lines
+  while read -r line ; do
+    # valid lines need to at least include a =
+    if [[ ! $line =~ .*"=".* ]]; then
+      @mpi.log_message "WARN" "ignoring line [$line], not a valid env assignment!"
+      continue
+    fi
+
+    IFS== read -r key val <<< $(echo "$line" | tr -d '\r' | tr -d '\n')
+    val=${val%\"}; val=${val#\"};
+    key=${key#export }; key=${key#\"};
+    MPI_DEPLOY_VARS="${MPI_DEPLOY_VARS} ${key}"
+    evalStatement=$(echo "export $key=\"${val//\"/\\\"}\"")
+
+    # allow overwriting if var is loaded by file, do not set if var was already present on the host (for ci provided vars that have priority)
+    if [ $val == "session.environment" ]; then
+      @mpi.log_message "DEBUG" "will set value from current environment, this will fail if the variable is not set!"
+      set +u
+      if [ -n "${!key+set}" ]; then
+        @mpi.run_command export "ORIGINOF_${key}"="session.environment"
+      else
+        @mpi.log_message "ERROR" "supposed to take value [$key] from host environment, but is not set!"
+        exit 1
+      fi
+      set -u
+    else
+      @mpi.log_message "DEBUG" "setting var [$key]=[$val]"
+      @mpi.run_command eval "$evalStatement"
+      @mpi.run_command export "ORIGINOF_${key}"="file:$fileName"
+    fi
+  done < <(grep -v '^#' ${fileName} | sort)
+
+  export MPI_DEPLOY_VARS
 }
