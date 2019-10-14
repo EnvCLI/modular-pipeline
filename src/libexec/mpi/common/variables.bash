@@ -97,7 +97,8 @@ set -euo pipefail
       @mpi.run_command eval "$evalStatement"
       @mpi.run_command export "ORIGINOF_${key}"="file:$fileName"
     fi
-  done < <(grep -v '^#' ${fileName} | sort)
+    # ignore all lines starting with #, or lines that are empty / only contain spaces
+  done < <(grep -v '^#' ${fileName} | grep -v '^[[:space:]]*$' | sort)
 
   export MPI_DEPLOY_VARS
 }
