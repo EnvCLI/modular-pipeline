@@ -4,6 +4,7 @@ set -euo pipefail
 # Public: Sends a discord message to a channel via webhook
 #
 # This will send a discord message to a specified channel.
+# Documentation: https://birdie0.github.io/discord-webhooks-guide/discord_webhook.html
 #
 # Examples
 #
