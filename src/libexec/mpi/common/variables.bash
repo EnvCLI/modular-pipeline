@@ -20,31 +20,31 @@ set -euo pipefail
   @mpi.log_message "TRACE" "@mpi.get_filepath_or_default : $varname : $defaultFileName"
 
   # configuration
-  local filpeath=${!varname:-}
-  local filpeathFromResources=${!varnameRes:-}
-  local filpeathFromUrl=${!varnameUrl:-}
-  @mpi.run_command export "${varname}=$defaultFileName"
+  local filepath=${!varname:-}
+  local filepathFromResources=${!varnameRes:-}
+  local filepathFromUrl=${!varnameUrl:-}
+  @mpi.run_command export "${varname}"="$defaultFileName"
 
   # check if file exists
-  if ! test -f "$filpeath"; then
-    @mpi.log_message "DEBUG" "file [$filpeath] not found locally."
+  if ! test -f "$filepath"; then
+    @mpi.log_message "DEBUG" "file [$filepath] not found locally."
 
-    if [ -n "$filpeathFromResources" ]; then
-      @mpi.log_message "INFO" "taking [$defaultFileName] from resources [$MPI_RESOURCE_PATH/$filpeathFromResources]!"
-      cp "$MPI_RESOURCE_PATH/$filpeathFromResources" "${TMP_DIR}/${defaultFileName}"
-      export "${varname}=${TMP_DIR}/${defaultFileName}"
-    elif [ -n "$filpeathFromUrl" ]; then
-      @mpi.log_message "INFO" "taking [$defaultFileName] from remote url [$MPI_RESOURCE_PATH/$filpeathFromResources]!"
-      curl -L -s -o "${TMP_DIR}/${defaultFileName}" "$filpeathFromUrl"
-      export "${varname}=${TMP_DIR}/${defaultFileName}"
+    if [ -n "$filepathFromResources" ]; then
+      @mpi.log_message "INFO" "taking [$defaultFileName] from resources [$MPI_RESOURCE_PATH/$filepathFromResources]!"
+      cp "$MPI_RESOURCE_PATH/$filepathFromResources" "${TMP_DIR}/${defaultFileName}"
+      export "${varname}"="${TMP_DIR}/${defaultFileName}"
+    elif [ -n "$filepathFromUrl" ]; then
+      @mpi.log_message "INFO" "taking [$defaultFileName] from remote url [$MPI_RESOURCE_PATH/$filepathFromResources]!"
+      curl -L -s -o "${TMP_DIR}/${defaultFileName}" "$filepathFromUrl"
+      export "${varname}"="${TMP_DIR}/${defaultFileName}"
     else
       @mpi.log_message "ERROR" "file [$defaultFileName] not present and no default available!"
       return 1
     fi
   fi
 
-  @mpi.run_command export "${varname}_PATH=$(dirname $(realpath "$defaultFileName"))"
-  @mpi.run_command export "${varname}_FILENAME=$(basename $(realpath "$defaultFileName"))"
+  @mpi.run_command export "${varname}_PATH=$(dirname $(realpath "${!varname}"))"
+  @mpi.run_command export "${varname}_FILENAME=$(basename $(realpath "${!varname}"))"
 }
 
 # Public: Load variables from file (or keep current env if set)
@@ -68,7 +68,9 @@ set -euo pipefail
   MPI_DEPLOY_VARS=${MPI_DEPLOY_VARS:-}
 
   # iterator over all lines
-  while read -r line ; do
+  varFile=$(mktemp)
+  grep -v '^#' ${fileName} | grep -v '^[[:space:]]*$' | sort > "$varFile"
+  while read -r line; do
     # valid lines need to at least include a =
     if [[ ! $line =~ .*"=".* ]]; then
       @mpi.log_message "WARN" "ignoring line [$line], not a valid env assignment!"
@@ -76,13 +78,13 @@ set -euo pipefail
     fi
 
     IFS== read -r key val <<< $(echo "$line" | tr -d '\r' | tr -d '\n')
-    val=${val%\"}; val=${val#\"};
+    # escape val for eval statement
+    val=${val%\"}; val=${val#\"}; escapedVal=$val;
     key=${key#export }; key=${key#\"};
     MPI_DEPLOY_VARS="${MPI_DEPLOY_VARS} ${key}"
-    evalStatement=$(echo "export $key=\"${val//\"/\\\"}\"")
 
     # allow overwriting if var is loaded by file, do not set if var was already present on the host (for ci provided vars that have priority)
-    if [ $val == "session.environment" ]; then
+    if [ "$val" == "session.environment" ]; then
       @mpi.log_message "DEBUG" "will set value from current environment, this will fail if the variable is not set!"
       set +u
       if [ -n "${!key+set}" ]; then
@@ -94,11 +96,11 @@ set -euo pipefail
       set -u
     else
       @mpi.log_message "DEBUG" "setting var [$key]=[$val]"
-      @mpi.run_command eval "$evalStatement"
-      @mpi.run_command export "ORIGINOF_${key}"="file:$fileName"
+      @mpi.run_command export "${key}=$val"
+      @mpi.run_command export "ORIGINOF_${key}=file:$fileName"
     fi
-    # ignore all lines starting with #, or lines that are empty / only contain spaces
-  done < <(grep -v '^#' ${fileName} | grep -v '^[[:space:]]*$' | sort)
+  done < "$varFile"
+  rm "$varFile"
 
   export MPI_DEPLOY_VARS
 }

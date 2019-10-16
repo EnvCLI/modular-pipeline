@@ -14,8 +14,9 @@
   # quote all args
   allargs=
   for arg in "$@"; do
-      arg="${arg//\\/\\\\}"
-      allargs="$allargs \"${arg//\"/\\\"}\""
+    # escape $ as \$ as $ is special
+    arg=$(echo "$arg" | sed 's/\$/\\$/g')
+    allargs="$allargs \"${arg//\"/\\\"}\""
   done
 
   @mpi.log_message "TRACE" "Command $allargs"
