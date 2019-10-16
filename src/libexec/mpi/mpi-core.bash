@@ -38,7 +38,7 @@ export MPI_TEST_PATH="${MPI_TEST_PATH:-$MPI_ROOT_PATH/tests}"
 # This will load all required scripts
 source "$MPI_ROOT_PATH/common/common.bash"
 source "$MPI_ROOT_PATH/pipeline/pipeline.bash"
-source "$MPI_ROOT_PATH/action-helper/action-helper.bash"
+source "$MPI_ROOT_PATH/support/support.bash"
 
 # Main function
 #
