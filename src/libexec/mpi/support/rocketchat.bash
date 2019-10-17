@@ -32,10 +32,10 @@ set -euo pipefail
 
   # prepare body
   httpPayload=$(cat <<EOF
-  {
-    "username": "${senderName}",
-    "text": "${message}"
-  }
+{
+  "username": "${senderName}",
+  "text": "${message}"
+}
 EOF
   )
 

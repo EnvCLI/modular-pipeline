@@ -17,10 +17,10 @@ set -euo pipefail
 
   # post body
   httpPayload=$(cat <<EOF
-  {
-    "username": "${senderName}",
-    "content": "${message}"
-  }
+{
+  "username": "${senderName}",
+  "content": "${message}"
+}
 EOF
   )
 
