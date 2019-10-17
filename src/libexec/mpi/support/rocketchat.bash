@@ -31,9 +31,13 @@ set -euo pipefail
   declare endpointVar="${1:-}" senderName="${2:-}" message="${3:-}"
 
   # prepare body
-  read -d '' httpPayload << EOF
-  {"text": "${message}"}
+  httpPayload=$(cat <<EOF
+  {
+    "username": "${senderName}",
+    "text": "${message}"
+  }
 EOF
+  )
 
   @mpi.run_command curl \
     --silent \
