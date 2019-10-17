@@ -15,9 +15,21 @@ set -euo pipefail
 {
   declare endpointVar="${1:-}" senderName="${2:-}" message="${3:-}"
 
+  # post body
+  httpPayload=$(cat <<EOF
+  {
+    "username": "${senderName}",
+    "content": "${message}"
+  }
+EOF
+  )
+
+  # request
   @mpi.run_command curl \
+    --silent \
+    --output /dev/null \
     -H "Content-Type: application/json" \
     -X POST \
-    -d '{"username": "${senderName}", "content": "${message}"}' \
-    ${!endpointVar}
+    -d "$httpPayload" \
+    "${!endpointVar}"
 }
