@@ -8,10 +8,10 @@ set -euo pipefail
 #
 # Examples
 #
-#   @mpi.discord.send_webhook "DISCORD_RELEASE_WEBHOOK" "Releasebot" "Released version x.x.x"
+#   @mpi.discord.send_message "DISCORD_RELEASE_WEBHOOK" "Releasebot" "Released version x.x.x"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-@mpi.discord.send_webhook()
+@mpi.discord.send_message()
 {
   declare endpointVar="${1:-}" senderName="${2:-}" message="${3:-}"
 

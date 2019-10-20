@@ -23,10 +23,10 @@ set -euo pipefail
 #
 # Examples
 #
-#   @mpi.rocketchat.send_webhook "ROCKETCHAT_WEBHOOK" "Releasebot" "Released version x.x.x"
+#   @mpi.rocketchat.send_message "ROCKETCHAT_WEBHOOK" "Releasebot" "Released version x.x.x"
 #
 # Returns the exit code of the last command executed or 0 otherwise.
-@mpi.rocketchat.send_webhook()
+@mpi.rocketchat.send_message()
 {
   declare endpointVar="${1:-}" senderName="${2:-}" message="${3:-}"
 

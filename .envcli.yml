@@ -115,3 +115,9 @@ images:
   provides:
   - jq
   image: docker.io/fluidattacks/alpine-kaniko
+# Changelog
+- name: git-chglog
+  description: CHANGELOG generator implemented in Go (Golang).
+  provides:
+  - git-chglog
+  image: docker.io/envcli/git-chglog:0.9.1

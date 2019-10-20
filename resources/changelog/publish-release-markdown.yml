@@ -1,0 +1,31 @@
+style: none
+template: publish-release-markdown.tpl.md
+info:
+  title: CHANGELOG
+options:
+  commits:
+    # filters:
+    #   Type:
+    #     - feat
+    #     - fix
+    #     - perf
+    #     - refactor
+    sort_by: Scope
+  commit_groups:
+    group_by: Type
+    sort_by: Title
+    title_maps:
+      feat: Features
+      feature: Features
+      fix: Bug Fixes
+      perf: Performance Improvements
+      refactor: Code Refactoring
+      chore: Internal
+  header:
+    pattern: "^(\\w*)\\:\\s(.*)$"
+    pattern_maps:
+      - Type
+      - Subject
+  notes:
+    keywords:
+      - BREAKING CHANGE
