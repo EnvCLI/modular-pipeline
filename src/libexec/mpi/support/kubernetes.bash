@@ -5,7 +5,7 @@ set -euo pipefail
 @mpi.kubernetes.ensure_namespace() {
   local TARGET_NAMESPACE=${1:-}
   if [ -z "$TARGET_NAMESPACE" ]; then
-    @mpi.log_message "ERROR" "no target namespace specified as first argument when calling func act-common-kubernetes-ensure-namespace"
+    @mpi.log_message "ERROR" "no target namespace specified as first argument"
     exit 1
   fi
 
