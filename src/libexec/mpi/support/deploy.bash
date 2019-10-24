@@ -48,7 +48,7 @@ set -euo pipefail
 
     # do not add var if it is not present in MPI_DEPLOY_VARS
     # @see common/variables.bash
-    if [[ ! $MPI_DEPLOY_VARS =~ .*"$KEY".* ]]; then
+    if [[ ! ${MPI_DEPLOY_VARS:-} =~ .*"$KEY".* ]]; then
       continue
     fi
 
