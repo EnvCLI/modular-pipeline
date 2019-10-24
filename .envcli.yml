@@ -109,7 +109,7 @@ images:
   description: A tool to turn the continious integration / deployment variables into a common format for generally usable scripts without any dependencies.
   provides:
   - normalizeci
-  image: docker.io/envcli/normalizeci:0.1.1
+  image: docker.io/envcli/normalizeci:0.2.0
 - name: jq
   description: jq is a lightweight and flexible command-line JSON processor
   provides:
