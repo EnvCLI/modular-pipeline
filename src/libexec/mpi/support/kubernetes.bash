@@ -5,7 +5,7 @@ set -euo pipefail
 @mpi.kubernetes.ensure_namespace() {
   local TARGET_NAMESPACE=${1:-}
   if [ -z "$TARGET_NAMESPACE" ]; then
-    @mpi.log_message "ERROR" "no target namespace specified as first argument"
+    @mpi.log_message "ERROR" "no target namespace specified as first argument!"
     exit 1
   fi
 
@@ -61,27 +61,27 @@ set -euo pipefail
 @mpi.kubernetes.initialize_tiller() {
   # check if tiller was already initialized
   set +e
-  @mpi.container_command kubectl get serviceaccount --namespace ${DEPLOYMENT_NAMESPACE} tiller >> /dev/null
+  @mpi.container_command kubectl get serviceaccount --namespace "${DEPLOYMENT_NAMESPACE}" tiller >> /dev/null
   local getTillerServiceAccountStatus=$?
   set -e
   if [ "$getTillerServiceAccountStatus" -ne "0" ]; then
     @mpi.log_message "DEBUG" "Service account missing, creating tiller service account ..."
 
     ## Service Account
-    @mpi.container_command kubectl create serviceaccount --namespace ${DEPLOYMENT_NAMESPACE} tiller
+    @mpi.container_command kubectl create serviceaccount --namespace "${DEPLOYMENT_NAMESPACE}" tiller
 
     ## Service Account Permissions (namespace admin or cluster admin, depending on $DEPLOYMENT_CLUSTER_ADMIN)
     if [ "$DEPLOYMENT_CLUSTER_ADMIN" == "true" ]; then
       @mpi.log_message "INFO" "Granting tiller cluster admin role."
-      @mpi.container_command kubectl create clusterrolebinding ${DEPLOYMENT_NAMESPACE}-tiller-rule \
+      @mpi.container_command kubectl create clusterrolebinding "${DEPLOYMENT_NAMESPACE}-tiller-rule" \
         --clusterrole=cluster-admin \
         --serviceaccount=${DEPLOYMENT_NAMESPACE}:tiller
     else
       @mpi.log_message "INFO" "Granting tiller namespace admin role."
-      @mpi.container_command kubectl create rolebinding ${DEPLOYMENT_NAMESPACE}-tiller-binding \
-        --namespace=${DEPLOYMENT_NAMESPACE} \
+      @mpi.container_command kubectl create rolebinding "${DEPLOYMENT_NAMESPACE}-tiller-binding" \
+        --namespace="${DEPLOYMENT_NAMESPACE}" \
         --clusterrole=admin \
-        --serviceaccount=${DEPLOYMENT_NAMESPACE}:tiller
+        --serviceaccount="${DEPLOYMENT_NAMESPACE}:tiller"
     fi
 
     ## Install Tiller
