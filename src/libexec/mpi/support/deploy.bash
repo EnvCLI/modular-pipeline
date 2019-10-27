@@ -16,9 +16,10 @@ set -euo pipefail
   fi
 
   # get all available variables (sourced or set)
-  compgen -v > ${TMP_DIR}/deployvars.env
-  readarray -t ALL_VARIABLES < ${TMP_DIR}/deployvars.env
-  rm ${TMP_DIR}/deployvars.env &> /dev/null || true # remove if already present
+  tmpFileWithEnvVars=$(mktemp)
+  compgen -v > "$tmpFileWithEnvVars"
+  readarray -t ALL_VARIABLES < "$tmpFileWithEnvVars"
+  rm "$tmpFileWithEnvVars"
 
   # prepare deploylent labels
   # - replicas
@@ -30,7 +31,7 @@ set -euo pipefail
   export RESOURCES_HARD_MEMORY=${RESOURCES_HARD_MEMORY:-512M}
 
   # deployment url
-  export HTTP_ENDPOINT_DEFAULT="${PROJECT_NAME:-NCI_PROJECT_SLUG}-${deploymentEnvironment}"
+  export HTTP_ENDPOINT_DEFAULT="${PROJECT_NAME:-$NCI_PROJECT_SLUG-$deploymentEnvironment}"
   export HTTP_ENDPOINT="${HTTP_ENDPOINT:-$HTTP_ENDPOINT_DEFAULT}"
   export HTTP_ENDPOINT_HOST=$(__get_hostname_from_url "$HTTP_ENDPOINT")
   export HTTP_ENDPOINT_PATH=$(__get_path_from_url "$HTTP_ENDPOINT")

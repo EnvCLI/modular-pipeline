@@ -14,10 +14,9 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()
 {
-  # configuration
-  export KUBERNETES_VERSION="${KUBERNETES_VERSION:-1.11}"
-  export HELM_VERSION="${HELM_VERSION:-2.14.2}"
-  export DOCKER_DRIVER="${DOCKER_DRIVER:-overlay2}"
+  # if debug
+  # HELM_ARGS="-debug"
+  HELM_ARGS=""
 
   # parameters
   # - namespaces
@@ -55,18 +54,20 @@ function main()
   fi
   local DEPLOYMENT_CHART_VERSION=${DEPLOYMENT_CHART_VERSION:-}
 
-  # download the chart / add the required repositories
-  @mpi.kubernetes.download_chart "$DEPLOYMENT_CHART"
-
   # make sure the target namespace exists
   @mpi.kubernetes.ensure_namespace "$DEPLOYMENT_NAMESPACE"
+
+  # download the chart / add the required repositories
+  @mpi.kubernetes.download_chart "$DEPLOYMENT_CHART"
 
   # init tiller
   @mpi.kubernetes.initialize_tiller "$DEPLOYMENT_NAMESPACE"
 
+  # registry access
+  @mpi.kubernetes.setup_registry_access "$DEPLOYMENT_NAMESPACE"
+
   # generate deployment configuration
   @mpi.deployment.generate_configuration "$DEPLOYMENT_ENVIRONMENT"
-  # values.yaml -f .helm/default.yaml
 
   # deploy the helm chart
   #
@@ -75,24 +76,21 @@ function main()
   # * install: install the specified chart, if it is not deployed yet
   # * force: overwrite conflicting resources if required (some have immutable attributes)
   # * version: the version of the chart that should be used
-  #
   @mpi.log_message "INFO" "deploying using chart [${DEPLOYMENT_CHART}:${DEPLOYMENT_CHART_VERSION:-latest}] into namespace [$DEPLOYMENT_NAMESPACE] as [$DEPLOYMENT_ID]"
   if [ -z "${DEPLOYMENT_CHART_VERSION}" ]; then
-    @mpi.container_command helm upgrade \
-      --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
-      --namespace "${DEPLOYMENT_NAMESPACE}" \
-      --install \
-      --force \
-      "$DEPLOYMENT_ID" "${DEPLOYMENT_CHART}"
-  else
-    @mpi.container_command helm upgrade \
-      --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
-      --namespace "${DEPLOYMENT_NAMESPACE}" \
-      --version "${DEPLOYMENT_CHART_VERSION}" \
-      --install \
-      --force \
-      "$DEPLOYMENT_ID" "${DEPLOYMENT_CHART}"
+    $HELM_ARGS="$HELM_ARGS --version ${DEPLOYMENT_CHART_VERSION}"
   fi
+  # TODO: generate a values yaml and use it # -f "${TMP_DIR}/helm-values.yaml" \
+  @mpi.container_command helm upgrade \
+    --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
+    --namespace "${DEPLOYMENT_NAMESPACE}" \
+    --install \
+    --force \
+    --set "image.repository=$CONTAINER_REPO,image.tag=$CONTAINER_TAG,image.pullSecret=" \
+    $HELM_ARGS \
+    "$DEPLOYMENT_ID" "${DEPLOYMENT_CHART}"
+  fi
+
 }
 
 # entrypoint
