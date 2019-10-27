@@ -1,0 +1,50 @@
+// .revealjs-slide-state
+// Demonstration of adding state to a slide and that it can be used by CSS.
+// :include: //div[@class="slides"]
+= Title Slide
+:topic: state=title,background-color=white
+:customcss: slides.css
+:source-highlighter: highlightjs
+// :revealjs_plugins: plugins
+
+== Slide One
+
+* Foo
+* Bar
+* World
+
+=== Slide Six.One
+
+This is a vertical subslide
+
+== Item by Item
+
+[%step]
+* Step
+* By
+* Step
+
+[transition-speed=fast, %notitle]
+== Slide Two
+
+A Great Story
+
+[source,java]
+----
+StreamsConfig config = ...;
+//Here we set various options
+Topology topology = new StreamsBuilder()
+//Here we build the topology
+....build();
+----
+
+[source, python]
+----
+print "Hello World"
+----
+
+[.notes]
+--
+* tell anecdote
+* make a point
+--
