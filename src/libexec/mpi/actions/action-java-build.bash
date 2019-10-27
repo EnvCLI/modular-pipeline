@@ -22,7 +22,7 @@ function main()
     @mpi.java.mvn versions:set -DnewVersion=$NCI_COMMIT_REF_RELEASE
 
     # - build
-    @mpi.java.mvn clean package
+    @mpi.java.mvn clean package -DskipTests=true
 
     # copy artifacts to ARTIFACT_DIR
     cp -R target/*.jar $ARTIFACT_DIR
