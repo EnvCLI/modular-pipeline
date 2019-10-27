@@ -9,7 +9,8 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()
 {
-  @mpi.log_message "INFO" "Will deploy using method: ${DEPLOYMENT_TYPE}"
+  @mpi.log_message "INFO" "DEPLOYMENT_TYPE: [${DEPLOYMENT_TYPE}]"
+  @mpi.log_message "INFO" "DEPLOYMENT_VARIANT: [${DEPLOYMENT_VARIANT}]"
 
   # deployment target: none
   if [[ ${DEPLOYMENT_TYPE} == "none" ]]; then
@@ -34,13 +35,15 @@ function main()
     exit 1
   fi
 
-  @mpi.log_message "INFO" "deploying Namespace[${DEPLOYMENT_NAMESPACE}] ID[${DEPLOYMENT_ID}] Environment[$DEPLOYMENT_ENVIRONMENT] ..."
+  @mpi.log_message "INFO" "TARGET NAMESPACE: [${DEPLOYMENT_NAMESPACE}]"
+  @mpi.log_message "INFO" "TARGET ID: [${DEPLOYMENT_ID}]"
+  @mpi.log_message "INFO" "TARGET ENVIRONMENT: [${DEPLOYMENT_ENVIRONMENT}]"
 
   # deploymentType: docker swarm
   if echo "${DEPLOYMENT_TYPE}" | grep -q 'swarm'; then
     # web based services
     if echo "${DEPLOYMENT_VARIANT}" | grep -q 'http'; then
-      export SWARMSTACKFILE_DEFAULT="${DEPLOYMENT_CHART:-${MPI_RESOURCES_MIRROR}/swarm-http.yml}"
+      export SWARMSTACK_RESOURCE="${SWARMSTACK_RESOURCE:-swarm-http.yml}"
     fi
 
     # run deployment
@@ -50,9 +53,11 @@ function main()
 
   # deploymentType: helm
   if echo "${DEPLOYMENT_TYPE}" | grep -q 'helm'; then
+    export DEPLOYMENT_CHART="${DEPLOYMENT_CHART:-}"
+
     # web based services
     if echo "${DEPLOYMENT_VARIANT}" | grep -q 'http'; then
-      DEPLOYMENT_CHART="${DEPLOYMENT_CHART:-philippheuer/webservice}"
+      export DEPLOYMENT_CHART="${DEPLOYMENT_CHART:-philippheuer/webservice}"
     fi
 
     @mpi action helm-deploy "$DEPLOYMENT_NAMESPACE" "$DEPLOYMENT_ENVIRONMENT" "$DEPLOYMENT_ID" "$DEPLOYMENT_CHART"
@@ -60,7 +65,7 @@ function main()
   fi
 
   # no match
-  @mpi.log_message "ERROR" "deployment type ${DEPLOYMENT_TYPE} is not supported!"
+  @mpi.log_message "ERROR" "deployment type [${DEPLOYMENT_TYPE}] is not supported!"
   exit 1
 }
 
