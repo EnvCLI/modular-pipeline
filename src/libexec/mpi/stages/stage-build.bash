@@ -39,6 +39,12 @@ function main()
     exit 0
   fi
 
+  # revealjs
+  if [[ ${PROJECT_TYPE} =~ ^revealjs$ ]]; then
+    @mpi action revealjs-build
+    exit 0
+  fi
+
   # no match
   @mpi.log_message "WARN" "project type [${PROJECT_TYPE}] is not supported!"
 }

@@ -121,3 +121,9 @@ images:
   provides:
   - git-chglog
   image: docker.io/envcli/git-chglog:0.9.1
+# Presentation
+- name: RevealJS
+  description: The HTML Presentation Framework
+  provides:
+  - asciidoctor-revealjs
+  image: docker.io/envcli/revealjs:latest
