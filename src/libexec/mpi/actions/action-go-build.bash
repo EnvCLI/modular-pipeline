@@ -22,21 +22,25 @@ _build_go() {
   GOARM=
 
   # arm architectures -> https://github.com/golang/go/wiki/GoArm#supported-architectures
-  if echo "$2" | grep -q 'arm32v6'; then
+  if [[ $ARTIFACT_ARCH == 'arm32v6' ]]; then
     ARTIFACT_ARCH=arm
     GOARM=6
-  fi
-  if echo "$2" | grep -q 'arm32v7'; then
+  elif [[ $ARTIFACT_ARCH == 'arm32v7' ]]; then
     ARTIFACT_ARCH=arm
     GOARM=7
-  fi
-  if echo "$2" | grep -q 'arm64v8'; then
+  elif [[ $ARTIFACT_ARCH == 'arm64v8' ]]; then
     ARTIFACT_ARCH=arm64
   fi
 
   @mpi.log_message "INFO" "Generating golang artifact $ARTIFACT [$NCI_COMMIT_REF_RELEASE] ..."
   # shellcheck disable=SC2086
-  @mpi.container_command --env GOOS=$ARTIFACT_OS --env GOARCH=$ARTIFACT_ARCH --env GOARM=$GOARM --env CGO_ENABLED=0 go build -o "$ARTIFACT_DIR/$ARTIFACT" -ldflags "-w -X main.version=$NCI_COMMIT_REF_RELEASE -X main.commit=$NCI_COMMIT_SHA -X main.date=`date -u +%Y%m%d.%H%M%S`" ./src
+  @mpi.container_command \
+    --env GOOS=$ARTIFACT_OS \
+    --env GOARCH=$ARTIFACT_ARCH \
+    --env GOARM=$GOARM \
+    --env CGO_ENABLED=0 \
+    --env GOPROXY=${GOPROXY:-https://goproxy.io} \
+    go build -o "$ARTIFACT_DIR/$ARTIFACT" -ldflags "-w -X main.version=$NCI_COMMIT_REF_RELEASE -X main.commit=$NCI_COMMIT_SHA -X main.date=`date -u +%Y%m%d.%H%M%S` ${GO_BUILD_LDFLAGS:-}" "${GO_BUILD_SRCDIR:-./src}"
   @mpi.log_message "INFO" "Successfully generated artifact $ARTIFACT_DIR/$ARTIFACT [$(ls -lh $ARTIFACT_DIR/$ARTIFACT | cut -d " " -f5)]"
 }
 
@@ -51,7 +55,15 @@ function main()
 {
   # code generation
   @mpi.log_message "INFO" "Running golang code generation"
-  @mpi.run_command envcli run go generate ./...
+  @mpi.container_command \
+    --env GOPROXY=${GOPROXY:-https://goproxy.io} \
+    go generate ./...
+
+  # if godep usage is detected
+  if [[ -f "Gopkg.lock" ]]; then
+    @mpi.log_message "INFO" "Installing dependencies with go-dep! [LEGACY]"
+    @mpi.container_command dep ensure -v
+  fi
 
   # build artifacts
   @mpi.log_message "INFO" "Running golang artifact generation"

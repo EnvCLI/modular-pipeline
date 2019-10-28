@@ -9,6 +9,12 @@ images:
   cache:
   - name: golang
     directory: /go/pkg
+- name: godep
+  description: dep is a prototype dependency management tool for Go. It requires Go 1.8 or newer to compile.
+  provides:
+  - dep
+  image: docker.io/envcli/go-dep:0.5.0
+  directory: /go/src/project
 # - Java
 - name: java
   description: OpenJDK 11
