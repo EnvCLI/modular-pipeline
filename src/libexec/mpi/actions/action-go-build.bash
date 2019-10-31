@@ -61,8 +61,11 @@ function main()
 
   # if godep usage is detected
   if [[ -f "Gopkg.lock" ]]; then
-    @mpi.log_message "INFO" "Installing dependencies with go-dep! [LEGACY]"
+    @mpi.log_message "INFO" "downloading dependencies"
     @mpi.container_command dep ensure -v
+
+    @mpi.log_message "INFO" "installed packages"
+    @mpi.container_command dep status
   fi
 
   # build artifacts
