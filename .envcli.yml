@@ -81,7 +81,6 @@ images:
   provides:
   - kubectl
   image: docker.io/envcli/kubectl:1.12.3
-  shell: sh
   cache:
   - name: kubectl
     directory: /root/.kube
@@ -91,7 +90,6 @@ images:
   provides:
   - helm
   image: docker.io/envcli/helm:2.14.0
-  shell: sh
   directory: /data
   cache:
   - name: kubectl
@@ -106,7 +104,6 @@ images:
   - ansible-playbook
   - ansible-pull
   image: docker.io/envcli/ansible:latest
-  shell: sh
   cache:
   - name: ssh
     directory: /root/.ssh

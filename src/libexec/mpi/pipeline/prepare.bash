@@ -56,7 +56,7 @@ set -euo pipefail
   # only run if NCI is not set yet
   if [ -z ${NCI+x} ]; then
     @mpi.log_message "TRACE" "normalizing ci variables"
-    eval $(@mpi.container_command normalizeci)
+    @mpi.run_command eval $(@mpi.container_command normalizeci)
 
     if [ -z ${NCI+x} ]; then
       @mpi.log_message "ERROR" "normalized variables not available!"

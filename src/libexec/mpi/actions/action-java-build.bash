@@ -10,13 +10,13 @@ function main()
   @mpi.java.detect_build_system
 
   # run build
-  if echo "$BUILD_SYSTEM" | grep -q 'gradle'; then
+  if [[ $BUILD_SYSTEM == "gradle"]]; then
     # gradle
-    @mpi.java.gradle clean assemble --no-daemon
+    @mpi.java.gradle clean assemble --no-daemon -Xlint:deprecation
 
     # copy artifacts to ARTIFACT_DIR
     cp -R build/libs/*.jar $ARTIFACT_DIR
-  elif echo "$BUILD_SYSTEM" | grep -q 'maven'; then
+  elif [[ $BUILD_SYSTEM == "maven"]]; then
     # maven
     # - version
     @mpi.java.mvn versions:set -DnewVersion=$NCI_COMMIT_REF_RELEASE
