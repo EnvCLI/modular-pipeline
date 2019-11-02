@@ -28,3 +28,19 @@
   esac
   export HOST_ARCH
 }
+
+# Public: Removes a file if it is present, does nothing otherwise
+#
+# Examples
+#
+#   @mpi.file.safe_remove "file.txt"
+#
+# Returns the exit code of the last command executed or 0 otherwise.
+@mpi.file.safe_remove() {
+  declare file="${1}"
+
+  # check if file is present and remove
+  if [ -f "$file" ]; then
+    rm "$file"
+  fi
+}

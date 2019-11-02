@@ -27,7 +27,7 @@ FROM ${BASE_IMAGE:-docker.io/nginxinc/nginx-unprivileged:1.16-alpine}
 # dependencies
 USER root
 RUN apk add --no-cache curl bash &&\
-    curl -L -s -o "/entrypoint.sh" "https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/resources/html-http.entrypoint" &&\
+    curl -L -s -o "/entrypoint.sh" "https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/resources/dockerfiles/html-http.entrypoint" &&\
     chmod +x /entrypoint.sh &&\
     chown -R 101:0 /usr/share/nginx/html &&\
     chmod 775 -R /usr/share/nginx/html

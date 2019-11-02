@@ -12,9 +12,9 @@ function main()
   # package: container
   if [[ ${PACKAGE_TYPE} =~ ^container$ ]]; then
     if [[ ${PROJECT_TYPE} =~ ^java$ ]]; then
-      export DOCKERFILE_RESOURCE="java-http.dockerfile"
+      export DOCKERFILE_RESOURCE="dockerfiles/java-http.dockerfile"
     elif [[ ${PROJECT_TYPE} =~ ^html$ ]]; then
-      export DOCKERFILE_RESOURCE="html-http.dockerfile"
+      export DOCKERFILE_RESOURCE="dockerfiles/html-http.dockerfile"
     fi
 
     @mpi action container-build

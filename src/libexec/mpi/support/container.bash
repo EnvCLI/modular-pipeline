@@ -16,10 +16,9 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 @mpi.container.registry_login() {
   declare registryHost="$1" registryUsername="$2" registryPassword="$3"
+  @mpi.log_message "INFO" "trying to login to container registry [$registryHost] as [$registryUsername] ..."
 
-  @mpi.log_message "INFO" "trying to login to container registry $registryHost ..."
-
-  if [[ -n "$registryUsername" ]]; then
+  if [[ -n "$registryUsername" ]] && [[ -n "$registryPassword" ]] && [[ -n "$registryHost" ]]; then
     @mpi.run_command docker login -u "$registryUsername" -p "$registryPassword" "$registryHost"
   else
     @mpi.log_message "ERROR" "Failed to login to container registry! No credentials provided!"

@@ -16,10 +16,9 @@ set -euo pipefail
   fi
 
   # get all available variables (sourced or set)
-  tmpFileWithEnvVars=$(mktemp)
-  compgen -v > "$tmpFileWithEnvVars"
-  readarray -t ALL_VARIABLES < "$tmpFileWithEnvVars"
-  rm "$tmpFileWithEnvVars"
+  compgen -v > ${TMP_DIR}/deployvars.env
+  readarray -t ALL_VARIABLES < ${TMP_DIR}/deployvars.env
+  @mpi.file.safe_remove "${TMP_DIR}/deployvars.env"
 
   # prepare deploylent labels
   # - replicas
@@ -32,13 +31,16 @@ set -euo pipefail
 
   # deployment url
   export HTTP_ENDPOINT_DEFAULT="${PROJECT_NAME:-$NCI_PROJECT_SLUG-$deploymentEnvironment}"
-  export HTTP_ENDPOINT="${HTTP_ENDPOINT:-$HTTP_ENDPOINT_DEFAULT}"
+  export HTTP_ENDPOINT_DEFAULT_SUFFIX="${HTTP_ENDPOINT_DEFAULT_SUFFIX:-}"
+  export HTTP_ENDPOINT="${HTTP_ENDPOINT:-$HTTP_ENDPOINT_DEFAULT.$HTTP_ENDPOINT_DEFAULT_SUFFIX}"
   export HTTP_ENDPOINT_HOST=$(__get_hostname_from_url "$HTTP_ENDPOINT")
   export HTTP_ENDPOINT_PATH=$(__get_path_from_url "$HTTP_ENDPOINT")
   @mpi.log_message "DEBUG" "exposing http endpopint at [${HTTP_ENDPOINT}]"
 
   # prepare deployment variables
-  rm ${TMP_DIR}/deploy.env &> /dev/null || true # remove if already present
+  @mpi.file.safe_remove "${TMP_DIR}/deploy.env"
+  @mpi.file.safe_remove "${TMP_DIR}/deploy-config.env"
+  @mpi.file.safe_remove "${TMP_DIR}/deploy-secret.env"
   for KEY in "${ALL_VARIABLES[@]}"; do
     VALUE=${!KEY:-}
 
@@ -55,6 +57,13 @@ set -euo pipefail
 
     # .env for deployments
     echo "$KEY=$VALUE" >> ${TMP_DIR}/deploy.env
+
+    # split into config and secret values for other use-cases
+    if [[ $KEY == *"USER"* ]] || [[ $KEY == *"PASS"* ]]; then
+      echo "$KEY=$VALUE" >> "${TMP_DIR}/deploy-secret.env"
+    else
+      echo "$KEY=$VALUE" >> "${TMP_DIR}/deploy-config.env"
+    fi
   done
 }
 

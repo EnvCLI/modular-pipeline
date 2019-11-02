@@ -104,3 +104,25 @@ set -euo pipefail
 
   export MPI_DEPLOY_VARS
 }
+
+# Public: Substitues environment variables in a file
+#
+# $1 - File Path
+#
+# Examples
+#
+#   @mpi.substitute_environment_in_file "fileName"
+#
+# Returns the exit code of the last command executed or 0 otherwise
+@mpi.substitute_environment_in_file() {
+  declare fileName="${1}"
+  @mpi.log_message "DEBUG" "replacing environment variables present in $fileName"
+
+  tempFile=$(mktemp)
+
+  envsubst < "${fileName}" > "${tempFile}"
+  local newContent=$(cat "$tempFile")
+  @mpi.log_message "TRACE" "new file content: $newContent"
+  cp "${tempFile}" "${fileName}"
+  rm "${tempFile}"
+}

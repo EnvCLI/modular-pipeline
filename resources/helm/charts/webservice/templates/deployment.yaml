@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webservice.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "webservice.name" . }}
+    helm.sh/chart: {{ include "webservice.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  strategy:
+    type: {{ .Values.deployment.strategy.type }}
+    {{- if eq .Values.deployment.strategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.deployment.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.deployment.strategy.rollingUpdate.maxSurge }}
+    {{- end }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "webservice.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "webservice.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        # Image
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        # Environment
+        {{- if or (eq .Values.deployment.configType "env") (eq .Values.deployment.secretType "env") }}
+        envFrom:
+        {{- if eq .Values.deployment.configType "env" }}
+        - configMapRef:
+            name: {{ .Release.Name }}-configmap
+        {{- end }}
+        {{- if eq .Values.deployment.secretType "env" }}
+        - secretMapRef:
+            name: {{ .Release.Name }}-secret
+        {{- end }}
+        {{- end }}
+        # Ports
+        ports:
+          - name: http
+            containerPort: {{ .Values.deployment.containerPort }}
+            protocol: TCP
+        # Liveness
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+        # Readiness
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+        # Resources
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret | quote }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

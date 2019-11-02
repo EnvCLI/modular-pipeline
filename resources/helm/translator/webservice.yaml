@@ -1,0 +1,51 @@
+###
+# This is a translation layer to turn environment variables into the yaml needed by helm.
+# Chart: philippheuer/webservice
+###
+
+image:
+  repository: "${CONTAINER_REPO}"
+  tag: "${CONTAINER_TAG}"
+  pullPolicy: IfNotPresent
+  pullSecret: "${CONTAINERREGISTRY_ACCESS_SECRET_NAME}"
+
+deployment:
+  replicaCount: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 1
+  containerPort: 8080
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  # nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+  - host: "${HTTP_ENDPOINT}"
+    paths:
+    - "/"
+
+resources:
+  # resource reservation
+  requests:
+    cpu: "${RESOURCES_SOFT_CPU}"
+    memory: "${RESOURCES_SOFT_MEMORY}"
+  # resource limits
+  limits:
+    cpu: "${RESOURCES_HARD_CPU}"
+    memory: "${RESOURCES_HARD_MEMORY}"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

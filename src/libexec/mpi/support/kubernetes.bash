@@ -55,16 +55,12 @@ set -euo pipefail
 
 # download_chart
 @mpi.kubernetes.download_chart() {
-  local CHART_ID=${1:-}
-
-  # prepare helm cli
-  @mpi.log_message "DEBUG" "Initializing Helm ..."
-  @mpi.container_command helm init --client-only --skip-refresh &> /dev/null
+  local CHART_ID=${1:-}, DEPLOYMENT_CHART_VERSION=${2:-} CHART_TARGET_DIR=${3:-}
 
   # print variable content
   local CHART_REPOSITORY=$(echo $CHART_ID | cut -d '/' -f 1)
 
-  # Check if the repository is known / needs to be added for the deployment to work
+  # check if the repository is known / needs to be added for the deployment to work
   @mpi.log_message "DEBUG" "Chart Repository: ${CHART_REPOSITORY}"
   if [ "$CHART_REPOSITORY" != "stable" ]; then
     ## if the repo isn't stable/ then we're using a custom repository that we need to initialize
@@ -85,6 +81,13 @@ set -euo pipefail
     fi
   fi
   @mpi.container_command helm repo update &> /dev/null
+
+  # download chart and extract into target dir
+  if [[ -n $DEPLOYMENT_CHART_VERSION ]]; then
+    @mpi.container_command helm fetch "$CHART_ID" --version "${DEPLOYMENT_CHART_VERSION}" --untar --destination "$CHART_TARGET_DIR"
+  else
+    @mpi.container_command helm fetch "$CHART_ID" --untar --destination "$CHART_TARGET_DIR"
+  fi
 }
 
 # initialize tiller
