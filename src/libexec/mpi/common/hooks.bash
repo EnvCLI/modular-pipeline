@@ -24,7 +24,11 @@
   if [ -f "${hookFile}" ]; then
     @mpi.log_message "INFO" "running hook $hookDir/${hookName}.sh"
     "${hookFile}"
-    return 0
+
+    if [ ! $? == "0" ]; then
+      @mpi.log_message "ERROR" "execution of hook [$hookDir/${hookName}.sh] failed with code $?!"
+      return 1
+    fi
   fi
 
   return 1
