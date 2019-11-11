@@ -67,20 +67,20 @@ set -euo pipefail
     @mpi.log_message "DEBUG" "Using custom chart repository: ${CHART_REPOSITORY}"
 
     if [ "$CHART_REPOSITORY" == "incubator" ]; then
-      @mpi.container_command helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com &> /dev/null
+      @mpi.container_command helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com >> /dev/null
     elif [ "$CHART_REPOSITORY" == "rancher-stable" ]; then
-      @mpi.container_command helm repo add rancher-stable https://releases.rancher.com/server-charts/stable &> /dev/null
+      @mpi.container_command helm repo add rancher-stable https://releases.rancher.com/server-charts/stable >> /dev/null
     elif [ "$CHART_REPOSITORY" == "appscode" ]; then
-      @mpi.container_command helm repo add appscode https://charts.appscode.com/stable &> /dev/null
+      @mpi.container_command helm repo add appscode https://charts.appscode.com/stable >> /dev/null
     elif [ "$CHART_REPOSITORY" == "gitlab" ]; then
-      @mpi.container_command helm repo add gitlab https://charts.gitlab.io &> /dev/null
+      @mpi.container_command helm repo add gitlab https://charts.gitlab.io >> /dev/null
     elif [ "$CHART_REPOSITORY" == "jetstack" ]; then
-      @mpi.container_command helm repo add jetstack https://charts.jetstack.io &> /dev/null
+      @mpi.container_command helm repo add jetstack https://charts.jetstack.io >> /dev/null
     elif [ "$CHART_REPOSITORY" == "philippheuer" ]; then
-      @mpi.container_command helm repo add philippheuer https://philippheuer.gitlab.io/kubernetes-charts &> /dev/null
+      @mpi.container_command helm repo add philippheuer https://philippheuer.gitlab.io/kubernetes-charts >> /dev/null
     fi
   fi
-  @mpi.container_command helm repo update &> /dev/null
+  @mpi.container_command helm repo update >> /dev/null
 
   # download chart and extract into target dir
   if [[ -n $DEPLOYMENT_CHART_VERSION ]]; then
