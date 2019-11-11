@@ -21,8 +21,8 @@ function main()
 
   # publish
   if [ "$BUILD_SYSTEM" == "gradle" ]; then
-    # gradle projects require the bintray plugin to use bintrayUpload
-    @mpi.java.gradle bintrayUpload -PrepoAddress="$repoAddr" -PrepoUsername="$repoUser" -PrepoPassword="$repoPass" -Pversion="$version"
+    # gradle projects require the maven plugin to use uploadArchives
+    @mpi.java.gradle uploadArchives -PrepoAddress="$repoAddr" -PrepoUsername="$repoUser" -PrepoPassword="$repoPass" -Pversion="$version"
   else
     @mpi.log_message "ERROR" "$BUILD_SYSTEM does not support publish yet!"
     return 1
