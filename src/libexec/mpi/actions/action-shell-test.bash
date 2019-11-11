@@ -26,7 +26,7 @@ function main()
     if [ "$HOST_OS" == "windows" ]; then
       @mpi.log_message "INFO" "installing bats for windows on the host to [$HOME]"
       git clone https://github.com/bats-core/bats-core.git "$tmpRepoDir"
-      sudo $tmpRepoDir/install.sh $HOME
+      $tmpRepoDir/install.sh "$HOME"
     fi
   else
     @mpi.log_message "DEBUG" "bats already present on host, not doing anything."
@@ -34,9 +34,9 @@ function main()
 
   # use parallel for test execution if available
   if command -v parallel > /dev/null; then
-    @mpi.run_command bats --tap --jobs 4 --recursive $TEST_DIR
+    @mpi.run_command bats --tap --jobs 4 --recursive "$TEST_DIR"
   else
-    @mpi.run_command bats --tap --recursive $TEST_DIR
+    @mpi.run_command bats --tap --recursive "$TEST_DIR"
   fi
 }
 
