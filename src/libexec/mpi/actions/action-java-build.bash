@@ -10,13 +10,18 @@ function main()
   @mpi.java.detect_build_system
 
   # run build
-  if [[ $BUILD_SYSTEM == "gradle"]]; then
+  if [[ $BUILD_SYSTEM == "gradle" ]]; then
     # gradle
     @mpi.java.gradle clean assemble --no-daemon -Xlint:deprecation
 
     # copy artifacts to ARTIFACT_DIR
-    cp -R build/libs/*.jar $ARTIFACT_DIR
-  elif [[ $BUILD_SYSTEM == "maven"]]; then
+    if [ -d "build/libs" ]; then
+      @mpi.log_message "INFO" "taking artifacts from build/libs ..."
+      cp -R build/libs/*.jar "$ARTIFACT_DIR"
+    else
+      @mpi.log_message "INFO" "no build dir, multi module projects have to copy relevant artifacts manually"
+    fi
+  elif [[ $BUILD_SYSTEM == "maven" ]]; then
     # maven
     # - version
     @mpi.java.mvn versions:set -DnewVersion=$NCI_COMMIT_REF_RELEASE

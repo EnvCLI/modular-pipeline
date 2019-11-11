@@ -23,7 +23,7 @@
 ARG BASE_IMAGE
 
 # Base Image
-FROM ${BASE_IMAGE:-adoptopenjdk/openjdk11-openj9:jre-11.0.4_11_openj9-0.15.1-alpine}
+FROM ${BASE_IMAGE:-adoptopenjdk/openjdk11:x86_64-alpine-jre-11.0.5_10}
 
 ############################################################
 # Installation
@@ -43,13 +43,18 @@ ADD dist/*.jar /app.jar
 EXPOSE 8080/tcp
 
 # Execution
-CMD [ \
-  "java", \
-  "-Djava.security.egd=file:/dev/./urandom", \
-  "-XX:-TieredCompilation", \
-  "-XX:+UseStringDeduplication", \
-  "-XX:+UseG1GC", \
-  "-XX:OnOutOfMemoryError=\"kill -TERM $p; sleep 10; kill -9 %p\"", \
-  "-jar", \
-  "/app.jar" \
-]
+CMD "java" \
+  "-Djava.security.egd=file:/dev/./urandom" \
+  "-Djava.net.useSystemProxies=true" \
+  "-Duser.language=${JVM_USER_LANGUAGE:-en}" \
+  "-Duser.country=${JVM_USER_COUNTRY:-US}" \
+  "-Duser.timezone=${JVM_USER_TIMEZONE:-UTC}" \
+  "-Dorg.jboss.logging.provider=log4j2" \
+  "-Dfile.encoding=${JVM_FILE_ENCODING:-UTF8}" \
+  "${JAVA_OPTS_CUSTOM:--Dhello=world}" \
+  "-XX:-TieredCompilation" \
+  "-XX:+UseStringDeduplication" \
+  "-XX:+UseG1GC" \
+  "-XX:OnOutOfMemoryError=\"kill -TERM $p; sleep 10; kill -9 %p\"" \
+  "-jar" \
+  "/app.jar"

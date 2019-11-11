@@ -23,7 +23,7 @@ COPY . /tmp/mpi
 ############################################################
 
 RUN echo "System Packages ..." &&\
-    apk add --no-cache curl bash gettext &&\
+    apk add --no-cache curl bash gettext git grep &&\
     echo "Tools ..." &&\
     echo "-> Getting EnvCLI ..." &&\
     curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.3/envcli_linux_amd64 &&\
@@ -32,6 +32,9 @@ RUN echo "System Packages ..." &&\
     chmod -R 755 /tmp/mpi &&\
     /tmp/mpi/install.sh /usr/local &&\
     rm -rf /tmp/mpi &&\
+    echo "-> EnvCLI Configuration" &&\
+    mkdir -p /cache &&\
+    envcli config set cache-path "/cache" &&\
     echo "-> Installing EnvCLI Aliases" &&\
     envcli install-aliases &&\
     echo "-> Executable permissions" &&\
