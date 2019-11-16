@@ -1,7 +1,12 @@
 #! /usr/bin/env bash
+
+###
+# This script installs the modular pipeline itself
+###
+
 set -e
 echo "Installing modular pipeline ..."
-downloadUrl=${downloadUrl:-https://github.com/EnvCLI/modular-pipeline/archive/master.zip}
+gitRepo=${gitRepo:-https://github.com/EnvCLI/modular-pipeline.git}
 
 # preq: envcli
 if ! [ -x "$(command -v envcli)" ]; then
@@ -20,36 +25,24 @@ if [[ -z "$PATH_PREFIX" ]]; then
   exit 1
 fi
 
-# download
-if [ -d "$MPI_ROOT/src" ]; then
-  echo "Local installation ..."
+# get files if not present locally
+if [ -d "$MPI_ROOT/src/libexec/mpi" ]; then
+  echo "Installing using local files ..."
 else
-  if ! [ -x "$(command -v curl)" ]; then
-    echo "ERROR: please install curl on your host machine!"
-    exit 1
-  fi
-  if ! [ -x "$(command -v unzip)" ]; then
-    echo "ERROR: please install unzip on your host machine!"
+  if ! [ -x "$(command -v git)" ]; then
+    echo "ERROR: please install git on your host machine!"
     exit 1
   fi
 
-  echo "Downloading ..."
+  echo "Cloning git repository ..."
   tmpDir=$(mktemp -d)
-  curl -L -s -o "$tmpDir/pipeline.zip" "$downloadUrl"
-  unzip -q $tmpDir/pipeline.zip -d $tmpDir
-  MPI_ROOT=$(realpath $tmpDir/modular-pipeline*)
+  git clone "$gitRepo" --single-branch "$tmpDir"
+  MPI_ROOT=$(realpath $tmpDir)
 fi
 
 # installation
-install -d -m 755 "$PATH_PREFIX"/{bin,libexec/mpi/{common,pipeline,actions,stages,support,cfg,resources}}
-install -m 755 "$MPI_ROOT/src/bin"/* "$PATH_PREFIX/bin"
-install -m 755 "$MPI_ROOT/src/libexec/mpi"/*.bash "$PATH_PREFIX/libexec/mpi"
-install -m 755 "$MPI_ROOT/src/libexec/mpi/common"/* "$PATH_PREFIX/libexec/mpi/common"
-install -m 755 "$MPI_ROOT/src/libexec/mpi/pipeline"/* "$PATH_PREFIX/libexec/mpi/pipeline"
-install -m 755 "$MPI_ROOT/src/libexec/mpi/actions"/* "$PATH_PREFIX/libexec/mpi/actions"
-install -m 755 "$MPI_ROOT/src/libexec/mpi/stages"/* "$PATH_PREFIX/libexec/mpi/stages"
-install -m 755 "$MPI_ROOT/src/libexec/mpi/support"/* "$PATH_PREFIX/libexec/mpi/support"
-install -m 755 "$MPI_ROOT/.envcli.yml" "$PATH_PREFIX/libexec/mpi/cfg/.envcli.yml"
-cp -R "$MPI_ROOT/resources"/* "$PATH_PREFIX/libexec/mpi/resources" && chmod -R 755 "$PATH_PREFIX/libexec/mpi/resources"
+cp --recursive --preserve=all "$MPI_ROOT/src/." "$PATH_PREFIX/"
+chmod -R 755 "$PATH_PREFIX/bin/mpi"
+chmod -R 755 "$PATH_PREFIX/libexec/mpi"
 
 echo "Installed MPI to $PATH_PREFIX/bin/mpi"
