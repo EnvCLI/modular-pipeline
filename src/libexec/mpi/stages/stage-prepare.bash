@@ -18,14 +18,14 @@ function main()
   # golang
   if [[ ${PROJECT_TYPE} =~ ^golang*$ ]]; then
     @mpi.log_message "INFO" "pulling images ..."
-    envcli pull-image go upx
+    @mpi.envcli pull-image go upx
     return 0
   fi
 
   # java
   if [[ ${PROJECT_TYPE} =~ ^java$ ]]; then
     @mpi.log_message "INFO" "pulling images ..."
-    envcli pull-image java
+    @mpi.envcli pull-image java
     return 0
   fi
 

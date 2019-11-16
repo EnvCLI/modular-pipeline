@@ -24,6 +24,18 @@
   return "$?"
 }
 
+# Public: Run EnvCLI Command
+#
+# Examples
+#
+#   @mpi.envcli --help
+#
+# Returns the exit code of the last command executed or 0 otherwise
+@mpi.envcli() {
+  @mpi.run_command "envcli" "--config-include=${MPI_ROOT_PATH}/cfg/.envcli.yml" "$@"
+  return $?
+}
+
 # Public: Runs a container command
 #
 # Arguments:
@@ -36,6 +48,6 @@
 #
 # Returns the exit code of the last command executed or 0 otherwise
 @mpi.container_command() {
-  @mpi.run_command "envcli" "--config-include=${MPI_ROOT_PATH}/cfg/.envcli.yml" "run" "$@"
+  @mpi.envcli "run" "$@"
   return $?
 }
