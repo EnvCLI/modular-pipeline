@@ -26,7 +26,7 @@ RUN echo "System Packages ..." &&\
     apk add --no-cache curl bash gettext git grep &&\
     echo "Tools ..." &&\
     echo "-> Getting EnvCLI ..." &&\
-    curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.4/envcli_linux_amd64 &&\
+    curl -L -s -o /usr/local/bin/envcli https://dl.bintray.com/envcli/golang/envcli/v0.6.4/linux_amd64 &&\
     chmod +x /usr/local/bin/envcli &&\
     echo "-> Pipeline" &&\
     chmod -R 755 /tmp/mpi &&\
