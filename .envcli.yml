@@ -89,13 +89,17 @@ images:
   description: Helm is a tool for managing Kubernetes charts. Charts are packages of pre-configured Kubernetes resources.
   provides:
   - helm
-  image: docker.io/envcli/helm:2.14.0
+  image: docker.io/lachlanevenson/k8s-helm:v3.0.0
   directory: /data
   cache:
   - name: kubectl
     directory: /root/.kube
-  - name: helm
-    directory: /root/.helm
+  - name: helm-cfg
+    directory: /root/.config/helm
+  - name: helm-data
+    directory: /root/.local/share/helm
+  - name: helm-cache
+    directory: /root/.cache/helm
 # - Ansible
 - name: Ansible
   description: Ansible is open source software that automates software provisioning, configuration management, and application deployment. Ansible connects via SSH, remote PowerShell or via other remote APIs.

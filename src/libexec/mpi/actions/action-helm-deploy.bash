@@ -46,10 +46,6 @@ function main()
     return 1
   fi
 
-  # prepare helm cli
-  @mpi.log_message "DEBUG" "initializing helm ..."
-  @mpi.container_command helm init --client-only --skip-refresh &> /dev/null
-
   # download chart or copy from local path (makes sure chart is in ${TMP_DIR}/helm-deploy-chart)
   @mpi.log_message "DEBUG" "load the helm chart"
   local DEPLOYMENT_CHART=${4:-$DEPLOYMENT_CHART}
@@ -66,14 +62,11 @@ function main()
   else
     @mpi.log_message "DEBUG" "downloading chart from remote $DEPLOYMENT_CHART"
     CHART_NAME=$(basename "${DEPLOYMENT_CHART}")
-    @mpi.kubernetes.download_chart "$DEPLOYMENT_CHART" "${DEPLOYMENT_CHART_VERSION:-}" "${TMP_DIR}/helm-deploy-chart/$CHART_NAME"
+    @mpi.helm.download_chart "$DEPLOYMENT_CHART" "${DEPLOYMENT_CHART_VERSION:-}" "${TMP_DIR}/helm-deploy-chart/"
   fi
 
   # make sure the target namespace exists
   @mpi.kubernetes.ensure_namespace "$DEPLOYMENT_NAMESPACE"
-
-  # init tiller
-  @mpi.kubernetes.initialize_tiller "$DEPLOYMENT_NAMESPACE"
 
   # registry access
   @mpi.kubernetes.setup_registry_access "$DEPLOYMENT_NAMESPACE"
@@ -117,14 +110,12 @@ function main()
 
   # deploy the helm chart
   #
-  # * tiller-namespace: the namespace helms service side component tiller runs in
   # * namespace: the target namespace we deploy into
   # * install: install the specified chart, if it is not deployed yet
   # * force: overwrite conflicting resources if required (some have immutable attributes)
   # * version: the version of the chart that should be used
   @mpi.log_message "INFO" "deploying using chart [${DEPLOYMENT_CHART}:${DEPLOYMENT_CHART_VERSION:-latest}] into namespace [$DEPLOYMENT_NAMESPACE] as [$DEPLOYMENT_ID]"
   @mpi.container_command helm upgrade \
-    --tiller-namespace "${DEPLOYMENT_NAMESPACE}" \
     --namespace "${DEPLOYMENT_NAMESPACE}" \
     --install \
     --force \
