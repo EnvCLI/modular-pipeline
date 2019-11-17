@@ -20,7 +20,9 @@
 
   if [[ "$interpreter" == 'bash' || "$interpreter" == 'sh' ]]; then
     @mpi.run_command . "$cmd_path" "$@"
-  elif [[ -z "$interpreter" ]]; then
+  elif [[ "$interpreter" == 'python3' ]]; then
+    @mpi.run_command "$cmd_path" "$@"
+  else
     echo "Could not parse interpreter from first line of $cmd_path.\n" >&2
     return 1
   fi

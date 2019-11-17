@@ -50,6 +50,12 @@ source "$MPI_ROOT_PATH/support/support.bash"
   case "${1:-}" in
     action)
       declare actionName="$2" scriptFile="$MPI_ROOT_PATH/actions/action-${2}.bash"
+
+      # TODO: temp to run python files
+      if [ -f "$MPI_ROOT_PATH/actions/action-${2}.py" ]; then
+        scriptFile="$MPI_ROOT_PATH/actions/action-${2}.py"
+      fi
+
       if [ ! -f "$scriptFile" ]; then
         @mpi.log_message "ERROR" "Action [${actionName}] does not exist!"
         return 1
@@ -66,6 +72,12 @@ source "$MPI_ROOT_PATH/support/support.bash"
       ;;
     stage)
       declare stageName="$2" scriptFile="$MPI_ROOT_PATH/stages/stage-${2}.bash"
+
+      # TODO: temp to run python files
+      if [ -f "$MPI_ROOT_PATH/stages/stage-${2}.py" ]; then
+        scriptFile="$MPI_ROOT_PATH/stages/stage-${2}.py"
+      fi
+
       if [ ! -f "$scriptFile" ]; then
         @mpi.log_message "ERROR" "Action [${actionName}] does not exist!"
         return 1
