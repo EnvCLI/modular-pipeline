@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
 
-. "${0%/*}/../libexec/mpi/mpi-core.bash"
+scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. "$scriptDir/../libexec/mpi/mpi-core.bash"
 @mpi "$@"
