@@ -10,6 +10,7 @@ This should help you modify workflow files by providing a few useful links to th
 - [YAML Syntax](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions)
 - [Expresssion Syntax](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions)
 - [Operators](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/contexts-and-expression-syntax-for-github-actions#operators)
+- [Modify PATH/Env/Logging](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/development-tools-for-github-actions)
 
 ## Notes
 

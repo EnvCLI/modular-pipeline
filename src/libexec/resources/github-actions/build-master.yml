@@ -1,0 +1,71 @@
+###
+# Pipeline: Modular Pipeline
+# Version: master
+###
+
+# meta
+name: CI
+
+# trigger
+on:
+  push:
+    branches:
+      - master
+
+# jobs
+jobs:
+  # stages
+  build:
+    # runtime environment
+    runs-on: ubuntu-latest
+
+    # global env
+    #env:
+    #  SCRIPT_LOG_LEVEL: "TRACE"
+
+    # jobs
+    steps:
+    # checkout
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    # pipeline steps
+    - id: prepare
+      name: Prepare
+      run: |
+        curl -L -s https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/install-prerequisites.sh | sudo bash -s
+        curl -L -s https://raw.githubusercontent.com/EnvCLI/modular-pipeline/master/install.sh | sudo bash -s /usr/local
+        . mpi stage prepare
+        echo "::set-output name=PROJECT_TYPE::PROJECT_TYPE"
+        echo "::set-output name=PACKAGE_TYPE::PACKAGE_TYPE"
+        echo "::set-output name=PUBLISH_TYPE::PUBLISH_TYPE"
+    # projectType
+    - name: Build
+      run: |
+        mpi stage build
+      if: success() && steps.prepare.outputs.PROJECT_TYPE != 'none'
+    - name: Test
+      run: |
+        mpi stage test
+      if: success() && steps.prepare.outputs.PROJECT_TYPE != 'none'
+    # packageType
+    - name: Package
+      run: |
+        source mpi stage package
+      if: success() && steps.prepare.outputs.PACKAGE_TYPE != 'none'
+    - name: Audit
+      run: |
+        mpi stage audit
+      if: success() && (steps.prepare.outputs.PROJECT_TYPE != 'none' || steps.prepare.outputs.PACKAGE_TYPE != 'none')
+    # publishType
+    #- name: Publish
+    #  env:
+    #    publish_kind: stable
+    #  run: |
+    #    mpi stage publish
+    #  if: success() && steps.prepare.outputs.PUBLISH_TYPE != 'none'
+    # CleanUp
+    - name: CleanUp
+      run: |
+        mpi stage cleanup
+      if: success() || failure()
