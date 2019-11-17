@@ -37,6 +37,8 @@ function main()
 
     # upload artifacts
 
+    @mpi.log_message "WARN" "publishType GitHub is not supported yet!"
+    return 0
   fi
 
   # release notes
