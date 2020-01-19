@@ -91,6 +91,19 @@ set -euo pipefail
   @mpi.prerequisites_docker
   @mpi.prerequisites_envcli
 
+  # proxy
+  export HTTP_PROXY=${HTTP_PROXY:-}
+  export HTTPS_PROXY=${HTTPS_PROXY:-}
+  export NO_PROXY=${NO_PROXY:-}
+  export PROXY_HOST=${PROXY_HOST:-}
+  export PROXY_PORT=${PROXY_PORT:-}
+  export JAVA_PROXY_OPTS="-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT"
+
+  # proxy for containers
+  envcli config set http-proxy "$HTTP_PROXY"
+  envcli config set https-proxy "$HTTPS_PROXY"
+  envcli config set no-proxy "$NO_PROXY"
+
   # normalizeci
   @mpi.normalizeci
 
@@ -112,13 +125,6 @@ set -euo pipefail
   export CONTAINER_REPO="${CONTAINER_REPO:-$NCI_CONTAINERREGISTRY_REPOSITORY}"
   export CONTAINER_TAG="${CONTAINER_TAG:-$NCI_COMMIT_REF_RELEASE}"
 
-  # proxy
-  export HTTP_PROXY=${HTTP_PROXY:-}
-  export HTTPS_PROXY=${HTTPS_PROXY:-}
-  export NO_PROXY=${NO_PROXY:-}
-  export PROXY_HOST=${PROXY_HOST:-}
-  export PROXY_PORT=${PROXY_PORT:-}
-  export JAVA_PROXY_OPTS="-Dhttp.proxyHost=$PROXY_HOST -Dhttp.proxyPort=$PROXY_PORT -Dhttps.proxyHost=$PROXY_HOST -Dhttps.proxyPort=$PROXY_PORT"
 
   # set run to true
   export MPI_PREPARE_ENVIRONMENT_RUN=true
