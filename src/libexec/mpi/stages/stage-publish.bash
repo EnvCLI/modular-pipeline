@@ -9,7 +9,7 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()
 {
-  # container registry
+  # publishType: containerregistry
   if [[ ${PUBLISH_TYPE} == "containerregistry" ]]; then
     if test -f "${TMP_DIR}/container-image/main.tar"; then
       # import image
@@ -24,11 +24,25 @@ function main()
     fi
   fi
 
-  # bintray
+  # publishType: nexus
+  if [[ ${PUBLISH_TYPE} == "nexus" ]]; then
+    if [[ ${PROJECT_TYPE} == "java" ]]; then
+      @mpi action java-publish
+    fi
+  fi
+
+  # publishType: bintray
   if [[ ${PUBLISH_TYPE} == "bintray" ]]; then
-    # for cli and libraries, TODO: add filter later
-    @mpi.log_message "INFO" "publishing bintray artifacts from dist/"
-    @mpi action bintray-publish
+    if [[ ${PROJECT_TYPE} == "java" ]]; then
+      @mpi action java-publish
+    fi
+  fi
+
+  # publishType: artifactory
+  if [[ ${PUBLISH_TYPE} == "artifactory" ]]; then
+    if [[ ${PROJECT_TYPE} == "java" ]]; then
+      @mpi action java-publish
+    fi
   fi
 
   # github
