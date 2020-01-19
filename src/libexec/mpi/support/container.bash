@@ -196,6 +196,10 @@ set -euo pipefail
     --build-arg "BASE_IMAGE=${baseImageRepo}@${overwriteWithTag}" \
     --build-arg "http_proxy=$HTTP_PROXY" \
     --build-arg "https_proxy=$HTTPS_PROXY" \
+    --build-arg "no_proxy=$NO_PROXY" \
+    --build-arg "HTTP_PROXY=$HTTP_PROXY" \
+    --build-arg "HTTPS_PROXY=$HTTPS_PROXY" \
+    --build-arg "NO_PROXY=$NO_PROXY" \
     --build-arg "proxy_host=$PROXY_HOST" \
     --build-arg "proxy_port=$PROXY_PORT" \
     --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
