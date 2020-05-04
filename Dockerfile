@@ -6,7 +6,7 @@
 ARG BASE_IMAGE
 
 # Base Image
-FROM ${BASE_IMAGE:-docker.io/library/docker:19.03.5}
+FROM ${BASE_IMAGE:-docker.io/library/docker:19}
 
 ############################################################
 # Artifacts
