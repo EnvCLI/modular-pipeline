@@ -44,7 +44,6 @@ RUN apk add --no-cache curl bash gettext &&\
   # helper to escape bash values
   printf "#!/usr/bin/env bash\n(echo \"\$1\" | sed -e 's/[]\/\$*.^[]/\\\\\\&/g')" >> /usr/local/bin/helper-escape-value &&\
   chmod +x /usr/local/bin/helper-escape-value &&\
-  cat /usr/local/bin/helper-escape-value &&\
 	# Entrypoint
 	printf '#!/usr/bin/env bash\n\
 set -euo pipefail\n\
@@ -104,19 +103,23 @@ cat /entrypoint.sh &&\
       proxy_set_header X-Forwarded-Host $http_host;\n\
       proxy_pass "$NGINX_FORWARDING_PROTOCOL://$NGINX_FORWARDING_TARGET_HOST$NGINX_FORWARDING_TARGET_PATH$1";\n\
     }\n\
-}' >> /etc/nginx/conf.d/default.apiforwarding &&\
-    cat /etc/nginx/conf.d/default.apiforwarding &&\
-    chown -R 101:0 /usr/share/nginx/html &&\
-    chmod 775 -R /usr/share/nginx/html &&\
-    chown -R 101:0 /etc/nginx
-USER 101
+}' >> /etc/nginx/conf.d/default.apiforwarding
 
 # copy files from rootfs to the container
 ADD dist /usr/share/nginx/html
 
+# permissions
+RUN chown -R 101:0 /usr/share/nginx/html &&\
+    chmod 775 -R /usr/share/nginx/html &&\
+    chown -R 101:0 /etc/nginx &&\
+    chmod 775 -R /etc/nginx
+
 ############################################################
 # Execution
 ############################################################
+
+# execution user
+USER 101
 
 # working directory
 WORKDIR /usr/share/nginx/html
