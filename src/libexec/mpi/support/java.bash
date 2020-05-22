@@ -66,7 +66,7 @@ set -euo pipefail
   else
     @mpi.log_message "INFO" "Couldn't find .mvn/wrapper/maven-wrapper.jar, downloading it ..."
     mkdir -p .mvn/wrapper
-    curl -L -s -o .mvn/wrapper/maven-wrapper.jar https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.5/maven-wrapper-0.5.5.jar
+    curl -L -s -o .mvn/wrapper/maven-wrapper.jar https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.6/maven-wrapper-0.5.6.jar
   fi
 
   # - check for maven wrapper properties file
