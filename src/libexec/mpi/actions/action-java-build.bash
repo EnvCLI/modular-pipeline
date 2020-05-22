@@ -12,7 +12,7 @@ function main()
   # run build
   if [[ $BUILD_SYSTEM == "gradle" ]]; then
     # gradle
-    @mpi.java.gradle clean assemble --no-daemon -Xlint:deprecation
+    @mpi.java.gradle clean assemble --no-daemon --warning-mode all
 
     # copy artifacts to ARTIFACT_DIR
     if [ -d "build/libs" ]; then
