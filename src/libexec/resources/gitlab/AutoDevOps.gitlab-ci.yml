@@ -111,10 +111,6 @@ Documentation:
   stage: documentation
   script:
     - mpi stage documentation
-  artifacts:
-    paths:
-    - public
-    expire_in: 1 hour
   only:
     refs:
     - feature/pipeline
