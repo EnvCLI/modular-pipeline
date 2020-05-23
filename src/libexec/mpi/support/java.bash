@@ -51,7 +51,7 @@ set -euo pipefail
   # maven config
   M2_HOME=${M2_HOME:-/root/.m2}
   MAVEN_CONFIG=${MAVEN_CONFIG:-}
-  MAVEN_DEFAULTVERSION=${MAVEN_DEFAULTVERSION:-3.6.2}
+  MAVEN_DEFAULTVERSION=${MAVEN_DEFAULTVERSION:-3.6.3}
 
   # maven wrapper
   if ! test -f "mvnw"; then
