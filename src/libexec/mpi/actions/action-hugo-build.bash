@@ -9,12 +9,11 @@ function main()
   # configuration
   HUGO_SOURCE=${HUGO_SOURCE:-.}
   HUGO_TARGET=${HUGO_TARGET:-${ARTIFACT_DIR}/hugo}
-  HUGO_URL=${HUGO_URL:-/}
 
   # get dependencies
   if test -f "${HUGO_SOURCE}/config.toml"; then
-    @mpi.log_message "INFO" "Generating hugo documentation from [${HUGO_SOURCE}], target [${HUGO_TARGET}], url [${HUGO_URL}]!"
-    @mpi.container_command hugo --source "${HUGO_SOURCE}" --minify --gc --baseUrl "${HUGO_URL}" --log --verboseLog
+    @mpi.log_message "INFO" "Generating hugo documentation from [${HUGO_SOURCE}], target [${HUGO_TARGET}]!"
+    @mpi.container_command hugo --source "${HUGO_SOURCE}" --minify --gc --log --verboseLog
 
     rm -rf "${HUGO_TARGET}"
     cp -R "${HUGO_SOURCE}/public" "${HUGO_TARGET}"

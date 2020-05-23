@@ -11,8 +11,6 @@ variables:
   GIT_DEPTH: 10
   # submodule support
   GIT_SUBMODULE_STRATEGY: recursive
-  # gitlab pages
-  HUGO_URL: "${HUGO_URL:-$CI_PAGES_URL}"
 
 # Services
 services:
