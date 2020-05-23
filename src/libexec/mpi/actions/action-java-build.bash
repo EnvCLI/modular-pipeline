@@ -13,11 +13,12 @@ function main()
   if [[ $BUILD_SYSTEM == "gradle" ]]; then
     # gradle
     @mpi.java.gradle clean assemble --no-daemon --warning-mode all
+    GRADLE_ARTIFACT_DIR=${GRADLE_ARTIFACT_DIR:-build/libs}
 
     # copy artifacts to ARTIFACT_DIR
-    if [ -d "build/libs" ]; then
-      @mpi.log_message "INFO" "taking artifacts from build/libs ..."
-      cp -R build/libs/*.jar "$ARTIFACT_DIR"
+    if [ -d "$GRADLE_ARTIFACT_DIR" ]; then
+      @mpi.log_message "INFO" "taking artifacts from $GRADLE_ARTIFACT_DIR ..."
+      find "$GRADLE_ARTIFACT_DIR" -name \*.jar -exec cp {} "$ARTIFACT_DIR" \;
     else
       @mpi.log_message "INFO" "no build dir, multi module projects have to copy relevant artifacts manually"
     fi
