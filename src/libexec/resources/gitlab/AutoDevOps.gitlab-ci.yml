@@ -12,7 +12,7 @@ variables:
   # submodule support
   GIT_SUBMODULE_STRATEGY: recursive
   # gitlab pages
-  HUGO_URL: "${HUGO_URL:-https://${CI_PROJECT_NAMESPACE}.gitlab.io/${CI_PROJECT_NAME}/}"
+  HUGO_URL: "${HUGO_URL:-$CI_PAGES_URL}"
 
 # Services
 services:
