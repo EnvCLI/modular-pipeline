@@ -48,8 +48,11 @@ main()
     shift
   done
 
+  # copy template file into tmp dir
+  cp -R "$MPI_RESOURCE_PATH/changelog" "$TMP_DIR"
+
   # generate changelog
-  @mpi.container_command git-chglog --config "$MPI_RESOURCE_PATH/changelog/publish-release-markdown.yml" --output "$CHANGELOG_OUTPUT_FILE" --no-emoji "$CHANGELOG_REF"
+  @mpi.container_command git-chglog --config "$TMP_DIR/changelog/publish-release-markdown.yml" --output "$CHANGELOG_OUTPUT_FILE" --no-emoji "$CHANGELOG_REF"
 }
 
 # entrypoint

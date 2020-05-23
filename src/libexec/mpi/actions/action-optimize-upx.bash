@@ -15,7 +15,6 @@ set -euo pipefail
 function main()
 {
   # configuration
-  ARTIFACT_DIR=${ARTIFACT_DIR:-dist}
   ARTIFACT_FILTER=${ARTIFACT_FILTER:-*}
   UPX_ARGS=${UPX_ARGS:---brute}
 
