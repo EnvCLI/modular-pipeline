@@ -30,8 +30,8 @@ stages:
   - test
   - package
   - audit
-  - publish
   - documentation
+  - publish
   - cleanup
 
 # Stage Template
@@ -105,33 +105,54 @@ Audit:
     variables:
       - $DISABLE_AUDIT
 
-# Stage - Publish
-Publish:
-  <<: *stage-template
-  stage: publish
-  script:
-    - mpi stage publish
-  only:
-    refs:
-    - branches
-    - tags
-  except:
-    variables:
-      - $DISABLE_PUBLISH
-
 # Stage - Documentation
 Documentation:
   <<: *stage-template
   stage: documentation
   script:
     - mpi stage documentation
+  artifacts:
+    paths:
+    - public
+    expire_in: 1 hour
   only:
     refs:
-    - branches
-    - tags
+    - feature/pipeline
+    - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+    #- /^v[0-9]+\.[0-9]+\.[0-9]+\-[a-z]+\.[0-9]+$/
   except:
     variables:
       - $DISABLE_DOCUMENTATION
+
+# GitLab Pages
+pages:
+  <<: *stage-template
+  stage: publish
+  script:
+  - cp -R dist/hugo public
+  artifacts:
+    paths:
+    - public
+  only:
+    variables:
+    - $DOCUMENTATION_TYPE == "hugo"
+    refs:
+    - branches
+    - tags
+
+# Stage - Publish
+Publish - Stable:
+  <<: *stage-template
+  stage: publish
+  script:
+    - mpi stage publish
+  only:
+    refs:
+    - feature/pipeline
+    - /^v[0-9]+\.[0-9]+\.[0-9]+$/
+  except:
+    variables:
+      - $DISABLE_PUBLISH
 
 # Stage - Performance
 CleanUp:
