@@ -121,7 +121,7 @@ images:
   description: jq is a lightweight and flexible command-line JSON processor
   provides:
   - jq
-  image: docker.io/fluidattacks/alpine-kaniko
+  image: docker.io/imega/jq:1.6
 # Changelog
 - name: git-chglog
   description: CHANGELOG generator implemented in Go (Golang).
