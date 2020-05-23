@@ -131,7 +131,7 @@ pages:
     - public
   only:
     variables:
-    - $DOCUMENTATION_TYPE == "hugo"
+    - $GITLAB_PAGES_ENABLED == "true"
     refs:
     - branches
     - tags
