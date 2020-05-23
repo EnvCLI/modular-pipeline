@@ -10,6 +10,7 @@ function main()
   documentationType="${DOCUMENTATION_TYPE:-none}"
   # - hugo
   if [ "${documentationType}" == "hugo" ]; then
+    HUGO_TARGET=${HUGO_TARGET:-${ARTIFACT_DIR}/docs}
     @mpi action hugo-build
   # - default
   else

@@ -125,7 +125,8 @@ pages:
   <<: *stage-template
   stage: publish
   script:
-  - cp -R dist/hugo public
+  # try to copy artifacts
+  - cp -R dist/docs public || true
   artifacts:
     paths:
     - public
