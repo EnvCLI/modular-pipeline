@@ -13,7 +13,7 @@ function main()
 
   # get dependencies
   if test -f "${HUGO_SOURCE}/config.toml"; then
-    @mpi.log_message "INFO" "Generating hugo documentation from [${HUGO_SOURCE}], target [${HUGO_TARGET}]!"
+    @mpi.log_message "INFO" "Generating hugo documentation from [${HUGO_SOURCE}], target [${HUGO_TARGET}], url [${HUGO_URL}]!"
     @mpi.container_command hugo --source "${HUGO_SOURCE}" --minify --gc --baseUrl "${HUGO_URL}" --log --verboseLog
 
     rm -rf "${HUGO_TARGET}"
