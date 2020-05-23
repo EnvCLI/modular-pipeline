@@ -1,0 +1,148 @@
+##
+# Modular Pipeline CI Configuration
+##
+
+# Variables
+variables:
+  # cluster
+  DOCKER_DRIVER: "${DOCKER_DRIVER:-overlay2}"
+  # git settings
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 10
+  # submodule support
+  GIT_SUBMODULE_STRATEGY: recursive
+  # gitlab pages
+  HUGO_URL: "${HUGO_URL:-https://${CI_PROJECT_NAMESPACE}.gitlab.io/${CI_PROJECT_NAME}/}"
+
+# Services
+services:
+- name: docker:19.03.9-dind
+
+# Cache
+cache: &project-cache
+  key: "$CI_PROJECT_ID"
+  paths:
+    - /cache/gradle/wrapper
+
+# Stages
+stages:
+  - build
+  - test
+  - package
+  - audit
+  - publish
+  - documentation
+  - cleanup
+
+# Stage Template
+.stage-template: &stage-template
+  image: docker.io/envcli/modular-pipeline:latest
+  artifacts:
+    paths:
+    - dist
+    - tmp
+    expire_in: 1 hour
+
+# Stage - Build
+Build:
+  <<: *stage-template
+  stage: build
+  cache:
+    <<: *project-cache
+    policy: pull-push
+  script:
+    - mpi stage build
+  only:
+    refs:
+    - branches
+    - tags
+  except:
+    variables:
+      - $DISABLE_BUILD
+
+# Stage - Test
+Test:
+  <<: *stage-template
+  stage: test
+  cache:
+    <<: *project-cache
+    policy: pull-push
+  script:
+    - mpi stage test
+  only:
+    refs:
+    - branches
+    - tags
+  except:
+    variables:
+      - $DISABLE_TEST
+
+# Stage - Package
+Package:
+  <<: *stage-template
+  stage: package
+  script:
+    - mpi stage package
+  only:
+    refs:
+    - branches
+    - tags
+  except:
+    variables:
+      - $DISABLE_PACKAGE
+
+# Stage - Audit
+Audit:
+  <<: *stage-template
+  stage: audit
+  script:
+    - mpi stage audit
+  only:
+    refs:
+    - branches
+    - tags
+  except:
+    variables:
+      - $DISABLE_AUDIT
+
+# Stage - Publish
+Publish:
+  <<: *stage-template
+  stage: publish
+  script:
+    - mpi stage publish
+  only:
+    refs:
+    - branches
+    - tags
+  except:
+    variables:
+      - $DISABLE_PUBLISH
+
+# Stage - Documentation
+Documentation:
+  <<: *stage-template
+  stage: documentation
+  script:
+    - mpi stage documentation
+  only:
+    refs:
+    - branches
+    - tags
+  except:
+    variables:
+      - $DISABLE_DOCUMENTATION
+
+# Stage - Performance
+CleanUp:
+  <<: *stage-template
+  stage: cleanup
+  script:
+    - mpi stage cleanup
+  only:
+    refs:
+    - branches
+    - tags
+  except:
+    variables:
+      - $DISABLE_CLEANUP

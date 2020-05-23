@@ -73,7 +73,7 @@ images:
   provides:
   - hugo
   - htmlproofer
-  image: docker.io/cibuilds/hugo:0.58.2
+  image: docker.io/cibuilds/hugo:0.71
 # Infrastructure
 # - Kubernetes
 - name: KubeCTL

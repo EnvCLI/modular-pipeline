@@ -22,7 +22,12 @@ RUN chmod -R 755 /tmp/mpi &&\
     /tmp/mpi/install.sh "/usr/local" &&\
     rm -rf /tmp/mpi &&\
     # Configuration
-    envcli config set cache-path "/cache"
+    mkdir -p /cache &&\
+    envcli config set cache-path "/cache" &&\
+    # Aliases
+    envcli install-aliases &&\
+    # Permissions
+    chmod +x /usr/local/bin/*
 
 ############################################################
 # Execution

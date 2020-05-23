@@ -30,5 +30,6 @@
 
   # log the message
   >&2 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${log_priority} : ${log_message}"
+
   return 0
 }
