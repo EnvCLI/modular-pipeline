@@ -34,6 +34,9 @@ main()
         print_help
         exit
         ;;
+      --config)
+        CHANGELOG_CONFIG_FILE=$VALUE
+        ;;
       --ref)
         CHANGELOG_REF=$VALUE
         ;;
