@@ -1,5 +1,5 @@
 style: none
-template: publish-release-markdown.tpl.md
+template: publish-release.tpl.md
 info:
   title: CHANGELOG
 options:

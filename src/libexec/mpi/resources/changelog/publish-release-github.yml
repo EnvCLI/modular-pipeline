@@ -1,0 +1,33 @@
+style: none
+template: publish-release-github.tpl.md
+info:
+  title: CHANGELOG
+options:
+  commits:
+    # filters:
+    #   Type:
+    #     - feat
+    #     - fix
+    #     - perf
+    #     - refactor
+    sort_by: Scope
+  commit_groups:
+    group_by: Type
+    sort_by: Title
+    title_maps:
+      feat: Features
+      feature: Features
+      fix: Bug Fixes
+      bugfix: Bug Fixes
+      perf: Performance Improvements
+      refactor: Code Refactoring
+      chore: Internal
+      docs: Documentation
+  header:
+    pattern: "^(\\w*)\\:\\s(.*)$"
+    pattern_maps:
+      - Type
+      - Subject
+  notes:
+    keywords:
+      - BREAKING CHANGE

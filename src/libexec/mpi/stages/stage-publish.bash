@@ -47,12 +47,35 @@ function main()
 
   # github
   if [[ ${PUBLISH_TYPE} == "github" ]]; then
-    # create github release
-
     # upload artifacts
 
     @mpi.log_message "WARN" "publishType GitHub is not supported yet!"
     return 0
+  fi
+
+  # kind: changelog
+  # - release notes
+  if [ "$NCI_COMMIT_REF_TYPE" == "tag" ]; then
+    # generate changelog
+    @mpi action changelog-generate --ref="$NCI_COMMIT_REF_NAME" --output="${TMP_DIR}/changelog.md"
+
+    # release notification
+    # - github
+    if [ -n "${GITHUB_TOKEN:-}" ] && [ -n "${GITHUB_REPOSITORY:-}" ]; then
+      CHANGELOG_CONFIG_FILE="${CHANGELOG_CONFIG_FILE_DISCORD:-$TMP_DIR/changelog/publish-release-github.yml}" @mpi action changelog-generate --ref="$NCI_COMMIT_REF_NAME" --output="${TMP_DIR}/changelog-github"
+      @mpi.github.create_release "$GITHUB_REPOSITORY" "$NCI_COMMIT_REF_NAME" "$(<${TMP_DIR}/changelog-github)"
+    fi
+    # - discord
+    if [ -n "${RELEASE_WEBHOOK_DISCORD:-}" ]; then
+      RELEASE_WEBHOOK_DISCORD_SENDERNAME="${RELEASE_WEBHOOK_DISCORD_SENDERNAME:-Releasebot}"
+      CHANGELOG_CONFIG_FILE="${CHANGELOG_CONFIG_FILE_DISCORD:-$TMP_DIR/changelog/publish-release-discord.yml}" @mpi action changelog-generate --ref="$NCI_COMMIT_REF_NAME" --output="${TMP_DIR}/changelog-discord"
+      @mpi.discord.send_message "RELEASE_WEBHOOK_DISCORD" "$RELEASE_WEBHOOK_DISCORD_SENDERNAME" "$(<${TMP_DIR}/changelog-discord)"
+    fi
+    # - rocketchat
+    if [ -n "${RELEASE_WEBHOOK_ROCKETCHAT:-}" ]; then
+      RELEASE_WEBHOOK_ROCKETCHAT_SENDERNAME="${RELEASE_WEBHOOK_ROCKETCHAT_SENDERNAME:-Releasebot}"
+      @mpi.rocketchat.send_message "RELEASE_WEBHOOK_ROCKETCHAT" "$RELEASE_WEBHOOK_ROCKETCHAT_SENDERNAME" "$(<${TMP_DIR}/changelog.md)"
+    fi
   fi
 }
 

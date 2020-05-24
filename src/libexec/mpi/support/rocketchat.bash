@@ -29,18 +29,21 @@ set -euo pipefail
 @mpi.rocketchat.send_message()
 {
   declare endpointVar="${1:-}" senderName="${2:-}" message="${3:-}"
+  senderNameEscaped=$(jq -aRs . <<< "$senderName")
+  contentEscaped=$(jq -aRs . <<< "$message")
 
   # prepare body
   httpPayload=$(cat <<EOF
 {
-  "username": "${senderName}",
-  "text": "${message}"
+  "username": ${senderNameEscaped},
+  "text": ${contentEscaped}
 }
 EOF
   )
 
   @mpi.run_command curl \
-    --silent \
+    --fail \
+    --no-progress-meter \
     --output /dev/null \
     -X POST \
     -H 'Content-type: application/json' \
