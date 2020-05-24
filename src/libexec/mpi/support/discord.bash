@@ -15,6 +15,9 @@ set -euo pipefail
 {
   declare endpointVar="${1:-}" senderName="${2:-}" message="${3:-}"
 
+  messageDump=$(mktemp -d ${TMP_DIR}/discord.XXXXXXXXX)
+  @mpi.log_message "INFO" "sending message to discord webhook [logfile:$messageDump]!"
+
   # post body
   httpPayload=$(cat <<EOF
 {
@@ -26,10 +29,11 @@ EOF
 
   # request
   @mpi.run_command curl \
-    --silent \
+    --no-progress-meter \
     --output /dev/null \
     -H "Content-Type: application/json" \
     -X POST \
     -d "$httpPayload" \
+    --trace-asci $messageDump \
     "${!endpointVar}"
 }

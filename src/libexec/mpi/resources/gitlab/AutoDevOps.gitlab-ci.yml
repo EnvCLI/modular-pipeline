@@ -30,7 +30,6 @@ stages:
   - audit
   - documentation
   - publish
-  - cleanup
 
 # Stage Template
 .stage-template: &stage-template
@@ -146,17 +145,3 @@ Publish - Stable:
   except:
     variables:
       - $DISABLE_PUBLISH
-
-# Stage - Performance
-CleanUp:
-  <<: *stage-template
-  stage: cleanup
-  script:
-    - mpi stage cleanup
-  only:
-    refs:
-    - branches
-    - tags
-  except:
-    variables:
-      - $DISABLE_CLEANUP
