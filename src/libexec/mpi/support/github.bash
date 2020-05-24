@@ -29,6 +29,7 @@ set -euo pipefail
 }
 EOF
   )
+  @mpi.log_message "INFO" "creating github release: $httpPayload!"
 
   @mpi.run_command curl \
     --fail \
@@ -36,6 +37,6 @@ EOF
     --output /dev/null \
     -H "Content-Type: application/json" \
     -X POST \
-    --data "$(GENERATE_POST_BODY)" \
+    --data "$(httpPayload)" \
     "https://api.github.com/repos/${repository}/releases?access_token=${GITHUB_TOKEN}"
 }
