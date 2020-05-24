@@ -14,8 +14,8 @@ set -euo pipefail
 @mpi.discord.send_message()
 {
   declare endpointVar="${1:-}" senderName="${2:-}" message="${3:-}"
-  senderNameEscaped=$(@mpi.container_command jq -aRs . <<< "$senderName")
-  contentEscaped=$(@mpi.container_command jq -aRs . <<< "$message")
+  senderNameEscaped=$(jq -aRs . <<< "$senderName")
+  contentEscaped=$(jq -aRs . <<< "$message")
 
   # post body
   httpPayload=$(cat <<EOF
@@ -25,7 +25,7 @@ set -euo pipefail
 }
 EOF
   )
-  @mpi.log_message "DEBUG" "sending discord message: $httpPayload!"
+  @mpi.log_message "INFO" "sending discord message: $httpPayload!"
 
   # request
   @mpi.run_command curl \

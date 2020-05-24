@@ -12,9 +12,9 @@ SCRIPT_DIR=$(dirname "$0")
 # prerequisites
 if grep -q "alpine" "/etc/os-release"; then
   echo "Installing alpine packages ..."
-  apk add --no-cache curl bash gettext git grep coreutils
+  apk add --no-cache curl bash gettext git grep coreutils jq
 elif grep -q "debian" "/etc/os-release" | grep -q "ubuntu" "/etc/os-release"; then
-  apt-get install -y curl bash gettext git grep coreutils
+  apt-get install -y curl bash gettext git grep coreutils jq
 fi
 
 # envcli
