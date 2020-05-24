@@ -21,7 +21,7 @@ function main()
   # - release notes
   if [ "$NCI_COMMIT_REF_TYPE" == "tag" ]; then
     # generate changelog
-    @mpi action changelog-generate --ref="$NCI_COMMIT_REF_NAME" --output="${TMP_DIR}/changelog"
+    @mpi action changelog-generate --ref="$NCI_COMMIT_REF_NAME" --output="${TMP_DIR}/changelog.md"
 
     # notification
     # - discord
@@ -31,7 +31,7 @@ function main()
     fi
     # - rocketchat
     if [ -n "$RELEASE_WEBHOOK_ROCKETCHAT" ]; then
-      @mpi.rocketchat.send_webhook "RELEASE_WEBHOOK_ROCKETCHAT" "Releasebot" "$(<${TMP_DIR}/changelog)"
+      @mpi.rocketchat.send_webhook "RELEASE_WEBHOOK_ROCKETCHAT" "Releasebot" "$(<${TMP_DIR}/changelog.md)"
     fi
   fi
 }
