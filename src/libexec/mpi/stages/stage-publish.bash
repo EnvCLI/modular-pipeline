@@ -57,7 +57,7 @@ function main()
   # - release notes
   if [ "$NCI_COMMIT_REF_TYPE" == "tag" ]; then
     # generate changelog
-    @mpi action changelog-generate --ref="$NCI_COMMIT_REF_NAME" --output="${TMP_DIR}/changelog.md"
+    # @mpi action changelog-generate --ref="$NCI_COMMIT_REF_NAME" --output="${TMP_DIR}/changelog.md"
 
     # release notification
     # - github

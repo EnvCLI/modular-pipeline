@@ -24,7 +24,7 @@ main()
   # - default values
   CHANGELOG_REF="${CHANGELOG_REF:-v0.0.1}"
   CHANGELOG_OUTPUT_FILE="${CHANGELOG_OUTPUT_FILE:-$TMP_DIR/changelog.md}"
-  CHANGELOG_CONFIG_FILE="${CHANGELOG_CONFIG_FILE:-$TMP_DIR/changelog/publish-release-markdown.yml}"
+  CHANGELOG_CONFIG_FILE="${CHANGELOG_CONFIG_FILE:-$TMP_DIR/changelog/publish-release.yml}"
   # - parse
   while [ "${1:-}" != "" ]; do
     PARAM=`echo $1 | awk -F= '{print $1}'`
