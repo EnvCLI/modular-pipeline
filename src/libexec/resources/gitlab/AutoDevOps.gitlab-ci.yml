@@ -90,18 +90,18 @@ Package:
       - $DISABLE_PACKAGE
 
 # Stage - Audit
-Audit:
-  <<: *stage-template
-  stage: audit
-  script:
-    - mpi stage audit
-  only:
-    refs:
-    - branches
-    - tags
-  except:
-    variables:
-      - $DISABLE_AUDIT
+#Audit:
+#  <<: *stage-template
+#  stage: audit
+#  script:
+#    - mpi stage audit
+#  only:
+#    refs:
+#    - branches
+#    - tags
+#  except:
+#    variables:
+#      - $DISABLE_AUDIT
 
 # Stage - Documentation
 Documentation:
@@ -112,8 +112,6 @@ Documentation:
   only:
     refs:
     - master
-    - /^v[0-9]+\.[0-9]+\.[0-9]+$/
-    #- /^v[0-9]+\.[0-9]+\.[0-9]+\-[a-z]+\.[0-9]+$/
   except:
     variables:
       - $DISABLE_DOCUMENTATION
@@ -132,8 +130,8 @@ pages:
     variables:
     - $GITLAB_PAGES_ENABLED == "true"
     refs:
-    - branches
-    - tags
+    - master
+    - /^v[0-9]+\.[0-9]+\.[0-9]+$/
 
 # Stage - Publish
 Publish - Stable:
@@ -143,7 +141,6 @@ Publish - Stable:
     - mpi stage publish
   only:
     refs:
-    - feature/pipeline
     - /^v[0-9]+\.[0-9]+\.[0-9]+$/
   except:
     variables:
