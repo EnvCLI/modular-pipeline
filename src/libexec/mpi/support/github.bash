@@ -25,7 +25,6 @@ set -euo pipefail
   httpPayload=$(cat <<EOF
 {
   "tag_name": "$version",
-  "target_commitish": "$version",
   "name": "$version",
   "body": $contentEscaped,
   "draft": false,
@@ -40,7 +39,9 @@ EOF
     --no-progress-meter \
     --output /dev/null \
     -H "Content-Type: application/json" \
+    -H "Accept: application/vnd.github.v3+json" \
+    -H "Authorization: token ${GITHUB_TOKEN}" \
     -X POST \
-    --data "$httpPayload" \
-    "https://api.github.com/repos/${repository}/releases?access_token=${GITHUB_TOKEN}"
+    -d "$httpPayload" \
+    "https://api.github.com/repos/${repository}/releases"
 }
