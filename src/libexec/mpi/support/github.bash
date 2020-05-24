@@ -15,7 +15,11 @@ set -euo pipefail
   # release notes
   contentEscaped=$(jq -aRs . <<< "$message")
 
-  # TODO: check tag for vX.X.X / vX.X.X-alpha.X / etc. to detect prereleases
+  # isPrerelease?
+  isPreRelease="true"
+  if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    isPreRelease="false"
+  fi
 
   # prepare body
   httpPayload=$(cat <<EOF
@@ -25,7 +29,7 @@ set -euo pipefail
   "name": "$version",
   "body": $contentEscaped,
   "draft": false,
-  "prerelease": false
+  "prerelease": $isPreRelease
 }
 EOF
   )
@@ -37,6 +41,6 @@ EOF
     --output /dev/null \
     -H "Content-Type: application/json" \
     -X POST \
-    --data "$(httpPayload)" \
+    --data "$httpPayload" \
     "https://api.github.com/repos/${repository}/releases?access_token=${GITHUB_TOKEN}"
 }
