@@ -9,8 +9,6 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()
 {
-  @mpi.log_message "INFO" "publish type is set to [${PUBLISH_TYPE}]."
-
   # publishType: containerregistry
   if [[ ${PUBLISH_TYPE} == "containerregistry" ]]; then
     if test -f "${TMP_DIR}/container-image/main.tar"; then
@@ -49,7 +47,7 @@ function main()
   # publishType: artifactory
   if [[ ${PUBLISH_TYPE} == "artifactory" ]]; then
     if [[ ${PROJECT_TYPE} == "java" ]]; then
-      @mpi action java-publish "${PUBLISH_TYPE}" "${NCI_COMMIT_REF_RELEASE}"
+      @mpi action java-publish
     else
       @mpi.log_message "INFO" "publish type ${PUBLISH_TYPE} not supported on project type [${PROJECT_TYPE}] ..."
       exit 1

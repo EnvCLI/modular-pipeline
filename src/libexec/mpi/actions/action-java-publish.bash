@@ -30,6 +30,9 @@ function main()
   # detect build system
   @mpi.java.detect_build_system
 
+  # print information
+  @mpi.log_message "INFO" "publish parameters - [PUBLISH_TYPE: $publishType, VERSION: $version, BUILDSYSTEM: $BUILD_SYSTEM]"
+
   # publishType: nexus
   if [ "$publishType" == "nexus" ]; then
     declare repoAddr="${3:-$NEXUS_ADDRESS}" repoUser="${4:-$NEXUS_USERNAME}" repoPass="${5:-$NEXUS_PASSWORD}"
