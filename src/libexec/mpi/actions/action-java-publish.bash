@@ -25,7 +25,7 @@ set -euo pipefail
 # Returns the exit code of the last command executed or 0 otherwise.
 function main()
 {
-  declare publishType="${1:-$PUBLISH_TYPE}" version="${2:-$NCI_COMMIT_REF_RELEASE}"
+  declare publishType="${PUBLISH_TYPE}" version="${NCI_COMMIT_REF_RELEASE}"
 
   # detect build system
   @mpi.java.detect_build_system
