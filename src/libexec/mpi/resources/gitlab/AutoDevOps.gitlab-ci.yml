@@ -42,7 +42,7 @@ stages:
     - tmp
     expire_in: 1 hour
   # retries
-  retry: 3
+  retry: 2
 
 # Stage - Build
 Build:
