@@ -33,12 +33,16 @@ stages:
 
 # Stage Template
 .stage-template: &stage-template
+  # container image
   image: docker.io/envcli/modular-pipeline:latest
+  # artifact storage
   artifacts:
     paths:
     - dist
     - tmp
     expire_in: 1 hour
+  # retries
+  retry: 3
 
 # Stage - Build
 Build:
