@@ -45,10 +45,25 @@ repositories:
     maintainers:
       - email: rmocius@gmail.com
         name: rimusz
+  - name: cloudposse
+    url: https://charts.cloudposse.com/incubator/
+    maintainers:
+      - email: ops@cloudposse.com
+      - name: cloudposse
+  - name: cockroachdb
+    url: https://charts.cockroachdb.com/
+    maintainers:
+      - email: helm-charts@cockroachlabs.com
+        name: Cockroach Labs
   - name: keel
     url: https://charts.keel.sh
     maintainers:
       - email: karolis.rusenas@gmail.com
+        name: rusenask
+  - name: webhookrelay
+    url: https://charts.webhookrelay.com
+    maintainers:
+      - email: karolis@webhookrelay.com
         name: rusenask
   - name: appscode
     url: https://charts.appscode.com/stable/
@@ -61,10 +76,21 @@ repositories:
       - name: GitLab
         email: distribution@gitlab.com
   - name: bitnami
-    url: https://charts.bitnami.com
+    url: https://charts.bitnami.com/bitnami
     maintainers:
       - name: Bitnami
         email: containers@bitnami.com
+  - name: puppet
+    url: https://puppetlabs.github.io/puppetserver-helm-chart
+    maintainers:
+      - name: Pupperware Team
+        email: pupperware@puppet.com
+      - name: underscorgan
+        email: morgan@puppet.com
+      - name: Xtigyro
+        email: miroslav.hadzhiev@gmail.com
+      - name: slconley
+        email: slconley@gmail.com
   - name: fluxcd
     url: https://charts.fluxcd.io
     maintainers:
@@ -73,20 +99,30 @@ repositories:
   - name: jetstack
     url: https://charts.jetstack.io/
     maintainers:
-      - email: james.munnelly@jetstack.io
+      - email: cert-manager-maintainers@jetstack.io
+        name: cert-manager project maintainers
+      - email: james@munnelly.eu
         name: James Munnelly
-      - email: christian.simon@jetstack.io
-        name: Christian Simon
   - name: ibm-charts
     url: https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
     maintainers:
       - email: icp@ibm.com
         name: IBM Cloud Private
+  - name: infobloxopen
+    url: https://infobloxopen.github.io/cert-manager/
+    maintainers:
+      - email: dwells@infoblox.com
+        name: Drew Wells
   - name: kanister
     url: https://charts.kanister.io/
     maintainers:
       - email: helm@kasten.io
         name: Kanister
+  - name: fikaworks
+    url: https://fikaworks.github.io/helm-charts
+    maintainers:
+      - email: etienne.tremel@fika.works
+        name: Etienne Tremel
   - name: flagger
     url: https://flagger.app
     maintainers:
@@ -128,6 +164,11 @@ repositories:
         name: Lucas Roesler
       - email: stefan.prodan@gmail.com
         name: Stefan Prodan
+  - name: inlets
+    url: https://inlets.github.io/inlets-operator
+    maintainers:
+      - email: alex@openfaas.com
+        name: Alex Ellis
   - name: odavid
     url: https://odavid.github.io/k8s-helm-charts
     maintainers:
@@ -185,12 +226,12 @@ repositories:
       - email: yourls@yourls.org
         name: YOURLS
   - name: hazelcast
-    url: https://hazelcast.github.io/charts/
+    url: https://hazelcast-charts.s3.amazonaws.com/
     maintainers:
       - email: rafal@hazelcast.com
         name: Rafal Leszko
-      - email: guglielmo@hazelcast.com
-        name: Guglielmo Nigri
+      - email: hasan@hazelcast.com
+        name: Hasan Celik
       - email: mesut@hazelcast.com
         name: Mesut Celik
   - name: nginx
@@ -201,16 +242,12 @@ repositories:
     url: https://helm.nginx.com/edge
     maintainers:
       - email: kubernetes@nginx.com
-  - name: cic
-    url: https://citrix.github.io/citrix-k8s-ingress-controller/
-    maintainers:
-      - email: priyanka.sharma@citrix.com
-      - email: subash.dangol@citrix.com
   - name: citrix
-    url: https://citrix.github.io/citrix-istio-adaptor/
+    url: https://citrix.github.io/citrix-helm-charts/
     maintainers:
       - email: dhiraj.gedam@citrix.com
       - email: subash.dangol@citrix.com
+      - email: priyanka.sharma@citrix.com
   - name: zooz
     url: https://zooz.github.io/helm/
     maintainers:
@@ -224,12 +261,20 @@ repositories:
     maintainers:
       - name: Loki Maintainers
         email: lokiproject@googlegroups.com
+  - name: grafana
+    url: https://github.com/grafana/helm-charts
+    maintainers:
+      - email: zanhsieh@gmail.com
   - name: microsoft
     url: https://microsoft.github.io/charts/repo/
     maintainers:
       - name: mstf-charts
         email: msft-charts-support@microsoft.com
       - email: dabanda@microsoft.com
+  - name: expediagroup
+    url: https://expediagroup.github.io/helm-charts/repo
+    maintainers:
+      - email: oss@expedia.com
   - name: codecentric
     url: https://codecentric.github.io/helm-charts
     maintainers:
@@ -248,6 +293,10 @@ repositories:
       - email: eric@herbrandson.com
   - name: funkypenguin
     url: https://funkypenguin.github.io/helm-charts
+    maintainers:
+      - email: helm-charts@funkypenguin.co.nz
+  - name: geek-cookbook
+    url: https://geek-cookbook.github.io/charts
     maintainers:
       - email: helm-charts@funkypenguin.co.nz
   - name: mattermost
@@ -273,7 +322,7 @@ repositories:
       - email: aaron@ecomaz.net
         name: Aaron Schlesinger
   - name: zentainer
-    url: https://charts.zenatiner.app
+    url: https://charts.zentainer.app
     maintainers:
       - name: Will Newby
         email: will@zentainer.app
@@ -320,7 +369,7 @@ repositories:
       - email: dong@wenqi.us
         name: Vink Dong
   - name: kedacore
-    url: https://kedacore.azureedge.net/helm
+    url: https://kedacore.github.io/charts
     maintainers:
       - email: ahmels@microsoft.com
         name: Ahmed ElSayed
@@ -355,7 +404,7 @@ repositories:
         name: G-Research Open Source Developers
   - name: smallstep
     url: https://smallstep.github.io/helm-charts/
-    mainteiners:
+    maintainers:
       - email: techadmin@smallstep.com
         name: Smallstep Open Source Developers
   - name: volcano
@@ -520,6 +569,10 @@ repositories:
     maintainers:
       - email: andrew.nelson@yugabyte.com
         name: Andrew Nelson
+      - email: ram@yugabyte.com
+        name: Ram Vaidyanathan
+      - email: arnav@yugabyte.com
+        name: Arnav Agarwal
   - name: crate
     url: https://crate.github.io/helm-charts
     maintainers:
@@ -587,3 +640,968 @@ repositories:
     maintainers:
       - email: kerkhove.tom@gmail.com
         name: Tom Kerkhove
+  - name: cgroschupp
+    url: https://cgroschupp.github.io/helm-charts/
+    maintainers:
+      - email: christian@groschupp.org
+        name: Christian Groschupp
+  - name: jenkins
+    url: https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart
+    maintainers:
+      - email: tomasz.sek.88@gmail.com
+        name: Tomasz Sęk
+      - email: jal-khalili@virtuslab.com
+        name: Jakub Al-Khalili
+  - name: jenkinsci
+    url: https://charts.jenkins.io/
+    maintainers:
+      - email: mail@torstenwalter.de
+        name: Torsten Walter
+  - name: talend
+    url: https://talend.github.io/helm-charts-public/stable
+    maintainers:
+      - email: sgandon@talend.com
+        name: Sebastien Gandon
+      - email: asaintsever@talend.com
+        name: Alain Saint-Sever
+  - name: softonic
+    url: https://charts.softonic.io
+    maintainers:
+      - email: sre@softonic.com
+        name: Softonic
+  - name: aws
+    url: https://aws.github.io/eks-charts
+    maintainers:
+      - email: stefan.prodan@gmail.com
+        name: Stefan Prodan
+      - email: nic@amazon.com
+        name: Nick Turner
+      - email: jsstraub@amazon.com
+        name: James Straub
+      - email: meduri@amazon.com
+        name: Kiran Meduri
+      - email: sabhayav@amazon.com
+        name: Vipul Sabhayav
+      - email: jaypipes@amazon.com
+        name: Jay Pipes
+      - email: mhausler@amazon.com
+        name: Micah Hausler
+  - name: kubeinvaders
+    url: https://lucky-sideburn.github.io/helm-charts/
+    maintainers:
+      - email: luckysideburn@gmail.com
+        name: Eugenio Marzo
+  - name: wso2
+    url: https://helm.wso2.com
+    maintainers:
+      - email: chiranga@wso2.com
+        name: Chiranga Alwis
+      - email: aaquiff@wso2.com
+        name: Aaquiff Rauf
+      - email: thilinama@wso2.com>
+        name: Thilina Manamgoda
+      - email: dilana@wso2.com
+        name: Dilan U. Ariyaratne
+      - email: jayanga@wso2.com
+        name: Jayanga Dissanayake
+      - email: shariq@wso2.com
+        name: Shariq Muhammed
+  - name: crossplane
+    url: https://charts.crossplane.io/master/
+    maintainers:
+      - email: info@crossplane.io
+        name: Crossplane Maintainers
+  - name: lohmag
+    url: https://lohmag.github.io/helm-charts/
+    maintainers:
+      - email: massalitine@gmail.com
+        name: Nikita Massalitin
+  - name: cern
+    url: https://charts.cern.ch/cern/
+    maintainers:
+      - email: helm-repo-admins@cern.ch
+        name: CERN Helm Repo Admins
+  - name: chubaofs
+    url: https://chubaofs.github.io/chubaofs-charts
+    maintainers:
+      - email: chengyu_l@126.com
+        name: Chengyu Liu
+  - name: ruguodangshi
+    url: https://ruguodangshi.github.io
+    maintainers:
+      - email: shih5@chinaunicom.cn
+        name: Hao Shi
+  - name: mailu
+    url: https://mailu.github.io/helm-charts/
+    maintainers:
+      - email: mailu@michael.wyraz.de
+        name: Michael Wyraz
+  - name: gp42
+    url: https://ops42.org/helm-charts
+    maintainers:
+      - email: gennadiy.potapov@gmail.com
+        name: Gennady Potapov
+  - name: sumologic
+    url: https://sumologic.github.io/sumologic-kubernetes-collection
+    maintainers:
+      - email: collection@sumologic.com
+        name: Sumo Logic Data Collection
+  - name: inspur
+    url: https://inspur-iop.github.io/charts/
+    maintainers:
+      - email: koulq@inspur.com
+        name: Leach Kou
+      - email: zhaoshan@inspur.com
+        name: Eric Zhao
+  - name: backube
+    url: https://backube.github.io/helm-charts/
+    maintainers:
+      - email: jstrunk@redhat.com
+        name: John Strunk
+  - name: k8s-land
+    url: https://charts.k8s.land
+    maintainers:
+      - email: charlie+helm@charliedrage.com
+        name: Charlie Drage
+  - name: fold
+    url: https://charts.foldapp.com
+    maintainers:
+      - email: tom.dickman@foldapp.com
+        name: Tom Dickman
+  - name: vmware-tanzu
+    url: https://vmware-tanzu.github.io/helm-charts/
+    maintainers:
+      - email: carlisia@vmware.com
+        name: Carlisia Campos
+      - email: brubakern@vmware.com
+        name: Nolan Brubaker
+  - name: pangeo
+    url: https://pangeo-data.github.io/helm-chart/
+    maintainers:
+      - email: jacob@tomlinson.email
+        name: Jacob Tomlinson
+      - email: rpa@ldeo.columbia.edu
+        name: Ryan Abernathy
+      - email: jhamman@ucar.edu
+        name: Joe Hamman
+  - name: jaegertracing
+    url: https://jaegertracing.github.io/helm-charts
+    maintainers:
+      - email: ctadeu@gmail.com
+        name: cpanato
+      - email: naseemkullah@gmail.com
+        name: naseemkullah
+  - name: riskfocus
+    url: https://riskfocus.github.io/helm-charts-public/
+    maintainers:
+      - email: charts-maintainers@riskfocus.com
+        name: Riskfocus
+  - name: flink-operator
+    url: https://googlecloudplatform.github.io/flink-on-k8s-operator/
+    maintainers:
+      - email: dataproc-dev@google.com
+        name: dataproc-dev
+  - name: halkeye
+    url: https://halkeye.github.io/helm-charts/
+    maintainers:
+      - email: helm@gavinmogan.com
+        name: Gavin Mogan
+  - name: wavefront
+    url: https://wavefronthq.github.io/helm/
+    maintainers:
+      - email: ptessier@vmware.com
+        name: Pierre Tessier
+      - email: rvikram@vmare.com
+        name: Vikram Raman
+  - name: eclipse-iot
+    url: https://www.eclipse.org/packages/charts/
+    maintainers:
+      - email: thomas.jaeckle@bosch-si.com
+        name: Thomas Jaeckle
+      - email: jreimann@redhat.com
+        name: Jens Reimann
+      - email: carsten.lohmann@bosch-si.com
+        name: Carsten Lohmann
+      - email: axel.koehler@kiwigrid.com
+        name: Axel Koehler
+  - name: ntppool
+    url: https://charts.ntppool.org/
+    maintainers:
+      - email: ask@ntppool.org
+        name: Ask Bjørn Hansen
+  - name: pomerium
+    url: https://helm.pomerium.io
+    maintainers:
+      - name: Pomerium Team
+        email: info@pomerium.io
+  - name: http-folder
+    url: https://aureliengasser.github.io/charts
+    maintainers:
+      - email: aurelien.gasser@gmail.com
+        name: Aurélien Gasser
+      - email: clement@gauter.im
+        name: Clément Gautier
+  - name: kong
+    url: https://charts.konghq.com
+    maintainers:
+      - name: Harry
+        email: harry@konghq.com
+      - name: Shashi
+        email: shashi@konghq.com
+      - name: Travis
+        email: traines@konghq.com
+  - name: dynatrace
+    url: https://raw.githubusercontent.com/Dynatrace/helm-charts/master/repos/stable/
+    maintainers:
+      - email: support@dynatrace.com
+        name: Dynatrace LLC
+  - name: mojo2600
+    url: https://mojo2600.github.io/pihole-kubernetes/
+    maintainers:
+      - email: christian.erhardt@mojo2k.de
+        name: Christian Erhardt
+      - email: jeff@billimek.com
+        name: Jeff Billimek
+  - name: purestorage
+    url: https://purestorage.github.io/helm-charts
+    maintainers:
+      - name: purestorage
+        email: pure-helm@purestorage.com
+  - name: solace
+    url: https://solaceproducts.github.io/pubsubplus-kubernetes-quickstart/helm-charts/
+    maintainers:
+      - email: balazs.czoma@solace.com
+        name: bczoma
+      - email: ken.barr@solace.com
+        name: KenBarr
+      - email: philippe.khalife@solace.com
+        name: PhilippeKhalife
+      - email: support@solace.com
+        name: Solace Support
+  - name: ckotzbauer
+    url: https://ckotzbauer.github.io/helm-charts
+    maintainers:
+      - name: ckotzbauer
+        email: christian.kotzbauer@gmail.com
+  - name: larribas
+    url: https://larribas.me/helm-charts
+    maintainers:
+      - name: larribas
+        email: contact@larribas.me
+  - name: ealenn
+    url: https://ealenn.github.io/charts
+    maintainers:
+      - name: Rudy Marchandise
+        email: ealenn.github-helm@yahoo.com
+  - name: dgraph
+    url: https://charts.dgraph.io
+    maintainers:
+      - name: Dgraph Labs
+        email: contact@dgraph.io
+      - name: Daniel Mai
+        email: daniel@dgraph.io
+      - name: Prashant Shahi
+        email: prashant@dgraph.io
+  - name: oteemo
+    url: https://oteemo.github.io/charts/
+    maintainers:
+      - name: Oteemo Support
+        email: charts@oteemo.com
+  - name: tietoevryfs
+    url: https://evryfs.github.io/helm-charts/
+    maintainers:
+      - name: TietoEVRY Financial Services
+        email: fsdevops@evry.com
+  - name: cleardata
+    url: https://helm.cleardata.com/
+    maintainers:
+      - name: ClearDATA Locate Team
+        email: locate-support@cleardata.com
+  - name: meshery
+    url: https://meshery.io/charts/
+    maintainers:
+      - name: Aisuko
+        email: urakiny@gmail.com
+      - name: Lee Calcote
+        email: lee.calcote@layer5.io
+      - name: Layer5 Authors
+        email: community@layer5.io
+  - name: blazure
+    url: https://charts.blazure.com
+    maintainers:
+      - email: ryan@ryanholt.net
+        name: Ryan Holt
+  - name: cdi
+    url: http://raw.githubusercontent.com/woohhan/cdi-chart/master/
+    maintainers:
+      - name: Woohyung Han
+        email: woohhan@gmail.com
+  - name: quarks
+    url: https://cloudfoundry-incubator.github.io/quarks-helm/
+    maintainers:
+      - name: project-quarks
+        email: project-quarks@googlegroups.com
+  - name: dniel
+    url: https://dniel.github.io/charts/
+    maintainers:
+      - name: Daniel Engfeldt
+        email: daniel@engfeldt.net
+  - name: cowboysysop
+    url: https://cowboysysop.github.io/charts/
+    maintainers:
+      - name: Sébastien Prud'homme
+        email: sebastien.prudhomme@gmail.com
+  - name: influxdata
+    url: https://helm.influxdata.com/
+    maintainers:
+      - name: David McKay
+        email: rawkode@influxdata.com
+      - name: Giacomo Tirabassi
+        email: giacomo@influxdata.com
+  - name: eclipse-dirigible
+    url: https://dirigiblelabs.github.io/charts/
+    maintainers:
+      - email: yordan.pavlov@sap.com
+        name: Yordan Pavlov
+      - email: nedelcho.delchev@sap.com
+        name: Nedelcho Delchev
+      - email: georgi.pavlov@sap.com
+        name: Georgi Pavlov
+  - name: microcks
+    url: https://microcks.io/helm
+    maintainers:
+      - name: Laurent Broudoux
+        email: laurent.broudoux@gmail.com
+  - name: enapter
+    url: https://enapter.github.io/charts/
+    maintainers:
+      - name: Andrey Voronkov
+        email: avoronkov@enapter.com
+      - name: Enapter
+        email: admin@enapter.com
+  - name: camptocamp
+    url: http://charts.camptocamp.com
+    maintainers:
+      - name: Camptocamp Infrastructure Department
+        email: kubernetes@camptocamp.com
+  - name: camel-k
+    url: https://apache.github.io/camel-k/charts/
+    maintainers:
+      - email: dev@camel.apache.org
+        name: Apache Camel Team
+      - email: nferraro@apache.org
+        name: Nicola Ferraro
+  - name: trickster
+    url: https://helm.tricksterproxy.io/
+    maintainers:
+      - email: james@ranson.org
+        name: James Ranson
+      - email: limitlessearth@gmail.com
+        name: Adam Ross
+  - name: gradiant
+    url: https://gradiant.github.io/charts/
+    maintainers:
+      - email: cgiraldo@gradiant.org
+        name: Carlos Giraldo
+  - name: runix
+    url: https://helm.runix.net/
+    maintainers:
+      - email: rowanruseler@gmail.com
+        name: Rowan Ruseler
+  - name: jitterbit
+    url: https://jitterbit.github.io/charts/
+    maintainers:
+      - name: Sean Krail
+        email: sean.krail@jitterbit.com
+  - name: franzinc
+    url: https://franz.com/ftp/pub/helm/charts/
+    maintainers:
+      - name: Franz Inc
+        email: support@franz.com
+  - name: prometheus-msteams
+    url: https://prometheus-msteams.github.io/helm-chart
+    maintainers:
+      - name: John Bryan Sazon
+        email: jb.jorge.sazon@gmail.com
+      - name: Andy Knapp
+        email: andy.knapp.ak@googlemail.com
+  - name: dandydeveloper
+    url: https://dandydeveloper.github.io/charts
+    maintainers:
+      - email: salimsalaues@gmail.com
+        name: ssalaues
+      - email: aaron.layfield@gmail.com
+        name: dandydeveloper
+  - name: brannon
+    url: https://helm.brannon.online
+    maintainers:
+      - name: Brannon Dorsey
+        email: brannon@brannondorsey.com
+  - name: pcktdmp
+    url: https://pcktdmp.github.io/charts
+    maintainers:
+      - name: Serge van Namen
+        email: serge@se-cured.org
+  - name: fluent
+    url: https://fluent.github.io/helm-charts
+    maintainers:
+      - email: eduardo@treasure-data.com
+        name: edsiper
+      - email: naseemkullah@gmail.com
+        name: naseemkullah
+  - name: ververica
+    url: https://charts.ververica.com/
+    maintainers:
+      - name: Ververica
+        email: platform@ververica.com
+  - name: smueller18
+    url: https://smueller18.gitlab.io/helm-charts
+    maintainers:
+      - name: Stephan Müller
+        email: mail@stephanmueller.eu
+  - name: renovate
+    url: https://docs.renovatebot.com/helm-charts
+    maintainers:
+      - name: Jamie Magee
+        email: jamie.magee@gmail.com
+  - name: dacruz21
+    url: https://dacruz21.github.io/helm-charts
+    maintainers:
+      - name: David Cruz
+        email: david@typokign.com
+  - name: kuberhealthy
+    url: https://comcast.github.io/kuberhealthy/helm-repos
+    maintainers:
+      - name: tp-cts-kubesquad
+      - email: tp-cts-kubesquad@comcast.com
+  - name: equinor-charts
+    url: https://equinor.github.io/helm-charts/charts/
+    maintainers:
+      - name: Stian Ovrevage
+      - email: stian@peritusconsulting.no
+  - name: touk
+    url: https://helm-charts.touk.pl/public/
+    maintainers:
+      - name: TouK Helm Charts Team
+        email: helm-charts@touk.pl
+  - name: codimd
+    url: https://helm.codimd.dev/
+    maintainers:
+      - name: HackMD Inc. Dev Team
+        email: support@hackmd.io
+  - name: carlosjgp
+    url: https://carlosjgp.github.io/open-charts/
+    maintainers:
+      - name: Carlos Juan Gómez Peñalver
+        email: carlosjuangp@gmail.com
+  - name: fyipe
+    url: https://fyipe.com/chart
+    maintainers:
+      - name: Fyipe Engineering Team
+        email: engineering@fyipe.com
+  - name: nats
+    url: https://nats-io.github.io/k8s/helm/charts/
+    maintainers:
+      - name: Waldemar Quevedo
+      - email: wally@nats.io
+  - name: pndaproject
+    url: https://pndaproject.github.io/pnda-helm-chart/
+    maintainers:
+      - name: Carlos Giraldo
+        email: cgiraldo@gradiant.org
+      - name: Donald Hunter
+        email: donaldh@cisco.com
+  - name: wyrihaximusnet
+    url: https://helm.wyrihaximus.net/
+    maintainers:
+      - name: Cees-Jan Kiewiet
+        email: helm@wyrihaximus.net
+  - name: tremolosecurity
+    url: https://nexus.tremolo.io/repository/helm/
+    maintainers:
+      - name: Tremolo Security
+        email: helm@tremolo.io
+  - name: cronce
+    url: https://charts.cronce.io/
+    maintainers:
+      - name: Mike Cronce
+        email: helm@cronce.io
+  - name: verdaccio
+    url: https://charts.verdaccio.org/
+    maintainers:
+      - name: Juan Picado
+        email: juanpicado19@gmail.com
+      - name: Jhon Mike
+        email: jhon.msdev@gmail.com
+  - name: enix
+    url: https://charts.enix.io/
+    maintainers:
+      - name: Antoine Millet
+        email: antoine.millet@enix.fr
+  - name: mox
+    url: https://helm.mox.sh/
+    maintainers:
+      - name: Javier Moreno
+        email: jmox@protonmail.com
+  - name: saikatharryc
+    url: https://saikatharryc.github.io/helm/
+    maintainers:
+      - name: Saikat Chakrabortty
+        email: saikatchakrabortty2@gmail.com
+  - name: volantmq
+    url: https://volantmq.github.io/helm/
+    maintainers:
+      - name: Ante Gulin
+        email: gnante0@gmail.com
+      - name: Saikat Chakrabortty
+        email: saikatchakrabortty2@gmail.com
+  - name: ukfast
+    url: https://ukfast.github.io/helm-charts
+    maintainers:
+      - name: Lee Spottiswood
+        email: lee.spottiswood@ukfast.co.uk
+  - name: redash
+    url: https://getredash.github.io/contrib-helm-chart/
+    maintainers:
+      - name: Owen Barton
+        email: owen.barton@civicactions.com
+  - name: emagtechlabs
+    url: https://emagtechlabs.github.io/helm-charts/
+    maintainers:
+      - name: Beniamin Calota
+        email: beniamin.calota@emag.ro
+  - name: gitkent
+    url: https://gitkent.github.io/helm-charts/
+    maintainers:
+      - name: Kent Lee
+        email: kentw3e.lee@gmail.com
+  - name: logiqai
+    url: https://logiqai.github.io/helm-charts/
+    maintainers:
+      - name: Ranjan Parthasarathy
+        email: ranjan@logiq.ai
+  - name: couchbase
+    url: https://couchbase-partners.github.io/helm-charts/
+    maintainers:
+      - name: Couchbase Cloud Native Team
+        email: kubernetes@couchbase.com
+      - name: Tommie McAfee
+        email: tommie@couchbase.com
+  - name: hokstack
+    url: https://charts.hokstack.io
+    maintainers:
+      - name: Rohit Sharma
+        email: rohitrsh@gmail.com
+      - name: Shubhomoy Biswas
+        email: shubhomoy.biswas95@gmail.com
+  - name: redsky
+    url: https://redskyops.dev/charts/
+    maintainers:
+      - name: Red Sky Ops Team
+        email: info@redskyops.dev
+  - name: honeycomb
+    url: https://honeycombio.github.io/helm-charts/
+    maintainers:
+      - name: Pierre Tessier
+        email: pierre@honeycomb.io
+  - name: azure-apim-gateway
+    url: https://azure.github.io/api-management-self-hosted-gateway/helm-charts/
+    maintainers:
+      - email: apimgmt@microsoft.com
+        name: Azure API Management team
+      - email: kerkhove.tom@gmail.com
+        name: Tom Kerkhove
+  - name: stardog
+    url: https://stardog-union.github.io/helm-charts/
+    maintainers:
+      - name: Stardog Union
+        email: tech@stardog.com
+  - name: erpnext
+    url: https://helm.erpnext.com
+    maintainers:
+      - name: revant
+        email: revant@revant.me
+      - name: thunderbottom
+        email: chinmaydpai@gmail.com
+  - name: ladeit
+    url: https://ladeit.github.io/charts
+    maintainers:
+      - name: Ladeit Team
+        email: jiiiuxiii@gmail.com
+  - name: pozetron
+    url: https://www.pozetron.com/helm/
+    maintainers:
+      - name: Pozetron Inc
+        email: charts@pozetroninc.com
+  - name: sudermanjr
+    url: https://charts.sudermanjr.com
+    maintainers:
+      - name: Andrew Suderman
+        email: andrew@sudermanjr.com
+  - name: cnieg
+    url: https://cnieg.github.io/helm-charts
+    maintainers:
+      - name: CNIEG maintainers
+        email: maintainers@cnieg.fr
+  - name: snyk
+    url: https://snyk.github.io/kubernetes-monitor/
+    maintainers:
+      - name: Snyk Support
+        email: support@snyk.io
+  - name: weblate
+    url: https://helm.weblate.org
+    maintainers:
+      - name: Patrick Ruckstuhl
+        email: patrick@ch.tario.org
+      - name: Weblate Support
+        email: info@weblate.org
+  - name: solr-operator
+    url: https://bloomberg.github.io/solr-operator/charts/
+    maintainers:
+      - name: Houston Putman
+        email: houston@apache.org
+  - name: inaccel
+    url: https://setup.inaccel.com/helm
+    maintainers:
+      - name: InAccel
+        email: info@inaccel.com
+  - name: neo4j
+    url: https://neo4j-contrib.github.io/neo4j-helm/
+    maintainers:
+      - name: Neo4j
+        email: ecosystem@neo4j.com
+  - name: hashicorp
+    url: https://helm.releases.hashicorp.com
+    maintainers:
+      - name: HashiCorp
+        email: consul-tool@googlegroups.com
+  - name: eddycharly
+    url: https://eddycharly.github.io/tekton-helm
+    maintainers:
+      - name: eddycharly
+        email: ceb@agriconomie.com
+  - name: datawire
+    url: https://getambassador.io/
+    maintainers:
+      - name: Datwire
+        email: dev@datawire.io
+  - name: apicheck
+    url: https://bbva.github.io/apicheck/charts/
+    maintainers:
+      - name: innovation4security
+        email: security.group@bbva.com
+  - name: waldur
+    url: https://opennode.github.io/waldur-helm/
+    maintainers:
+      - name: Waldur
+        email: info@opennodecloud.com
+  - name: milvus
+    url: https://milvus-io.github.io/milvus-helm/
+    maintainers:
+      - name: milvus-dev
+        email: dev.milvus@zilliz.com
+      - name: community
+        email: community@zilliz.com
+  - name: sysdiglabs
+    url: https://sysdiglabs.github.io/charts/
+    maintainers:
+      - name: team cloud native
+        email: team-cloud-native@sysdig.com
+      - name: Néstor Salceda
+        email: nestor.salceda@sysdig.com
+  - name: yunikorn
+    url: https://apache.github.io/incubator-yunikorn-release
+    maintainers:
+      - name: YuniKorn Dev
+        email: dev@yunikorn.apache.org
+  - name: k8s-dashboard
+    url: https://kubernetes.github.io/dashboard
+    maintainers:
+      - name: Kubernetes SIG UI
+        email: kubernetes-sig-ui@googlegroups.com
+      - name: Cédric de Saint Martin
+        email: cedric@desaintmartin.fr
+  - name: newrelic
+    url: https://helm-charts.newrelic.com
+    maintainers:
+      - name: Douglas Camata
+        email: dcamata@newrelic.com
+      - name: Jorik van der Werf
+        email: jvanderwerf@nwerelic.com
+  - name: codesim
+    url: https://helm.codesim.com
+    maintainers:
+      - name: Codesim LLC
+        email: info@codesim.com
+  - name: curity
+    url: https://github.com/curityio/idsvr-helm
+    maintainers:
+      - name: Curity AB
+        email: info@curity.io
+  - name: dash-ops
+    url: http://dash-ops.github.io/helm-charts
+    maintainers:
+      - name: Jhon Mike
+        email: jhon.msdev@gmail.com
+  - name: rasooll
+    url: https://rasooll.github.io/helm-charts
+    maintainers:
+      - name: Rasool Safari
+        email: safari@rasooll.com
+  - name: openebs
+    url: https://openebs.github.io/charts
+    maintainers:
+      - name: Kiran Mova
+        email: kiran.mova@mayadata.io
+      - name: Prateek Pandey
+        email: prateek.pandey@openebs.io
+  - name: pulsar
+    url: https://pulsar.apache.org/charts
+    maintainers:
+      - name: Apache Pulsar Team
+        email: dev@pulsar.apache.org
+  - name: kafkaesque
+    url: https://helm.kafkaesque.io
+    maintainers:
+      - name: Chris Bartholomew
+        email: chris.bartholomew@kafkaesque.io
+      - name: Ming Luo
+        email: itestmycode@gmail.com
+  - name: cape
+    url: https://charts.cape.sh
+    maintainers:
+      - name: Cloud Native Team
+        email: cloudnative@biqmind.com
+  - name: wombat
+    url: https://esl.github.io/helm-chart/charts/wombatChart
+    maintainers:
+      - name: Mohamed Ali Khechine
+        email: mohamed.ali.khechine@erlang-solutions.com
+      - name: Tamás Lengyel
+        email: tamas.lengyel@erlang-solutions.com
+  - name: hkube
+    url: https://hkube.io/helm
+    maintainers:
+      - name: Maty Zisserman
+        email: maty21@gmail.com
+      - name: Yehiyam Livneh
+        email: yehiyam@gmail.com
+  - name: maesh
+    url: https://containous.github.io/maesh/charts
+    maintainers:
+      - name: Containous Team
+        email: helm-charts@containo.us
+  - name: traefik
+    url: https://containous.github.io/traefik-helm-chart
+    maintainers:
+      - name: Containous Team
+        email: helm-charts@containo.us
+  - name: cgsimmons
+    url: https://cgsimmons.github.io/charts
+    maintainers:
+      - name: Chris Simmons
+        email: chris.simmons.alt@gmail.com
+  - name: splicemachine
+    url: https://splicemachine.github.io/charts
+    maintainers:
+      - name: cloud-support
+        email: cloud-support@splicemachine.com
+  - name: streamnative
+    url: https://charts.streamnative.io
+    maintainers:
+      - name: StreamNative Support
+        email: support@streamnative.io
+  - name: kured
+    url: https://weaveworks.github.io/kured
+    maintainers:
+      - name: dholbach
+        email: daniel@weave.works
+      - name: ckotzbauer
+        email: christian.kotzbauer@gmail.com
+  - name: litmuschaos
+    url: https://litmuschaos.github.io/litmus-helm/
+    maintainers:
+      - name: Karthik S
+        email: karthik.s@mayadata.io
+      - name: Maria Kotlyarevskaya
+        email: jasssstkn@yahoo.com
+  - name: pl-helm-charts
+    url: https://pranay-lonkar.github.io/helm-charts
+    maintainers:
+      - name: pranay-lonkar
+        email: pranaylonkar19@gmail.com
+  - name: mlohr
+    url: https://helm-charts.mlohr.com/
+    maintainers:
+      - name: Matthias Lohr
+        email: mail@mlohr.com
+  - name: twingate
+    url: https://twingate.github.io/helm-charts
+    maintainers:
+      - name: Twingate Ops
+        email: ops@twingate.com
+  - name: longhorn
+    url: https://charts.longhorn.io
+    maintainers:
+      - name: Longhorn maintainers
+        email: maintainers@longhorn.io
+      - name: Sheng Yang
+        email: sheng@yasker.org
+  - name: falcosecurity
+    url: https://falcosecurity.github.io/charts
+    maintainers:
+      - name: The Falco Authors
+        email: cncf-falco-dev@lists.cncf.io
+  - name: aerokube
+    url: https://charts.aerokube.com/
+    maintainers:
+      - name: Aerokube Team
+        email: support@aerokube.com
+  - name: sonatype
+    url: https://sonatype.github.io/helm3-charts/
+    maintainers:
+      - name: Sonatype
+        email: ops@sonatype.com
+  - name: gissilabs
+    url: https://gissilabs.github.io/charts/
+    maintainers:
+      - name: Silvio Gissi
+        email: silvio@gissilabs.com
+  - name: sematext
+    url: https://cdn.sematext.com/helm-charts/
+    maintainers:
+      - name: Ciprian Hacman
+        email: ciprian.hacman@sematext.com
+  - name: ctron
+    url: https://ctron.github.io/helm-charts/
+    maintainers:
+      - name: Jens Reimann
+        email: ctron@dentrassi.de
+  - name: balle-petersen
+    url: https://charts.balle-petersen.org/
+    maintainers:
+      - name: Tobias Balle-Petersen
+        email: tobiasbp@gmail.com
+  - name: storageos
+    url: https://charts.storageos.com
+    maintainers:
+      - name: StorageOS
+        email: support@storageos.com
+  - name: datadog
+    url: https://helm.datadoghq.com
+    maintainers:
+      - name: Datadog
+        email: support@datadoghq.com
+  - name: w2bro
+    url: https://radio-charts.w2bro.dev
+    maintainers:
+      - name: Ross McKelvie
+        email: charts@w2b.ro
+  - name: minio
+    url: https://helm.min.io/
+    maintainers:
+      - name: Minio
+        email: dev@minio.io
+  - name: fermosit
+    url: https://harbor.fermosit.es/chartrepo/library
+    maintainers:
+      - name: Jose Manuel Ferrer
+        email: elmanytas@gmail.com
+  - name: astarte
+    url: https://helm.astarte-platform.org
+    maintainers:
+      - name: Astarte Maintainers
+        email: maintainers@astarte-platform.org
+  - name: codit
+    url: https://coditeu.github.io/charts
+    maintainers:
+      - name: Tom Kerkhove
+        email: tom.kerkhove@codit.eu
+  - name: stevehipwell
+    url: https://stevehipwell.github.io/helm-charts/
+    maintainers:
+      - name: Steve Hipwell
+        email: steve.hipwell@gmail.com
+  - name: vertigo
+    url: https://charts.vertigo.com.br/
+    maintainers:
+      - name: Devops
+        email: devops@vertigo.com.br
+  - name: neoskop
+    url: https://charts.neoskop.dev
+    maintainers:
+      - name: Arne Diekmann
+        email: diekmann@neoskop.de
+      - name: Neoskop
+        email: devops@neoskop.de
+  - name: vulcanlink
+    url: https://vulcanlink.github.io/charts/
+    maintainers:
+      - name: Leo Vigna
+        email: leo@vulcan.link
+  - name: descheduler
+    url: https://kubernetes-sigs.github.io/descheduler/
+    maintainers:
+      - name: Kubernetes SIG Scheduling
+        email: kubernetes-sig-scheduling@googlegroups.com
+  - name: percona
+    url: https://percona-lab.github.io/percona-helm-charts/
+    maintainers:
+      - name: Ivan Pylypenko
+        email: ivan.pylypenko@percona.com
+  - name: kuma
+    url: https://kumahq.github.io/charts
+    maintainers:
+      - name: Nikolay Nikolaev
+        email: nikolay.nikolaev@konghq.com
+      - name: Austin Cawley-Edwards
+        email: austin.cawley@gmail.com
+  - name: anchore
+    url: https://charts.anchore.io
+    maintainers:
+      - name: Brady Todhunter
+        email: bradyt@anchore.com
+      - name: Zach Hill
+        email: zach@anchore.com
+  - name: polyaxon
+    url: https://charts.polyaxon.com/
+    maintainers:
+      - name: Polyaxon
+        email: contact@polyaxon.com
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
+    maintainers:
+      - name: ChiefAlexander
+        email: acharder4@yahoo.com
+      - name: aledbf
+        email: aledbf@gmail.com
+  - name: lakefs
+    url: https://charts.lakefs.io
+    maintainers:
+      - name: Treeverse
+        email: support@treeverse.io
+  - name: duyet
+    url: https://duyet.github.io/charts
+    maintainers:
+      - name: duyet
+        email: me@duyet.net
+  - name: kvaps
+    url: https://kvaps.github.io/charts
+    maintainers:
+      - name: Andrei Kvapil
+        email: kvapss@gmail.com
+  - name: questdb
+    url: https://helm.questdb.io
+    maintainers:
+      - name: QuestDB Team
+        email: containers@questdb.io
+  - name: lightstepsatellite
+    url: https://lightstep.github.io/lightstep-satellite-helm-chart/
+    maintainers:
+      - name: Adam Johnson
+        email: ajohnson@lightstep.com
+  - name: fasterbytes
+    url: https://fasterbytes.github.io/charts
+    maintainers:
+      - name: John Teague
+        email: john@fasterbytes.com
