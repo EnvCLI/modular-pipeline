@@ -80,7 +80,7 @@ images:
   description: Use the Kubernetes command-line tool, kubectl, to deploy and manage applications on Kubernetes.
   provides:
   - kubectl
-  image: docker.io/lachlanevenson/k8s-kubectl:v1.18.2
+  image: docker.io/lachlanevenson/k8s-kubectl:v1.19.0
   cache:
   - name: kubectl
     directory: /root/.kube
@@ -89,7 +89,7 @@ images:
   description: Helm is a tool for managing Kubernetes charts. Charts are packages of pre-configured Kubernetes resources.
   provides:
   - helm
-  image: docker.io/lachlanevenson/k8s-helm:v3.2.0
+  image: docker.io/lachlanevenson/k8s-helm:v3.3.1
   directory: /data
   cache:
   - name: kubectl
