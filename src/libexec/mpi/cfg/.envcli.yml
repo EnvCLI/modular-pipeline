@@ -5,7 +5,7 @@ images:
   description: Go (golang) is a general purpose, higher-level, imperative programming language.
   provides:
   - go
-  image: docker.io/golang:1.14-buster
+  image: docker.io/golang:1.15
   cache:
   - name: golang
     directory: /go/pkg
@@ -127,7 +127,7 @@ images:
   description: CHANGELOG generator implemented in Go (Golang).
   provides:
   - git-chglog
-  image: docker.io/envcli/git-chglog:0.9.1
+  image: docker.io/envcli/git-chglog:1.0.0
 # Presentation
 - name: RevealJS
   description: The HTML Presentation Framework
