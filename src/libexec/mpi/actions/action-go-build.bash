@@ -98,10 +98,6 @@ function main()
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'windows_amd64'; then
     _build_go windows amd64 &
   fi
-  # darwin_386
-  if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_386'; then
-    _build_go darwin 386 &
-  fi
   # darwin_amd64
   if echo "$ARTIFACT_BUILD_ARCHS" | grep -q 'darwin_amd64'; then
     _build_go darwin amd64 &
